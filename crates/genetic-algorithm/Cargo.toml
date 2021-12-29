@@ -1,5 +1,5 @@
 [package]
-name = "brain"
+name = "genetic-algorithm"
 version = "0.1.0"
 edition = "2021"
 
