@@ -1,7 +1,11 @@
+use std::iter::once;
+
 use rand::Rng;
 pub struct LayerTopology {
     pub neurons: usize,
 }
+
+#[derive(Debug)]
 pub struct Network {
     layers: Vec<Layer>,
 }
@@ -22,8 +26,33 @@ impl Network {
             .iter()
             .fold(inputs.to_vec(), |inputs, layer| layer.propagate(inputs))
     }
+    pub fn weights(&self) -> impl Iterator<Item = f32> + '_ {
+        self.layers
+            .iter()
+            .flat_map(|layer| layer.neurons.iter())
+            .flat_map(|neuron| once(&neuron.bias).chain(&neuron.weights))
+            .cloned()
+    }
+    #[must_use]
+    pub fn from_weights(layers: &[LayerTopology], weights: impl IntoIterator<Item = f32>) -> Self {
+        assert!(layers.len() > 1);
+
+        let mut weights = weights.into_iter();
+
+        let layers = layers
+            .windows(2)
+            .map(|layers| Layer::from_weights(layers[0].neurons, layers[1].neurons, &mut weights))
+            .collect();
+
+        if weights.next().is_some() {
+            panic!("got too many weights");
+        }
+
+        Self { layers }
+    }
 }
 
+#[derive(Debug)]
 struct Layer {
     neurons: Vec<Neuron>,
 }
@@ -45,8 +74,19 @@ impl Layer {
             .map(|neuron| neuron.propagate(&inputs))
             .collect()
     }
+    pub fn from_weights(
+        input_size: usize,
+        output_size: usize,
+        weights: &mut dyn Iterator<Item = f32>,
+    ) -> Self {
+        let neurons = (0..output_size)
+            .map(|_| Neuron::from_weights(input_size, weights))
+            .collect();
+        Self { neurons }
+    }
 }
 
+#[derive(Debug)]
 struct Neuron {
     bias: f32,
     weights: Vec<f32>,
@@ -66,6 +106,13 @@ impl Neuron {
             .map(|(i, w)| i * w)
             .sum::<f32>();
         (output + self.bias).max(0.0)
+    }
+    pub fn from_weights(output_size: usize, weights: &mut dyn Iterator<Item = f32>) -> Self {
+        let bias = weights.next().expect("Not enough weights");
+        let weights = (0..output_size)
+            .map(|_| weights.next().expect("Not enough weights"))
+            .collect();
+        Self { bias, weights }
     }
 }
 

@@ -66,7 +66,7 @@ impl IntoIterator for Chromosome {
         self.genes.into_iter()
     }
 }
-
+#[derive(Clone, Debug)]
 pub struct RouletteWheelSelection;
 
 impl RouletteWheelSelection {
@@ -90,8 +90,13 @@ impl SelectionMethod for RouletteWheelSelection {
     }
 }
 
-pub struct UniformCrossOver {}
-impl CrossoverMethod for UniformCrossOver {
+pub struct UniformCrossover;
+impl UniformCrossover {
+    pub fn new() -> Self {
+        Self
+    }
+}
+impl CrossoverMethod for UniformCrossover {
     fn crossover(
         &self,
         rng: &mut dyn RngCore,
@@ -104,6 +109,11 @@ impl CrossoverMethod for UniformCrossOver {
             .zip(parent_b.iter())
             .map(|(a, b)| if rng.gen_bool(0.5) { *a } else { *b })
             .collect()
+    }
+}
+impl Default for UniformCrossover {
+    fn default() -> Self {
+        UniformCrossover::new()
     }
 }
 pub struct GaussianMutation {
@@ -156,12 +166,12 @@ where
             mutation_method: Box::new(mutation_method),
         }
     }
-    pub fn evolve<I>(&self, rng: &mut dyn RngCore, population: &[I]) -> Vec<I>
+    pub fn evolve<I>(&self, rng: &mut dyn RngCore, population: &[I]) -> (Vec<I>, Statistics)
     where
         I: Individual,
     {
         assert!(!population.is_empty());
-        (0..population.len())
+        let new_population = (0..population.len())
             .map(|_| {
                 let parent_a = self.selection_method.select(rng, population);
                 let parent_b = self.selection_method.select(rng, population);
@@ -173,7 +183,9 @@ where
                 self.mutation_method.mutate(rng, &mut child);
                 I::create(child)
             })
-            .collect()
+            .collect();
+        let stats = Statistics::new(population);
+        (new_population, stats)
     }
 }
 
@@ -228,5 +240,50 @@ mod tests {
         }
         let expected_histogram = BTreeMap::from_iter(vec![(1, 98), (2, 202), (3, 278), (4, 422)]);
         assert_eq!(actual_histogram, expected_histogram);
+    }
+}
+
+pub struct Statistics {
+    min_fitness: f32,
+    max_fitness: f32,
+    avg_fitness: f32,
+}
+
+impl Statistics {
+    fn new<I>(population: &[I]) -> Self
+    where
+        I: Individual,
+    {
+        assert!(!population.is_empty());
+
+        let mut min_fitness = population[0].fitness();
+        let mut max_fitness = min_fitness;
+        let mut sum_fitness = 0.0;
+
+        for individual in population {
+            let fitness = individual.fitness();
+
+            min_fitness = min_fitness.min(fitness);
+            max_fitness = max_fitness.max(fitness);
+            sum_fitness += fitness;
+        }
+
+        Self {
+            min_fitness,
+            max_fitness,
+            avg_fitness: sum_fitness / (population.len() as f32),
+        }
+    }
+
+    pub fn min_fitness(&self) -> f32 {
+        self.min_fitness
+    }
+
+    pub fn max_fitness(&self) -> f32 {
+        self.max_fitness
+    }
+
+    pub fn avg_fitness(&self) -> f32 {
+        self.avg_fitness
     }
 }

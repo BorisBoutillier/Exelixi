@@ -1,11 +1,29 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Hello wasm-pack!</title>
-  </head>
-  <body>
-    <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
-    <script src="./bootstrap.js"></script>
-  </body>
+
+<head>
+  <meta charset="utf-8">
+  <title>Shorelark</title>
+</head>
+<style>
+  body {
+    background: #1f2639;
+    /* A nice navy blue color that I found by
+                            a nice trial and error */
+  }
+
+  #train {
+    position: absolute;
+    top: 0;
+    margin: 15px;
+  }
+</style>
+
+<body>
+  <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
+  <canvas id="viewport" width="800" height="800"></canvas>
+  <button id="train">Train</button>
+  <script src="./bootstrap.js"></script>
+</body>
+
 </html>
