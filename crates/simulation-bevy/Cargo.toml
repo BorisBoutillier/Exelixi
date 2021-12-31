@@ -1,0 +1,15 @@
+[package]
+name = "simulation-bevy"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rand = "0.8"
+bevy = { path = "/home/boris/work/rust/gits/bevy"}
+neural-network = { path = "../neural-network" }
+genetic-algorithm = { path = "../genetic-algorithm" }
+
+[dev-dependencies]
+rand_chacha = "0.3"
