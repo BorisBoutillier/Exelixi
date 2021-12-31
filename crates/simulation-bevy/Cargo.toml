@@ -7,7 +7,9 @@ edition = "2021"
 
 [dependencies]
 rand = "0.8"
-bevy = { path = "/home/boris/work/rust/gits/bevy"}
+#bevy = { path = "/home/boris/work/rust/gits/bevy"}
+bevy = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_egui = { git = "https://github.com/jakobhellermann/bevy_egui", branch = "bevy-main"}
 neural-network = { path = "../neural-network" }
 genetic-algorithm = { path = "../genetic-algorithm" }
 

@@ -11,7 +11,7 @@ pub fn spawn_animals(
 ) {
     let window = windows.get_primary().unwrap();
     let mut rng = thread_rng();
-    for _ in 0..40 {
+    for _ in 0..N_ANIMAL {
         commands
             .spawn_bundle(SpriteBundle {
                 sprite: Sprite {
@@ -32,7 +32,30 @@ pub fn spawn_animals(
             })
             .insert(Velocity {
                 linear: rng.gen_range(V_LINEAR_MIN..V_LINEAR_MAX),
-                angular: rng.gen_range(-V_ANGULAR_MAX..V_ANGULAR_MAX),
+                angular: 0.0,
             });
+    }
+}
+
+pub fn spawn_foods(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Windows>) {
+    let window = windows.get_primary().unwrap();
+    let mut rng = thread_rng();
+    for _ in 0..N_FOOD {
+        commands.spawn_bundle(SpriteBundle {
+            sprite: Sprite {
+                custom_size: Some(Vec2::new(5.0, 5.0)),
+                ..Default::default()
+            },
+            transform: Transform {
+                translation: Vec3::new(
+                    rng.gen_range((-window.width() / 2.0)..(window.width() / 2.0)),
+                    rng.gen_range((-window.height() / 2.0)..(window.height() / 2.0)),
+                    1.0,
+                ),
+                ..Default::default()
+            },
+            texture: asset_server.load("food.png"),
+            ..Default::default()
+        });
     }
 }
