@@ -1,14 +1,18 @@
 use crate::prelude::*;
 
-#[allow(clippy::type_complexity)]
 pub fn evolve(
     mut commands: Commands,
     mut simulation: ResMut<Simulation>,
     mut animals: Query<(Entity, &mut Stomach, &Brain, &Eye)>,
     mut transforms: Query<&mut Transform, Or<(With<Food>, With<Animal>)>>,
     config: Res<SimulationConfig>,
+    time: Res<Time>,
 ) {
+    if !simulation.running {
+        return;
+    }
     simulation.age += 1;
+    simulation.duration += time.delta();
     if simulation.age == config.generation_length {
         let half_width = config.environment_size.width / 2.0;
         let half_height = config.environment_size.height / 2.0;

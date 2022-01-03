@@ -1,3 +1,4 @@
+#![allow(clippy::type_complexity)]
 mod animal_individual;
 mod brain;
 mod components;
@@ -9,8 +10,11 @@ mod systems;
 mod prelude {
     pub use std::f32::consts::{FRAC_PI_2, PI};
 
+    pub use bevy::diagnostic::Diagnostics;
+    pub use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
     pub use bevy::prelude::*;
     pub use bevy_egui::{egui, EguiContext, EguiPlugin, EguiSettings};
+
     pub use rand::{thread_rng, Rng, RngCore};
 
     pub use lib_genetic_algorithm as ga;
@@ -47,6 +51,7 @@ fn main() {
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)
+        .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(EguiPlugin)
         .add_startup_system(setup)
         .add_startup_system(spawn_animals)
