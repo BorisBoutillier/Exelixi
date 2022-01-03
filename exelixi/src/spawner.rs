@@ -83,13 +83,12 @@ pub fn spawn_foods(
 }
 
 pub fn spawn_floor(mut commands: Commands, config: Res<SimulationConfig>) {
-    println!("SPAWN {}", config.environment_size.width as f32);
     commands
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::new(
-                    config.environment_size.width as f32,
-                    config.environment_size.height as f32,
+                    config.environment_size.width as f32 + 20.0,
+                    config.environment_size.height as f32 + 20.0,
                 )),
                 color: Color::rgb(0.05, 0.0, 0.2),
                 ..Default::default()

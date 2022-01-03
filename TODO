@@ -1,0 +1,19 @@
+-- User Interaction
+. Allow user to move the Camera:
+    . Click + move = move around the environment
+    . Wheel Up/Down = Unzoom/zoom
+    . Middle Click : Recenter on environment
+. Allow user modification of the simulation configuraton
+. Status bar show current simulation status ( age/generation/stats)
+. Allow interaction with simulation speed (pause/start/)
+
+-- Simulation
+. Replace Stomach Satiation, with body energy management:
+    . Give a cost to each action:
+        . process vision
+            Based on number of cells and fov_range, fov_angle.
+        . process_brain
+            Based on non-epsilon weights
+        . process_movement:
+            exponential cost of linear/angular velocity
+    . Eating food raise energy.

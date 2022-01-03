@@ -1,7 +1,8 @@
 [package]
-name = "simulation-bevy"
+name = "exelixi"
 version = "0.1.0"
 edition = "2021"
+authors = [ "Boris Boutillier [boris.boutillier@gmail.com]" ]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -10,8 +11,8 @@ rand = "0.8"
 #bevy = { path = "/home/boris/work/rust/gits/bevy"}
 bevy = { git = "https://github.com/bevyengine/bevy", branch = "main" }
 bevy_egui = { git = "https://github.com/jakobhellermann/bevy_egui", branch = "bevy-main"}
-neural-network = { path = "../neural-network" }
-genetic-algorithm = { path = "../genetic-algorithm" }
+lib-neural-network = { path = "../libs/neural-network" }
+lib-genetic-algorithm = { path = "../libs/genetic-algorithm" }
 
 [dev-dependencies]
 rand_chacha = "0.3"

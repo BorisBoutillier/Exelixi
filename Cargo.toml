@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "crates/*",
-#   "wasm-crates/*",
+    "libs/*",
+    "exelixi",
 ]
 resolver = "2"

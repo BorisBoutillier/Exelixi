@@ -13,8 +13,8 @@ mod prelude {
     pub use bevy_egui::{egui, EguiContext, EguiPlugin, EguiSettings};
     pub use rand::{thread_rng, Rng, RngCore};
 
-    pub use genetic_algorithm as ga;
-    pub use neural_network as nn;
+    pub use lib_genetic_algorithm as ga;
+    pub use lib_neural_network as nn;
 
     pub use crate::animal_individual::*;
     pub use crate::brain::*;
@@ -39,6 +39,13 @@ use prelude::*;
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::BLACK))
+        .insert_resource(WindowDescriptor {
+            width: 1280.0,
+            height: 800.0,
+            title: "Exelixi".to_string(),
+            vsync: false,
+            ..Default::default()
+        })
         .add_plugins(DefaultPlugins)
         .add_plugin(EguiPlugin)
         .add_startup_system(setup)
