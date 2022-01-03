@@ -1,0 +1,22 @@
+use crate::prelude::*;
+
+pub fn collision(
+    mut animals: Query<(&mut Stomach, &Transform), Without<Food>>,
+    mut foods: Query<&mut Transform, With<Food>>,
+    windows: Res<Windows>,
+) {
+    let window = windows.get_primary().unwrap();
+    let mut rng = thread_rng();
+    for (mut animal_stomach, animal_transform) in animals.iter_mut() {
+        for mut food_transform in foods.iter_mut() {
+            let distance = (animal_transform.translation - food_transform.translation).length();
+            if distance <= 10.0 {
+                food_transform.translation.x =
+                    rng.gen_range((-window.width() / 2.0)..(window.width() / 2.0));
+                food_transform.translation.y =
+                    rng.gen_range((-window.height() / 2.0)..(window.height() / 2.0));
+                animal_stomach.satiation += 1.0;
+            }
+        }
+    }
+}

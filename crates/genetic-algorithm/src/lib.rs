@@ -15,7 +15,7 @@ pub trait SelectionMethod {
         I: Individual;
 }
 
-pub trait CrossoverMethod {
+pub trait CrossoverMethod: Send + Sync {
     fn crossover(
         &self,
         rng: &mut dyn RngCore,
@@ -23,10 +23,11 @@ pub trait CrossoverMethod {
         parent_b: &Chromosome,
     ) -> Chromosome;
 }
-pub trait MutationMethod {
+pub trait MutationMethod: Send + Sync {
     fn mutate(&self, rng: &mut dyn RngCore, chromosome: &mut Chromosome);
 }
 
+#[derive(Clone)]
 pub struct Chromosome {
     genes: Vec<f32>,
 }
@@ -285,5 +286,14 @@ impl Statistics {
 
     pub fn avg_fitness(&self) -> f32 {
         self.avg_fitness
+    }
+}
+impl Default for Statistics {
+    fn default() -> Self {
+        Self {
+            min_fitness: 0.0,
+            max_fitness: 0.0,
+            avg_fitness: 0.0,
+        }
     }
 }

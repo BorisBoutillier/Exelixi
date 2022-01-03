@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 use std::f32::consts::{FRAC_PI_4, PI};
 
-const FOV_RANGE: f32 = 0.25;
+const FOV_RANGE: f32 = 300.0;
 const FOV_ANGLE: f32 = PI + FRAC_PI_4;
 const CELLS: usize = 9;
 
@@ -36,7 +36,10 @@ impl Eye {
             if dist > self.fov_range {
                 continue;
             }
-            let (_, rotation_angle) = transform.rotation.to_axis_angle();
+            let (axis, mut rotation_angle) = transform.rotation.to_axis_angle();
+            if axis.z < 0.0 {
+                rotation_angle = -rotation_angle;
+            }
             let angle = Vec3::X.angle_between(vec) - rotation_angle;
             let angle = (angle % (2.0 * PI)) - PI; // = wrap(-PI,PI)
             if angle < -self.fov_angle / 2.0 || angle > self.fov_angle / 2.0 {

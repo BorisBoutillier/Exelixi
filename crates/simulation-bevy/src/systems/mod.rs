@@ -1,7 +1,11 @@
+mod brain;
+mod collision;
+mod evolve;
 mod movement;
-mod simulation_step;
 mod ui;
 
+pub use brain::*;
+pub use collision::*;
+pub use evolve::*;
 pub use movement::*;
-pub use simulation_step::*;
 pub use ui::*;
