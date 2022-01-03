@@ -39,5 +39,13 @@ pub fn evolve(
             transform.translation.y = rng.gen_range(-half_height..half_height);
             transform.rotation = Quat::from_axis_angle(Vec3::Z, rng.gen_range(-PI..PI));
         }
+        let sts = ((simulation.generation * config.generation_length) + simulation.age) as f64
+            / simulation.duration.as_secs_f64();
+        println!(
+            "Gen: {:03} , Sts: {:.0} , Avg: {:.1}",
+            simulation.generation,
+            sts,
+            simulation.statistics.avg_fitness()
+        );
     }
 }

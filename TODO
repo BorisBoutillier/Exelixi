@@ -8,6 +8,8 @@
 . Allow interaction with simulation speed (pause/start/)
 
 -- Simulation
+. Single system for doing simulation steps ?
+    . This would allow a kind of 'step per frame' ?
 . Replace Stomach Satiation, with body energy management:
     . Give a cost to each action:
         . process vision
