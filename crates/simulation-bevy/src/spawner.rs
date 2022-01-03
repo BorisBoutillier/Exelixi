@@ -5,14 +5,15 @@ use crate::*;
 pub fn spawn_animals(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    windows: Res<Windows>,
+    config: Res<SimulationConfig>,
 ) {
-    let window = windows.get_primary().unwrap();
+    let half_width = config.environment_size.width / 2.0;
+    let half_height = config.environment_size.height / 2.0;
     let mut rng = thread_rng();
-    for i in 0..N_ANIMAL {
+    for i in 0..config.starting_animals {
         let selected = i == 0;
         let color = if selected {
-            Color::YELLOW
+            Color::rgb(0.5, 0.5, 0.7)
         } else {
             Color::WHITE
         };
@@ -24,8 +25,8 @@ pub fn spawn_animals(
             },
             transform: Transform {
                 translation: Vec3::new(
-                    rng.gen_range((-window.width() / 2.0)..(window.width() / 2.0)),
-                    rng.gen_range((-window.height() / 2.0)..(window.height() / 2.0)),
+                    rng.gen_range(-half_width..half_width),
+                    rng.gen_range(-half_height..half_height),
                     1.0,
                 ),
                 rotation: Quat::from_axis_angle(Vec3::Z, rng.gen_range(-PI..PI)),
@@ -37,6 +38,7 @@ pub fn spawn_animals(
         let eye = Eye::default();
         let brain = Brain::random(&mut rng, &eye);
         command
+            .insert(Animal {})
             .insert(Velocity {
                 linear: rng.gen_range(V_LINEAR_MIN..V_LINEAR_MAX),
                 angular: 0.0,
@@ -50,10 +52,15 @@ pub fn spawn_animals(
     }
 }
 
-pub fn spawn_foods(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Windows>) {
-    let window = windows.get_primary().unwrap();
+pub fn spawn_foods(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    config: Res<SimulationConfig>,
+) {
+    let half_width = config.environment_size.width / 2.0;
+    let half_height = config.environment_size.height / 2.0;
     let mut rng = thread_rng();
-    for _ in 0..N_FOOD {
+    for _ in 0..config.starting_foods {
         commands
             .spawn_bundle(SpriteBundle {
                 sprite: Sprite {
@@ -62,8 +69,8 @@ pub fn spawn_foods(mut commands: Commands, asset_server: Res<AssetServer>, windo
                 },
                 transform: Transform {
                     translation: Vec3::new(
-                        rng.gen_range((-window.width() / 2.0)..(window.width() / 2.0)),
-                        rng.gen_range((-window.height() / 2.0)..(window.height() / 2.0)),
+                        rng.gen_range(-half_width..half_width),
+                        rng.gen_range(-half_height..half_height),
                         1.0,
                     ),
                     ..Default::default()
@@ -73,4 +80,21 @@ pub fn spawn_foods(mut commands: Commands, asset_server: Res<AssetServer>, windo
             })
             .insert(Food {});
     }
+}
+
+pub fn spawn_floor(mut commands: Commands, config: Res<SimulationConfig>) {
+    println!("SPAWN {}", config.environment_size.width as f32);
+    commands
+        .spawn_bundle(SpriteBundle {
+            sprite: Sprite {
+                custom_size: Some(Vec2::new(
+                    config.environment_size.width as f32,
+                    config.environment_size.height as f32,
+                )),
+                color: Color::rgb(0.05, 0.0, 0.2),
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .insert(Floor {});
 }

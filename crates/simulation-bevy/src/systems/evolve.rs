@@ -1,16 +1,18 @@
 use crate::prelude::*;
 
+#[allow(clippy::type_complexity)]
 pub fn evolve(
     mut commands: Commands,
     mut simulation: ResMut<Simulation>,
     mut animals: Query<(Entity, &mut Stomach, &Brain, &Eye)>,
-    mut transforms: Query<&mut Transform, Without<Camera>>,
-    windows: Res<Windows>,
+    mut transforms: Query<&mut Transform, Or<(With<Food>, With<Animal>)>>,
+    config: Res<SimulationConfig>,
 ) {
     simulation.age += 1;
-    if simulation.age == GENERATION_LENGTH {
+    if simulation.age == config.generation_length {
+        let half_width = config.environment_size.width / 2.0;
+        let half_height = config.environment_size.height / 2.0;
         let mut rng = thread_rng();
-        let window = windows.get_primary().unwrap();
         simulation.age = 0;
         simulation.generation += 1;
 
@@ -29,10 +31,8 @@ pub fn evolve(
         simulation.statistics = stats;
         // Reset all transform
         for mut transform in transforms.iter_mut() {
-            transform.translation.x =
-                rng.gen_range((-window.width() / 2.0)..(window.width() / 2.0));
-            transform.translation.y =
-                rng.gen_range((-window.height() / 2.0)..(window.height() / 2.0));
+            transform.translation.x = rng.gen_range(-half_width..half_width);
+            transform.translation.y = rng.gen_range(-half_height..half_height);
             transform.rotation = Quat::from_axis_angle(Vec3::Z, rng.gen_range(-PI..PI));
         }
     }

@@ -2,12 +2,11 @@ use crate::*;
 
 pub fn movement(
     time: Res<Time>,
-    windows: Res<Windows>,
     mut movables: Query<(&mut Transform, &Velocity)>,
+    config: Res<SimulationConfig>,
 ) {
-    let window = windows.get_primary().unwrap();
-    let half_width = window.width() / 2.0;
-    let half_height = window.height() / 2.0;
+    let half_width = config.environment_size.width / 2.0;
+    let half_height = config.environment_size.height / 2.0;
     for (mut transform, velocity) in movables.iter_mut() {
         // Update transform based on linear and angular velocity
         let delta =

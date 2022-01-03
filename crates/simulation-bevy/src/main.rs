@@ -2,6 +2,7 @@ mod animal_individual;
 mod brain;
 mod components;
 mod eye;
+mod simulation;
 mod spawner;
 mod systems;
 
@@ -19,6 +20,7 @@ mod prelude {
     pub use crate::brain::*;
     pub use crate::components::*;
     pub use crate::eye::*;
+    pub use crate::simulation::*;
     pub use crate::spawner::*;
     pub use crate::systems::*;
 
@@ -30,27 +32,27 @@ mod prelude {
     pub const V_LINEAR_ACCEL: f32 = 40.0;
     /// Maximum angalur velocity in radians/s
     pub const V_ANGULAR_MAX: f32 = PI;
-    pub const N_ANIMAL: usize = 30;
-    pub const N_FOOD: usize = 70;
-    pub const GENERATION_LENGTH: u32 = 500;
 }
 
 use prelude::*;
 
 fn main() {
     App::new()
-        .insert_resource(ClearColor(Color::rgb(0.2, 0.2, 0.6)))
+        .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
         .add_plugin(EguiPlugin)
         .add_startup_system(setup)
         .add_startup_system(spawn_animals)
         .add_startup_system(spawn_foods)
+        .add_startup_system(spawn_floor)
         .add_system(debug_ui)
         .add_system(movement)
         .add_system(collision)
         .add_system(process_brain)
         .add_system(evolve)
+        .add_system(simulation_config_update)
         .insert_resource(Simulation::default())
+        .insert_resource(SimulationConfig::default())
         .run();
 }
 

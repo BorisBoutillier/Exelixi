@@ -1,20 +1,18 @@
 use crate::prelude::*;
 
 pub fn debug_ui(
-    windows: Res<Windows>,
     egui_ctx: Res<EguiContext>,
     selection: Query<(&Transform, &Velocity, &Stomach), With<Selected>>,
     simulation: Res<Simulation>,
+    config: Res<SimulationConfig>,
 ) {
-    let window = windows.get_primary().unwrap();
     let (transform, velocity, stomach) = selection.iter().next().unwrap();
     egui::Window::new("Debug")
         .vscroll(true)
         .show(egui_ctx.ctx(), |ui| {
-            ui.heading("Window");
-            ui.label(format!("width : {}", window.width()));
-            ui.label(format!("height: {}", window.height()));
             ui.heading("Simulation");
+            ui.label(format!("width : {}", config.environment_size.width));
+            ui.label(format!("height: {}", config.environment_size.height));
             ui.label(format!("generation : {}", simulation.generation));
             ui.label(format!("age: {}", simulation.age));
             ui.label("fitness".to_string());
