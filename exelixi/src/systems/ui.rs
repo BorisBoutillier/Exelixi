@@ -15,8 +15,6 @@ pub fn debug_ui(
             ui.heading("Simulation");
             ui.label(format!("width : {}", config.environment_size.width));
             ui.label(format!("height: {}", config.environment_size.height));
-            ui.label(format!("generation : {}", simulation.generation));
-            ui.label(format!("age: {}", simulation.age));
             ui.label("fitness".to_string());
             ui.label(format!(
                 "    min: {:.2}",
@@ -30,8 +28,6 @@ pub fn debug_ui(
                 "    avg: {:.2}",
                 simulation.statistics.avg_fitness()
             ));
-            let running_button_s = if simulation.running { "Pause" } else { "Run" };
-            invert_running = ui.button(running_button_s).clicked();
             ui.heading("Selection");
             ui.label(format!("x: {:.1}", transform.translation.x));
             ui.label(format!("y: {:.1}", transform.translation.y));
@@ -50,6 +46,24 @@ pub fn debug_ui(
             let sts = ((simulation.generation * config.generation_length) + simulation.age) as f64
                 / simulation.duration.as_secs_f64();
             ui.label(format!("sps: {:.0}", sts));
+        });
+    egui::TopBottomPanel::bottom("bottom_panel")
+        //.default_height(10)
+        .frame(egui::Frame::default().fill(egui::Color32::from_rgb(0, 0, 30)))
+        .show(egui_ctx.ctx(), |ui| {
+            ui.centered_and_justified(|ui| {
+                ui.horizontal(|ui| {
+                    ui.label(format!("generation : {}", simulation.generation));
+                    ui.label(format!("age: {}", simulation.age));
+                    let running_button_s = if simulation.running { "⏸" } else { "▶" };
+                    invert_running = ui
+                        .add(
+                            egui::Button::new(running_button_s)
+                                .text_color(egui::Color32::from_rgb(0, 255, 0)),
+                        )
+                        .clicked();
+                });
+            });
         });
     if invert_running {
         simulation.running = !simulation.running;
