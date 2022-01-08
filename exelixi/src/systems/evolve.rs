@@ -6,13 +6,8 @@ pub fn evolve(
     mut animals: Query<(Entity, &mut Stomach, &Brain, &Eye)>,
     mut transforms: Query<&mut Transform, Or<(With<Food>, With<Animal>)>>,
     config: Res<SimulationConfig>,
-    time: Res<Time>,
 ) {
-    if simulation.speed == SimulationSpeed::Paused {
-        return;
-    }
     simulation.age += 1;
-    simulation.duration += time.delta();
     if simulation.age == config.generation_length {
         let half_width = config.environment_size.width / 2.0;
         let half_height = config.environment_size.height / 2.0;
@@ -39,12 +34,9 @@ pub fn evolve(
             transform.translation.y = rng.gen_range(-half_height..half_height);
             transform.rotation = Quat::from_axis_angle(Vec3::Z, rng.gen_range(-PI..PI));
         }
-        let sts = ((simulation.generation * config.generation_length) + simulation.age) as f64
-            / simulation.duration.as_secs_f64();
         println!(
-            "Gen: {:03} , Sts: {:.0} , Avg: {:.1}",
+            "Gen: {:03} , Avg: {:.1}",
             simulation.generation,
-            sts,
             simulation.statistics.avg_fitness()
         );
     }

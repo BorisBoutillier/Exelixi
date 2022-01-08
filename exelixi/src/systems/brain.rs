@@ -3,11 +3,7 @@ use crate::*;
 pub fn process_brain(
     mut animals: Query<(&Transform, &mut Velocity, &Eye, &Brain, Option<&Selected>)>,
     food_transforms: Query<&Transform, With<Food>>,
-    simulation: Res<Simulation>,
 ) {
-    if simulation.speed == SimulationSpeed::Paused {
-        return;
-    }
     let food_transforms = food_transforms.iter().collect::<Vec<_>>();
     animals.for_each_mut(
         |(animal_transform, mut animal_velocity, animal_eye, animal_brain, selected)| {

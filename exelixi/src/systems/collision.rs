@@ -3,12 +3,8 @@ use crate::prelude::*;
 pub fn collision(
     mut animals: Query<(&mut Stomach, &Transform), Without<Food>>,
     mut foods: Query<&mut Transform, With<Food>>,
-    simulation: Res<Simulation>,
     config: Res<SimulationConfig>,
 ) {
-    if simulation.speed == SimulationSpeed::Paused {
-        return;
-    }
     for (mut animal_stomach, animal_transform) in animals.iter_mut() {
         for mut food_transform in foods.iter_mut() {
             let distance = (animal_transform.translation - food_transform.translation).length();

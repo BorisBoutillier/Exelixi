@@ -3,12 +3,11 @@ use crate::prelude::*;
 pub fn debug_ui(
     egui_ctx: Res<EguiContext>,
     selection: Query<(&Transform, &Velocity, &Stomach), With<Selected>>,
-    mut simulation: ResMut<Simulation>,
+    simulation: ResMut<Simulation>,
     config: Res<SimulationConfig>,
     diagnostics: Res<Diagnostics>,
 ) {
     let (transform, velocity, stomach) = selection.iter().next().unwrap();
-    let mut new_speed = None;
     egui::Window::new("Debug")
         .vscroll(true)
         .show(egui_ctx.ctx(), |ui| {
@@ -44,14 +43,16 @@ pub fn debug_ui(
                 }
             }
             ui.label(format!("fps: {}", fps_s));
-            let sts = ((simulation.generation * config.generation_length) + simulation.age) as f64
-                / simulation.duration.as_secs_f64();
-            ui.label(format!("sps: {:.0}", sts));
         });
+}
+pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulation>) {
     let mut fonts = egui::FontDefinitions::default();
-    // Large button text:
     fonts.family_and_size.insert(
         egui::TextStyle::Body,
+        (egui::FontFamily::Proportional, 20.0),
+    );
+    fonts.family_and_size.insert(
+        egui::TextStyle::Monospace,
         (egui::FontFamily::Proportional, 20.0),
     );
     fonts.family_and_size.insert(
@@ -59,6 +60,8 @@ pub fn debug_ui(
         (egui::FontFamily::Proportional, 30.0),
     );
     egui_ctx.ctx().set_fonts(fonts);
+
+    let mut new_speed = None;
     egui::TopBottomPanel::bottom("bottom_panel")
         .frame(
             egui::Frame::default()
@@ -66,50 +69,33 @@ pub fn debug_ui(
                 .margin(egui::Vec2::new(10.0, 10.0)),
         )
         .show(egui_ctx.ctx(), |ui| {
+            let half_width = ui.available_width() / 2.0;
             ui.with_layout(egui::Layout::left_to_right(), |ui| {
                 ui.add_space(30.0);
-                ui.label(format!("generation : {:3}", simulation.generation));
-                ui.label(format!("age: {:4}", simulation.age));
-                ui.add_space(ui.available_size().x * 0.4);
-                let text;
-                let hover_text;
-                if simulation.speed == SimulationSpeed::Paused {
-                    text = "▶";
-                    hover_text = "Normal Speed";
-                } else {
-                    text = "⏸";
-                    hover_text = "Pause"
-                };
-                if ui
-                    .add(egui::Button::new(
-                        egui::RichText::new(text).color(egui::Color32::from_rgb(0, 255, 0)),
-                    ))
-                    .on_hover_text(hover_text)
-                    .clicked()
-                {
-                    new_speed = if simulation.speed != SimulationSpeed::Paused {
-                        Some(SimulationSpeed::Paused)
-                    } else {
-                        Some(SimulationSpeed::Normal)
-                    };
-                }
-                if ui
-                    .add(egui::Button::new(
-                        egui::RichText::new("⏩").color(egui::Color32::from_rgb(0, 255, 0)),
-                    ))
-                    .on_hover_text("Fast Speed")
-                    .clicked()
-                {
-                    new_speed = Some(SimulationSpeed::Fast);
-                }
-                if ui
-                    .add(egui::Button::new(
-                        egui::RichText::new("⏭").color(egui::Color32::from_rgb(0, 255, 0)),
-                    ))
-                    .on_hover_text("Maximum Speed")
-                    .clicked()
-                {
-                    new_speed = Some(SimulationSpeed::Fastest);
+                ui.label(
+                    egui::RichText::new(format!("generation : {:3}", simulation.generation))
+                        .text_style(egui::TextStyle::Monospace),
+                );
+                ui.label(
+                    egui::RichText::new(format!("step : {:4}", simulation.age))
+                        .text_style(egui::TextStyle::Monospace),
+                );
+                ui.add_space(ui.available_width() - half_width - 30.0 * 2.0);
+                for (text, hover_text, speed) in &[
+                    ("⏸", "Pause", SimulationSpeed::Paused),
+                    ("▶", "Normal Speed", SimulationSpeed::Normal),
+                    ("⏩", "Fast Speed", SimulationSpeed::Fast),
+                    ("⏭", "Maximum Speed", SimulationSpeed::Fastest),
+                ] {
+                    if ui
+                        .add(egui::Button::new(
+                            egui::RichText::new(*text).color(egui::Color32::from_rgb(0, 255, 0)),
+                        ))
+                        .on_hover_text(*hover_text)
+                        .clicked()
+                    {
+                        new_speed = Some(*speed);
+                    }
                 }
             });
         });

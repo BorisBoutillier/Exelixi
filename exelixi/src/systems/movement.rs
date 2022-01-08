@@ -1,13 +1,6 @@
 use crate::*;
 
-pub fn movement(
-    mut movables: Query<(&mut Transform, &Velocity)>,
-    config: Res<SimulationConfig>,
-    simulation: Res<Simulation>,
-) {
-    if simulation.speed == SimulationSpeed::Paused {
-        return;
-    }
+pub fn movement(mut movables: Query<(&mut Transform, &Velocity)>, config: Res<SimulationConfig>) {
     let half_width = config.environment_size.width / 2.0;
     let half_height = config.environment_size.height / 2.0;
     movables.for_each_mut(|(mut transform, velocity)| {

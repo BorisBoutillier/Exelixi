@@ -4,6 +4,11 @@ use std::time::Duration;
 use crate::prelude::*;
 use ga::Statistics;
 
+/// Length of a step in seconds for Normal speed
+pub const STEP_LENGTH_NORMAL: f32 = 1.0 / 60.0;
+/// Length of a step in seconds for Fast speed
+pub const STEP_LENGTH_FAST: f32 = 1.0 / 240.0;
+
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum SimulationSpeed {
     /// Simulation is paused, no steps are done
@@ -36,7 +41,8 @@ pub struct Simulation {
     pub generation: u32,
     pub ga: ga::GeneticAlgorithm<ga::RouletteWheelSelection>,
     pub statistics: Statistics,
-    pub duration: Duration,
+    // Internal. Used to control simulation speed
+    pub step_duration: Duration,
 }
 impl Simulation {
     pub fn new() -> Self {
@@ -50,7 +56,7 @@ impl Simulation {
                 ga::GaussianMutation::new(0.01, 0.3),
             ),
             statistics: Statistics::default(),
-            duration: Duration::ZERO,
+            step_duration: Duration::ZERO,
         }
     }
 }
