@@ -1,11 +1,37 @@
+use std::fmt;
 use std::time::Duration;
 
 use crate::prelude::*;
 use ga::Statistics;
 
+#[derive(Clone, Copy, PartialEq, Debug)]
+pub enum SimulationSpeed {
+    /// Simulation is paused, no steps are done
+    Paused,
+    /// Simulation speed of 60 step per seconds
+    Normal,
+    /// Simulation speed of 180 steps per seconds
+    Fast,
+    /// Fastest number of steps per seconds
+    Fastest,
+}
+impl fmt::Display for SimulationSpeed {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                SimulationSpeed::Paused => "Paused",
+                SimulationSpeed::Normal => "Normal",
+                SimulationSpeed::Fast => "Fast",
+                SimulationSpeed::Fastest => "Fastest",
+            }
+        )
+    }
+}
 // Resources
 pub struct Simulation {
-    pub running: bool,
+    pub speed: SimulationSpeed,
     pub age: u32,
     pub generation: u32,
     pub ga: ga::GeneticAlgorithm<ga::RouletteWheelSelection>,
@@ -15,7 +41,7 @@ pub struct Simulation {
 impl Simulation {
     pub fn new() -> Self {
         Self {
-            running: false,
+            speed: SimulationSpeed::Paused,
             age: 0,
             generation: 0,
             ga: ga::GeneticAlgorithm::new(

@@ -5,7 +5,7 @@ pub fn movement(
     config: Res<SimulationConfig>,
     simulation: Res<Simulation>,
 ) {
-    if !simulation.running {
+    if simulation.speed == SimulationSpeed::Paused {
         return;
     }
     let half_width = config.environment_size.width / 2.0;

@@ -5,7 +5,7 @@ pub fn process_brain(
     food_transforms: Query<&Transform, With<Food>>,
     simulation: Res<Simulation>,
 ) {
-    if !simulation.running {
+    if simulation.speed == SimulationSpeed::Paused {
         return;
     }
     let food_transforms = food_transforms.iter().collect::<Vec<_>>();

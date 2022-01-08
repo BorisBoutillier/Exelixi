@@ -8,7 +8,7 @@ pub fn evolve(
     config: Res<SimulationConfig>,
     time: Res<Time>,
 ) {
-    if !simulation.running {
+    if simulation.speed == SimulationSpeed::Paused {
         return;
     }
     simulation.age += 1;

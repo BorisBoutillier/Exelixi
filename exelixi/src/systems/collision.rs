@@ -6,7 +6,7 @@ pub fn collision(
     simulation: Res<Simulation>,
     config: Res<SimulationConfig>,
 ) {
-    if !simulation.running {
+    if simulation.speed == SimulationSpeed::Paused {
         return;
     }
     for (mut animal_stomach, animal_transform) in animals.iter_mut() {

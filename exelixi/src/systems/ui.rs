@@ -8,13 +8,14 @@ pub fn debug_ui(
     diagnostics: Res<Diagnostics>,
 ) {
     let (transform, velocity, stomach) = selection.iter().next().unwrap();
-    let mut invert_running = false;
+    let mut new_speed = None;
     egui::Window::new("Debug")
         .vscroll(true)
         .show(egui_ctx.ctx(), |ui| {
             ui.heading("Simulation");
             ui.label(format!("width : {}", config.environment_size.width));
             ui.label(format!("height: {}", config.environment_size.height));
+            ui.label(simulation.speed.to_string());
             ui.label("fitness".to_string());
             ui.label(format!(
                 "    min: {:.2}",
@@ -47,25 +48,72 @@ pub fn debug_ui(
                 / simulation.duration.as_secs_f64();
             ui.label(format!("sps: {:.0}", sts));
         });
+    let mut fonts = egui::FontDefinitions::default();
+    // Large button text:
+    fonts.family_and_size.insert(
+        egui::TextStyle::Body,
+        (egui::FontFamily::Proportional, 20.0),
+    );
+    fonts.family_and_size.insert(
+        egui::TextStyle::Button,
+        (egui::FontFamily::Proportional, 30.0),
+    );
+    egui_ctx.ctx().set_fonts(fonts);
     egui::TopBottomPanel::bottom("bottom_panel")
-        //.default_height(10)
-        .frame(egui::Frame::default().fill(egui::Color32::from_rgb(0, 0, 30)))
+        .frame(
+            egui::Frame::default()
+                .fill(egui::Color32::from_rgb(0, 0, 30))
+                .margin(egui::Vec2::new(10.0, 10.0)),
+        )
         .show(egui_ctx.ctx(), |ui| {
-            ui.centered_and_justified(|ui| {
-                ui.horizontal(|ui| {
-                    ui.label(format!("generation : {}", simulation.generation));
-                    ui.label(format!("age: {}", simulation.age));
-                    let running_button_s = if simulation.running { "⏸" } else { "▶" };
-                    invert_running = ui
-                        .add(
-                            egui::Button::new(running_button_s)
-                                .text_color(egui::Color32::from_rgb(0, 255, 0)),
-                        )
-                        .clicked();
-                });
+            ui.with_layout(egui::Layout::left_to_right(), |ui| {
+                ui.add_space(30.0);
+                ui.label(format!("generation : {:3}", simulation.generation));
+                ui.label(format!("age: {:4}", simulation.age));
+                ui.add_space(ui.available_size().x * 0.4);
+                let text;
+                let hover_text;
+                if simulation.speed == SimulationSpeed::Paused {
+                    text = "▶";
+                    hover_text = "Normal Speed";
+                } else {
+                    text = "⏸";
+                    hover_text = "Pause"
+                };
+                if ui
+                    .add(egui::Button::new(
+                        egui::RichText::new(text).color(egui::Color32::from_rgb(0, 255, 0)),
+                    ))
+                    .on_hover_text(hover_text)
+                    .clicked()
+                {
+                    new_speed = if simulation.speed != SimulationSpeed::Paused {
+                        Some(SimulationSpeed::Paused)
+                    } else {
+                        Some(SimulationSpeed::Normal)
+                    };
+                }
+                if ui
+                    .add(egui::Button::new(
+                        egui::RichText::new("⏩").color(egui::Color32::from_rgb(0, 255, 0)),
+                    ))
+                    .on_hover_text("Fast Speed")
+                    .clicked()
+                {
+                    new_speed = Some(SimulationSpeed::Fast);
+                }
+                if ui
+                    .add(egui::Button::new(
+                        egui::RichText::new("⏭").color(egui::Color32::from_rgb(0, 255, 0)),
+                    ))
+                    .on_hover_text("Maximum Speed")
+                    .clicked()
+                {
+                    new_speed = Some(SimulationSpeed::Fastest);
+                }
             });
         });
-    if invert_running {
-        simulation.running = !simulation.running;
+    if let Some(new_speed) = new_speed {
+        simulation.speed = new_speed;
     }
 }
