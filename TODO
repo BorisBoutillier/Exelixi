@@ -4,8 +4,13 @@
     . Wheel Up/Down = Unzoom/zoom
     . Middle Click : Recenter on environment
 . Allow user modification of the simulation configuraton
-. Status bar show current simulation status ( age/generation/stats)
-. Allow interaction with simulation speed (pause/start/)
+    Restart a new simulation on change.
+. Save/Load population
+. Save/Load configuration
+. Allow clicking an animal to see its state:
+    . fov_range/fov_angle drawn
+    . plot with evolution of the energy level.
+    
 
 -- Simulation
 . Single system for doing simulation steps ?
@@ -19,3 +24,13 @@
         . process_movement:
             exponential cost of linear/angular velocity
     . Eating food raise energy.
+. Allow to see Walls
+    A new set of values from eyes ?
+. Allow to see other animals
+    A new set of values from eyes ?
+. Allow an output neuron to control usage of eyes.
+    . On output for each eye ?  <0.4 disable, >-.6 enable , in-between don't touch ?
+. New genes to control the fov_range/fov_angle:
+    Impacts on energy based on 'visible' area.
+. New genes to control number of eyes.
+. If wall/animal visibility, genes to control availability of these features.
