@@ -45,7 +45,11 @@ pub fn debug_ui(
             ui.label(format!("fps: {}", fps_s));
         });
 }
-pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulation>) {
+pub fn status_bar_ui(
+    egui_ctx: Res<EguiContext>,
+    mut simulation: ResMut<Simulation>,
+    mut orthos: Query<&mut OrthographicProjection>,
+) {
     let mut fonts = egui::FontDefinitions::default();
     fonts.family_and_size.insert(
         egui::TextStyle::Body,
@@ -65,11 +69,13 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
     egui::TopBottomPanel::bottom("bottom_panel")
         .frame(
             egui::Frame::default()
-                .fill(egui::Color32::from_rgb(0, 0, 30))
+                .fill(egui::Color32::from_rgb(0, 0, 0))
                 .margin(egui::Vec2::new(10.0, 10.0)),
         )
         .show(egui_ctx.ctx(), |ui| {
             let half_width = ui.available_width() / 2.0;
+            let mut spacing = ui.spacing_mut();
+            spacing.button_padding = egui::Vec2::new(2.0, 2.0);
             ui.with_layout(egui::Layout::left_to_right(), |ui| {
                 ui.add_space(30.0);
                 ui.label(
@@ -101,5 +107,8 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
         });
     if let Some(new_speed) = new_speed {
         simulation.speed = new_speed;
+        for mut ortho in orthos.iter_mut() {
+            ortho.scale *= 2.0;
+        }
     }
 }

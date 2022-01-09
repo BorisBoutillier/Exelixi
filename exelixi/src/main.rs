@@ -47,8 +47,8 @@ fn main() {
     App::new()
         .insert_resource(ClearColor(Color::BLACK))
         .insert_resource(WindowDescriptor {
-            width: 1280.0,
-            height: 800.0,
+            width: 1500.0,
+            height: 900.0,
             title: "Exelixi".to_string(),
             vsync: false,
             ..Default::default()

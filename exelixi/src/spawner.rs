@@ -13,9 +13,9 @@ pub fn spawn_animals(
     for i in 0..config.starting_animals {
         let selected = i == 0;
         let color = if selected {
-            Color::rgb(0.5, 0.5, 0.7)
+            Color::rgb(0.2, 0.9, 0.9)
         } else {
-            Color::WHITE
+            Color::rgb(0.8, 0.3, 0.8)
         };
         let mut command = commands.spawn_bundle(SpriteBundle {
             sprite: Sprite {
@@ -65,6 +65,7 @@ pub fn spawn_foods(
             .spawn_bundle(SpriteBundle {
                 sprite: Sprite {
                     custom_size: Some(Vec2::new(10.0, 10.0)),
+                    color: Color::rgb(0.1, 0.7, 0.1),
                     ..Default::default()
                 },
                 transform: Transform {
@@ -90,7 +91,7 @@ pub fn spawn_floor(mut commands: Commands, config: Res<SimulationConfig>) {
                     config.environment_size.width as f32 + 20.0,
                     config.environment_size.height as f32 + 20.0,
                 )),
-                color: Color::rgb(0.05, 0.0, 0.2),
+                color: Color::rgb(0.1, 0.3, 0.1),
                 ..Default::default()
             },
             ..Default::default()
