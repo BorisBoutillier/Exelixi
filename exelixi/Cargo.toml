@@ -8,10 +8,7 @@ authors = [ "Boris Boutillier [boris.boutillier@gmail.com]" ]
 
 [dependencies]
 rand = "0.8"
-bevy = { git = "https://github.com/bevyengine/bevy", branch = "main" }
-bevy_egui = { git = "https://github.com/jakobhellermann/bevy_egui", branch = "bevy-main"}
+bevy = "0.6"
+bevy_egui = "0.10"
 lib-neural-network = { path = "../libs/neural-network" }
 lib-genetic-algorithm = { path = "../libs/genetic-algorithm" }
-
-[dev-dependencies]
-rand_chacha = "0.3"
