@@ -35,7 +35,10 @@ pub fn spawn_animals(
             texture: asset_server.load("bird.png"),
             ..Default::default()
         });
-        let eye = Eye::default();
+        let eye = Eye {
+            see_walls: config.environment.wall,
+            ..Default::default()
+        };
         let brain = Brain::random(&mut rng, &eye);
         command
             .insert(Animal {})
