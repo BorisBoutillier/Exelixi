@@ -3,7 +3,7 @@ use crate::prelude::*;
 pub fn debug_ui(
     egui_ctx: Res<EguiContext>,
     selection: Query<(&Transform, &Velocity, &Stomach), With<Selected>>,
-    simulation: ResMut<Simulation>,
+    simulation: Res<Simulation>,
     config: Res<SimulationConfig>,
     diagnostics: Res<Diagnostics>,
 ) {
@@ -43,6 +43,7 @@ pub fn debug_ui(
                 }
             }
             ui.label(format!("fps: {}", fps_s));
+            ui.label(format!("sts: {:.2}", simulation.sts(&config)));
         });
 }
 pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulation>) {

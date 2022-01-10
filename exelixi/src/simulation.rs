@@ -4,10 +4,12 @@ use std::time::Duration;
 use crate::prelude::*;
 use ga::Statistics;
 
-/// Length of a step in seconds for Normal speed
-pub const STEP_LENGTH_NORMAL: f32 = 1.0 / 60.0;
-/// Length of a step in seconds for Fast speed
-pub const STEP_LENGTH_FAST: f32 = 1.0 / 240.0;
+/// Number of simulation step we do per frame in Normal speed mode
+pub const STEP_PER_FRAME_NORMAL: usize = 1;
+/// Number of simulation step we do per frame in Fast speed mode
+pub const STEP_PER_FRAME_FAST: usize = 4;
+/// Maximum duration the simulation steps car run per frame
+pub const MAX_SIMULATION_DURATION_PER_FRAME: f32 = 1.0 / 60.0;
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum SimulationSpeed {
@@ -41,8 +43,11 @@ pub struct Simulation {
     pub generation: u32,
     pub ga: ga::GeneticAlgorithm<ga::RouletteWheelSelection>,
     pub statistics: Statistics,
+    // Total active running of the simulation
+    pub duration: Duration,
     // Internal. Used to control simulation speed
-    pub step_duration: Duration,
+    pub cur_steps: usize,
+    pub cur_steps_duration: Duration,
 }
 impl Simulation {
     pub fn new() -> Self {
@@ -56,8 +61,28 @@ impl Simulation {
                 ga::GaussianMutation::new(0.01, 0.3),
             ),
             statistics: Statistics::default(),
-            step_duration: Duration::ZERO,
+            duration: Duration::ZERO,
+            cur_steps_duration: Duration::ZERO,
+            cur_steps: 0,
         }
+    }
+    // Number simulation steps per seconds for this simulation
+    pub fn sts(&self, config: &SimulationConfig) -> f32 {
+        if self.duration.is_zero() {
+            0.0
+        } else {
+            (self.generation * config.generation_length + self.age) as f32
+                / self.duration.as_secs_f32()
+        }
+    }
+    // Dump current simulation information in a single line string.
+    pub fn sprint_state(&self, config: &SimulationConfig) -> String {
+        format!(
+            "Gen: {:03} , Sts: {:.2} , Avg: {:.1}",
+            self.generation,
+            self.sts(config),
+            self.statistics.avg_fitness()
+        )
     }
 }
 impl Default for Simulation {
@@ -78,7 +103,7 @@ impl Default for EnvironmentConfig {
     fn default() -> Self {
         Self {
             size: Size::new(1200.0, 700.0),
-            wall: false,
+            wall: true,
         }
     }
 }

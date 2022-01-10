@@ -34,10 +34,6 @@ pub fn evolve(
             transform.translation.y = rng.gen_range(-half_height..half_height);
             transform.rotation = Quat::from_axis_angle(Vec3::Z, rng.gen_range(-PI..PI));
         }
-        println!(
-            "Gen: {:03} , Avg: {:.1}",
-            simulation.generation,
-            simulation.statistics.avg_fitness()
-        );
+        println!("{}", simulation.sprint_state(&config));
     }
 }

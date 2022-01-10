@@ -63,6 +63,7 @@ fn main() {
         .add_system(debug_ui)
         .add_system(status_bar_ui)
         .add_system(simulation_config_update)
+        .add_system(simulation_duration)
         .insert_resource(Simulation::default())
         .insert_resource(SimulationConfig::default())
         .add_system_set(
@@ -80,27 +81,30 @@ fn setup(mut commands: Commands) {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 }
 fn run_simulation_speed(time: Res<Time>, mut simulation: ResMut<Simulation>) -> ShouldRun {
-    simulation.step_duration += time.delta();
-    let run = match simulation.speed {
-        SimulationSpeed::Paused => ShouldRun::No,
-        SimulationSpeed::Normal => {
-            if simulation.step_duration.as_secs_f32() >= STEP_LENGTH_NORMAL {
-                ShouldRun::Yes
-            } else {
-                ShouldRun::No
-            }
-        }
-        SimulationSpeed::Fast => {
-            if simulation.step_duration.as_secs_f32() >= STEP_LENGTH_FAST {
-                ShouldRun::Yes
-            } else {
-                ShouldRun::No
-            }
-        }
-        SimulationSpeed::Fastest => ShouldRun::Yes,
-    };
-    if run == ShouldRun::Yes {
-        simulation.step_duration = Duration::ZERO;
+    if simulation.speed == SimulationSpeed::Paused {
+        return ShouldRun::No;
     }
-    run
+    simulation.cur_steps_duration += time.delta();
+    let do_one_step = match simulation.speed {
+        SimulationSpeed::Paused => false,
+        SimulationSpeed::Normal => simulation.cur_steps < STEP_PER_FRAME_NORMAL,
+        SimulationSpeed::Fast => simulation.cur_steps < STEP_PER_FRAME_FAST,
+        SimulationSpeed::Fastest => true,
+    };
+    if do_one_step {
+        simulation.cur_steps += 1;
+        if simulation.cur_steps_duration.as_secs_f32() >= MAX_SIMULATION_DURATION_PER_FRAME {
+            simulation.cur_steps = 0;
+            simulation.cur_steps_duration = Duration::ZERO;
+            ShouldRun::Yes
+        } else {
+            ShouldRun::YesAndCheckAgain
+        }
+    } else {
+        if simulation.cur_steps_duration.as_secs_f32() >= MAX_SIMULATION_DURATION_PER_FRAME {
+            simulation.cur_steps = 0;
+            simulation.cur_steps_duration = Duration::ZERO;
+        }
+        ShouldRun::No
+    }
 }
