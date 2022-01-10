@@ -12,8 +12,8 @@ pub fn debug_ui(
         .vscroll(true)
         .show(egui_ctx.ctx(), |ui| {
             ui.heading("Simulation");
-            ui.label(format!("width : {}", config.environment_size.width));
-            ui.label(format!("height: {}", config.environment_size.height));
+            ui.label(format!("width : {}", config.environment.size.width));
+            ui.label(format!("height: {}", config.environment.size.height));
             ui.label(simulation.speed.to_string());
             ui.label("fitness".to_string());
             ui.label(format!(
@@ -45,11 +45,7 @@ pub fn debug_ui(
             ui.label(format!("fps: {}", fps_s));
         });
 }
-pub fn status_bar_ui(
-    egui_ctx: Res<EguiContext>,
-    mut simulation: ResMut<Simulation>,
-    mut orthos: Query<&mut OrthographicProjection>,
-) {
+pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulation>) {
     let mut fonts = egui::FontDefinitions::default();
     fonts.family_and_size.insert(
         egui::TextStyle::Body,
@@ -107,8 +103,5 @@ pub fn status_bar_ui(
         });
     if let Some(new_speed) = new_speed {
         simulation.speed = new_speed;
-        for mut ortho in orthos.iter_mut() {
-            ortho.scale *= 2.0;
-        }
     }
 }

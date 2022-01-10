@@ -7,8 +7,8 @@ pub fn spawn_animals(
     asset_server: Res<AssetServer>,
     config: Res<SimulationConfig>,
 ) {
-    let half_width = config.environment_size.width / 2.0;
-    let half_height = config.environment_size.height / 2.0;
+    let half_width = config.environment.size.width / 2.0;
+    let half_height = config.environment.size.height / 2.0;
     let mut rng = thread_rng();
     for i in 0..config.starting_animals {
         let selected = i == 0;
@@ -57,8 +57,8 @@ pub fn spawn_foods(
     asset_server: Res<AssetServer>,
     config: Res<SimulationConfig>,
 ) {
-    let half_width = config.environment_size.width / 2.0;
-    let half_height = config.environment_size.height / 2.0;
+    let half_width = config.environment.size.width / 2.0;
+    let half_height = config.environment.size.height / 2.0;
     let mut rng = thread_rng();
     for _ in 0..config.starting_foods {
         commands
@@ -88,8 +88,8 @@ pub fn spawn_floor(mut commands: Commands, config: Res<SimulationConfig>) {
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::new(
-                    config.environment_size.width as f32 + 20.0,
-                    config.environment_size.height as f32 + 20.0,
+                    config.environment.size.width as f32 + 20.0,
+                    config.environment.size.height as f32 + 20.0,
                 )),
                 color: Color::rgb(0.1, 0.3, 0.1),
                 ..Default::default()

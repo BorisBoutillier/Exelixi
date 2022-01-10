@@ -9,8 +9,8 @@ pub fn collision(
         for mut food_transform in foods.iter_mut() {
             let distance = (animal_transform.translation - food_transform.translation).length();
             if distance <= 10.0 {
-                let half_width = config.environment_size.width / 2.0;
-                let half_height = config.environment_size.height / 2.0;
+                let half_width = config.environment.size.width / 2.0;
+                let half_height = config.environment.size.height / 2.0;
                 let mut rng = thread_rng();
                 food_transform.translation.x = rng.gen_range(-half_width..half_width);
                 food_transform.translation.y = rng.gen_range(-half_height..half_height);

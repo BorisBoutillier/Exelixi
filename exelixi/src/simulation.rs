@@ -65,26 +65,38 @@ impl Default for Simulation {
         Self::new()
     }
 }
+
+pub struct EnvironmentConfig {
+    // Size of floor
+    pub size: Size,
+    // Presence of wall on the boundary.
+    // Without walls the world is a torus
+    pub wall: bool,
+}
+
+impl Default for EnvironmentConfig {
+    fn default() -> Self {
+        Self {
+            size: Size::new(1200.0, 700.0),
+            wall: false,
+        }
+    }
+}
 //
 // Resources
 pub struct SimulationConfig {
     pub generation_length: u32,
     pub starting_foods: u32,
     pub starting_animals: u32,
-    pub environment_size: Size,
+    pub environment: EnvironmentConfig,
 }
-impl SimulationConfig {
-    pub fn new() -> Self {
+impl Default for SimulationConfig {
+    fn default() -> Self {
         Self {
             generation_length: 2500,
             starting_foods: 30,
             starting_animals: 20,
-            environment_size: Size::new(1200.0, 700.0),
+            environment: EnvironmentConfig::default(),
         }
-    }
-}
-impl Default for SimulationConfig {
-    fn default() -> Self {
-        Self::new()
     }
 }

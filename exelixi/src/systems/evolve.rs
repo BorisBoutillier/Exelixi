@@ -9,8 +9,8 @@ pub fn evolve(
 ) {
     simulation.age += 1;
     if simulation.age == config.generation_length {
-        let half_width = config.environment_size.width / 2.0;
-        let half_height = config.environment_size.height / 2.0;
+        let half_width = config.environment.size.width / 2.0;
+        let half_height = config.environment.size.height / 2.0;
         let mut rng = thread_rng();
         simulation.age = 0;
         simulation.generation += 1;
