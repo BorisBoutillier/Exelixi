@@ -8,7 +8,9 @@ pub struct Velocity {
 #[derive(Component)]
 pub struct Animal {}
 #[derive(Component)]
-pub struct Food {}
+pub struct Food {
+    pub eaten: bool,
+}
 
 #[derive(Component)]
 pub struct Floor {}

@@ -55,37 +55,6 @@ pub fn spawn_animals(
     }
 }
 
-pub fn spawn_foods(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    config: Res<SimulationConfig>,
-) {
-    let half_width = config.environment.size.width / 2.0;
-    let half_height = config.environment.size.height / 2.0;
-    let mut rng = thread_rng();
-    for _ in 0..config.starting_foods {
-        commands
-            .spawn_bundle(SpriteBundle {
-                sprite: Sprite {
-                    custom_size: Some(Vec2::new(10.0, 10.0)),
-                    color: Color::rgb(0.1, 0.7, 0.1),
-                    ..Default::default()
-                },
-                transform: Transform {
-                    translation: Vec3::new(
-                        rng.gen_range(-half_width..half_width),
-                        rng.gen_range(-half_height..half_height),
-                        1.0,
-                    ),
-                    ..Default::default()
-                },
-                texture: asset_server.load("food.png"),
-                ..Default::default()
-            })
-            .insert(Food {});
-    }
-}
-
 pub fn spawn_floor(mut commands: Commands, config: Res<SimulationConfig>) {
     commands
         .spawn_bundle(SpriteBundle {

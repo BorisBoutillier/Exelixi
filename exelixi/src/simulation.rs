@@ -111,17 +111,18 @@ impl Default for EnvironmentConfig {
 // Resources
 pub struct SimulationConfig {
     pub generation_length: u32,
-    pub starting_foods: u32,
     pub starting_animals: u32,
+    // Average number of food spawning per step
+    pub food_spawn_rate: f64,
     pub environment: EnvironmentConfig,
 }
 impl Default for SimulationConfig {
     fn default() -> Self {
         Self {
             generation_length: 2500,
-            starting_foods: 30,
             starting_animals: 20,
             environment: EnvironmentConfig::default(),
+            food_spawn_rate: 20.0 * 20.0 / 2500.0,
         }
     }
 }

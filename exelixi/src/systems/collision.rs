@@ -1,20 +1,21 @@
 use crate::prelude::*;
 
 pub fn collision(
-    mut animals: Query<(&mut Stomach, &Transform), Without<Food>>,
-    mut foods: Query<&mut Transform, With<Food>>,
-    config: Res<SimulationConfig>,
+    mut commands: Commands,
+    mut animals: Query<(&mut Stomach, &Transform)>,
+    mut foods: Query<(Entity, &Transform, &mut Food)>,
 ) {
     for (mut animal_stomach, animal_transform) in animals.iter_mut() {
-        for mut food_transform in foods.iter_mut() {
-            let distance = (animal_transform.translation - food_transform.translation).length();
-            if distance <= 10.0 {
-                let half_width = config.environment.size.width / 2.0;
-                let half_height = config.environment.size.height / 2.0;
-                let mut rng = thread_rng();
-                food_transform.translation.x = rng.gen_range(-half_width..half_width);
-                food_transform.translation.y = rng.gen_range(-half_height..half_height);
-                animal_stomach.satiation += 1.0;
+        for (entity, food_transform, mut food) in foods.iter_mut() {
+            if !food.eaten {
+                let distance = (animal_transform.translation - food_transform.translation).length();
+                if distance <= 10.0 {
+                    animal_stomach.satiation += 1.0;
+                    // Storing the eaten state is currently necessary, because despawn will not
+                    // happen when we do multiple steps per run_criteria
+                    food.eaten = true;
+                    commands.entity(entity).despawn();
+                }
             }
         }
     }

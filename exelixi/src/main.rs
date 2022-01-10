@@ -58,7 +58,6 @@ fn main() {
         .add_plugin(EguiPlugin)
         .add_startup_system(setup)
         .add_startup_system(spawn_animals)
-        .add_startup_system(spawn_foods)
         .add_startup_system(spawn_floor)
         .add_system(debug_ui)
         .add_system(status_bar_ui)
@@ -72,7 +71,8 @@ fn main() {
                 .with_system(movement)
                 .with_system(collision)
                 .with_system(process_brain)
-                .with_system(evolve),
+                .with_system(evolve)
+                .with_system(spawn_food),
         )
         .run();
 }

@@ -38,7 +38,7 @@ pub fn debug_ui(
                 "eye wall vision: {}",
                 eye.process_vision_walls(transform, &config)
                     .iter()
-                    .map(|f| format!("{:.2} ", f))
+                    .map(|f| format!("{:.1} ", f))
                     .collect::<String>()
             ));
             ui.separator();
