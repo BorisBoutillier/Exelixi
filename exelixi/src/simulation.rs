@@ -77,11 +77,16 @@ impl Simulation {
     }
     // Dump current simulation information in a single line string.
     pub fn sprint_state(&self, config: &SimulationConfig) -> String {
+        let (dead, survives, reproduces) = self.statistics.population();
         format!(
-            "Gen: {:03} , Sts: {:.2} , Avg: {:.1}",
+            "Gen: {:03} , Sts: {:.2} , Avg: {:.1} , Pop: {} ({}/{}/{})",
             self.generation,
             self.sts(config),
-            self.statistics.avg_fitness()
+            self.statistics.avg_fitness(),
+            dead + survives + reproduces,
+            dead,
+            survives,
+            reproduces,
         )
     }
 }
@@ -111,7 +116,12 @@ impl Default for EnvironmentConfig {
 // Resources
 pub struct SimulationConfig {
     pub generation_length: u32,
-    pub starting_animals: u32,
+    // Number of random animals to spawn in first generation
+    pub min_population: u32,
+    // Minimum fitness required at end of generation to survive
+    pub fitness_die_threshold: f32,
+    // Minimum fitness required at participate in reproduction
+    pub fitness_reproduce_threshold: f32,
     // Average number of food spawning per step
     pub food_spawn_rate: f64,
     pub environment: EnvironmentConfig,
@@ -120,9 +130,11 @@ impl Default for SimulationConfig {
     fn default() -> Self {
         Self {
             generation_length: 2500,
-            starting_animals: 20,
+            min_population: 5,
+            fitness_die_threshold: 20.0,
+            fitness_reproduce_threshold: 20.0,
             environment: EnvironmentConfig::default(),
-            food_spawn_rate: 20.0 * 20.0 / 2500.0,
+            food_spawn_rate: 20.0 * 10.0 / 2500.0,
         }
     }
 }

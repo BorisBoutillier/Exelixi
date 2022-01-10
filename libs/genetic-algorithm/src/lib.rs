@@ -10,7 +10,8 @@ pub trait Individual {
 }
 
 pub trait SelectionMethod {
-    fn select<'a, I>(&self, rng: &mut dyn RngCore, population: &'a [I]) -> &'a I
+    // Select one individual among the provided population with its fitness higher than the threshold
+    fn select<'a, I>(&self, rng: &mut dyn RngCore, population: &'a [I], threshold: f32) -> &'a I
     where
         I: Individual;
 }
@@ -81,12 +82,19 @@ impl Default for RouletteWheelSelection {
     }
 }
 impl SelectionMethod for RouletteWheelSelection {
-    fn select<'a, I>(&self, rng: &mut dyn RngCore, population: &'a [I]) -> &'a I
+    fn select<'a, I>(&self, rng: &mut dyn RngCore, population: &'a [I], threshold: f32) -> &'a I
     where
         I: Individual,
     {
         population
-            .choose_weighted(rng, |individual| individual.fitness())
+            .choose_weighted(rng, |individual| {
+                let f = individual.fitness();
+                if f > threshold {
+                    f
+                } else {
+                    0.0
+                }
+            })
             .expect("Got an empty population to choose from")
     }
 }
@@ -167,25 +175,54 @@ where
             mutation_method: Box::new(mutation_method),
         }
     }
-    pub fn evolve<I>(&self, rng: &mut dyn RngCore, population: &[I]) -> (Vec<I>, Statistics)
+    pub fn evolve<I>(
+        &self,
+        rng: &mut dyn RngCore,
+        population: &[I],
+        die_threshold: f32,
+        reproduce_threshold: f32,
+    ) -> (Vec<I>, Statistics)
     where
         I: Individual,
     {
-        assert!(!population.is_empty());
-        let new_population = (0..population.len())
-            .map(|_| {
-                let parent_a = self.selection_method.select(rng, population);
-                let parent_b = self.selection_method.select(rng, population);
-                let mut child = self.crossover_method.crossover(
-                    rng,
-                    parent_a.chromosome(),
-                    parent_b.chromosome(),
-                );
-                self.mutation_method.mutate(rng, &mut child);
-                I::create(child)
+        // Start the new population by keep the barely survivors
+        let mut new_chromosomes = population
+            .iter()
+            .filter(|i| i.fitness() > die_threshold && i.fitness() < reproduce_threshold)
+            .map(|i| i.chromosome().clone())
+            .collect::<Vec<_>>();
+        // Then add two child per reproductors
+        let n_reproductors = population
+            .iter()
+            .filter(|i| i.fitness() > reproduce_threshold)
+            .count();
+        new_chromosomes.extend(
+            (0..(n_reproductors * 2))
+                .map(|_| {
+                    let parent_a =
+                        self.selection_method
+                            .select(rng, population, reproduce_threshold);
+                    let parent_b =
+                        self.selection_method
+                            .select(rng, population, reproduce_threshold);
+                    self.crossover_method.crossover(
+                        rng,
+                        parent_a.chromosome(),
+                        parent_b.chromosome(),
+                    )
+                })
+                .collect::<Vec<_>>(),
+        );
+        // Apply mutation and create new individuals
+        let new_population = new_chromosomes
+            .into_iter()
+            .map(|mut c| {
+                self.mutation_method.mutate(rng, &mut c);
+                I::create(c)
             })
-            .collect();
-        let stats = Statistics::new(population);
+            .collect::<Vec<_>>();
+
+        let stats = Statistics::new(population, die_threshold, reproduce_threshold);
         (new_population, stats)
     }
 }
@@ -235,7 +272,7 @@ mod tests {
 
         for _ in 0..1000 {
             let fitness = RouletteWheelSelection::new()
-                .select(&mut rng, &population)
+                .select(&mut rng, &population, 0.0)
                 .fitness() as i32;
             *actual_histogram.entry(fitness).or_insert(0) += 1;
         }
@@ -248,10 +285,13 @@ pub struct Statistics {
     min_fitness: f32,
     max_fitness: f32,
     avg_fitness: f32,
+    dead: usize,
+    survivors: usize,
+    reproductors: usize,
 }
 
 impl Statistics {
-    fn new<I>(population: &[I]) -> Self
+    fn new<I>(population: &[I], die_threshold: f32, reproduce_threshold: f32) -> Self
     where
         I: Individual,
     {
@@ -269,10 +309,22 @@ impl Statistics {
             sum_fitness += fitness;
         }
 
+        let dead = population
+            .iter()
+            .filter(|i| i.fitness() < die_threshold)
+            .count();
+        let reproductors = population
+            .iter()
+            .filter(|i| i.fitness() > reproduce_threshold)
+            .count();
+        let survivors = population.len() - dead - reproductors;
         Self {
             min_fitness,
             max_fitness,
             avg_fitness: sum_fitness / (population.len() as f32),
+            dead,
+            survivors,
+            reproductors,
         }
     }
 
@@ -287,6 +339,9 @@ impl Statistics {
     pub fn avg_fitness(&self) -> f32 {
         self.avg_fitness
     }
+    pub fn population(&self) -> (usize, usize, usize) {
+        (self.dead, self.survivors, self.reproductors)
+    }
 }
 impl Default for Statistics {
     fn default() -> Self {
@@ -294,6 +349,9 @@ impl Default for Statistics {
             min_fitness: 0.0,
             max_fitness: 0.0,
             avg_fitness: 0.0,
+            dead: 0,
+            survivors: 0,
+            reproductors: 0,
         }
     }
 }

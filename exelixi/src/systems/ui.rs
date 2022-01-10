@@ -7,7 +7,6 @@ pub fn debug_ui(
     config: Res<SimulationConfig>,
     diagnostics: Res<Diagnostics>,
 ) {
-    let (transform, velocity, stomach, eye) = selection.get_single().unwrap();
     egui::Window::new("Debug")
         .vscroll(true)
         .show(egui_ctx.ctx(), |ui| {
@@ -28,19 +27,21 @@ pub fn debug_ui(
                 "    avg: {:.2}",
                 simulation.statistics.avg_fitness()
             ));
-            ui.heading("Selection");
-            ui.label(format!("x: {:.1}", transform.translation.x));
-            ui.label(format!("y: {:.1}", transform.translation.y));
-            ui.label(format!("linear: {:.1}", velocity.linear));
-            ui.label(format!("angular: {:.1}", velocity.angular));
-            ui.label(format!("satiation: {:.1}", stomach.satiation));
-            ui.label(format!(
-                "eye wall vision: {}",
-                eye.process_vision_walls(transform, &config)
-                    .iter()
-                    .map(|f| format!("{:.1} ", f))
-                    .collect::<String>()
-            ));
+            if let Ok((transform, velocity, stomach, eye)) = selection.get_single() {
+                ui.heading("Selection");
+                ui.label(format!("x: {:.1}", transform.translation.x));
+                ui.label(format!("y: {:.1}", transform.translation.y));
+                ui.label(format!("linear: {:.1}", velocity.linear));
+                ui.label(format!("angular: {:.1}", velocity.angular));
+                ui.label(format!("satiation: {:.1}", stomach.satiation));
+                ui.label(format!(
+                    "eye wall vision: {}",
+                    eye.process_vision_walls(transform, &config)
+                        .iter()
+                        .map(|f| format!("{:.1} ", f))
+                        .collect::<String>()
+                ));
+            }
             ui.separator();
 
             let mut fps_s = "N/A".to_string();

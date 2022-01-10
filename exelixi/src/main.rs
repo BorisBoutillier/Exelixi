@@ -57,7 +57,7 @@ fn main() {
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(EguiPlugin)
         .add_startup_system(setup)
-        .add_startup_system(spawn_animals)
+        .add_startup_system(spawn_starting_animals)
         .add_startup_system(spawn_floor)
         .add_system(debug_ui)
         .add_system(status_bar_ui)
