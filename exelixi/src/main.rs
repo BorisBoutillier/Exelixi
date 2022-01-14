@@ -1,6 +1,7 @@
 #![allow(clippy::type_complexity)]
 mod animal_individual;
 mod brain;
+mod camera;
 mod components;
 mod eye;
 mod simulation;
@@ -23,6 +24,7 @@ mod prelude {
 
     pub use crate::animal_individual::*;
     pub use crate::brain::*;
+    pub use crate::camera::*;
     pub use crate::components::*;
     pub use crate::eye::*;
     pub use crate::simulation::*;
@@ -56,7 +58,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(EguiPlugin)
-        .add_startup_system(setup)
+        .add_plugin(CameraPlugin {})
         .add_startup_system(spawn_starting_animals)
         .add_startup_system(spawn_floor)
         .add_system(debug_ui)
@@ -77,9 +79,6 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands) {
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-}
 fn run_simulation_speed(time: Res<Time>, mut simulation: ResMut<Simulation>) -> ShouldRun {
     if simulation.speed == SimulationSpeed::Paused {
         return ShouldRun::No;

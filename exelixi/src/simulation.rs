@@ -107,8 +107,8 @@ pub struct EnvironmentConfig {
 impl Default for EnvironmentConfig {
     fn default() -> Self {
         Self {
-            size: Size::new(1200.0, 700.0),
-            wall: true,
+            size: Size::new(1200.0, 800.0),
+            wall: false,
         }
     }
 }
@@ -131,10 +131,10 @@ impl Default for SimulationConfig {
         Self {
             generation_length: 2500,
             min_population: 5,
-            fitness_die_threshold: 20.0,
-            fitness_reproduce_threshold: 20.0,
+            fitness_die_threshold: 1.0,
+            fitness_reproduce_threshold: 1.0,
             environment: EnvironmentConfig::default(),
-            food_spawn_rate: 20.0 * 10.0 / 2500.0,
+            food_spawn_rate: (30.0) / 2500.0,
         }
     }
 }

@@ -5,13 +5,11 @@ pub fn evolve(
     mut simulation: ResMut<Simulation>,
     config: Res<SimulationConfig>,
     animals: Query<(Entity, &Stomach, &Brain, &Eye)>,
-    mut transforms: Query<&mut Transform, Or<(With<Food>, With<Animal>)>>,
+    foods: Query<Entity, With<Food>>,
     asset_server: Res<AssetServer>,
 ) {
     simulation.age += 1;
     if simulation.age == config.generation_length {
-        let half_width = config.environment.size.width / 2.0;
-        let half_height = config.environment.size.height / 2.0;
         let mut rng = thread_rng();
         simulation.age = 0;
         simulation.generation += 1;
@@ -59,13 +57,11 @@ pub fn evolve(
                 spawn_animal(&mut commands, &*asset_server, &*config, eye, brain, false);
             }
         }
-        simulation.statistics = stats;
-        // Reset all transform
-        for mut transform in transforms.iter_mut() {
-            transform.translation.x = rng.gen_range(-half_width..half_width);
-            transform.translation.y = rng.gen_range(-half_height..half_height);
-            transform.rotation = Quat::from_axis_angle(Vec3::Z, rng.gen_range(-PI..PI));
+        // Remove all food
+        for entity in foods.iter() {
+            commands.entity(entity).despawn();
         }
+        simulation.statistics = stats;
         println!("{}", simulation.sprint_state(&config));
     }
 }

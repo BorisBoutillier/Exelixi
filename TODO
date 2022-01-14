@@ -1,8 +1,8 @@
 -- User Interaction
-. Allow user to move the Camera:
-    . Click + move = move around the environment
-    . Wheel Up/Down = Unzoom/zoom
-    . Middle Click : Recenter on environment
+. Improve user camera interaction:
+    . Improve update on window resize 
+    . Keep environment aspect ratio.
+    . Make panning around follow environment 'scale'
 . Allow user modification of the simulation configuraton
     Restart a new simulation on change.
 . Save/Load population
@@ -24,8 +24,6 @@
         . process_movement:
             exponential cost of linear/angular velocity
     . Eating food raise energy.
-. Allow to see Walls
-    A new set of values from eyes ?
 . Allow to see other animals
     A new set of values from eyes ?
 . Allow an output neuron to control usage of eyes.
@@ -33,4 +31,3 @@
 . New genes to control the fov_range/fov_angle:
     Impacts on energy based on 'visible' area.
 . New genes to control number of eyes.
-. If wall/animal visibility, genes to control availability of these features.
