@@ -2,7 +2,7 @@ use std::fmt;
 use std::time::Duration;
 
 use crate::prelude::*;
-use ga::Statistics;
+use ga::PopulationStatistics;
 
 /// Number of simulation step we do per frame in Normal speed mode
 pub const STEP_PER_FRAME_NORMAL: usize = 1;
@@ -36,13 +36,59 @@ impl fmt::Display for SimulationSpeed {
         )
     }
 }
+#[derive(Default)]
+pub struct SimulationStatistics {
+    pub population: Vec<PopulationStatistics>,
+}
+
+impl SimulationStatistics {
+    pub fn latest_dead(&self) -> usize {
+        let len = self.population.len();
+        match len {
+            0 => 0,
+            n => self.population[n - 1].dead(),
+        }
+    }
+    pub fn latest_size(&self) -> usize {
+        let len = self.population.len();
+        match len {
+            0 => 0,
+            n => self.population[n - 1].size(),
+        }
+    }
+    pub fn latest_avg_fitness(&self) -> f32 {
+        let len = self.population.len();
+        match len {
+            0 => 0.0,
+            n => self.population[n - 1].avg_fitness(),
+        }
+    }
+    pub fn latest_min_fitness(&self) -> f32 {
+        let len = self.population.len();
+        match len {
+            0 => 0.0,
+            n => self.population[n - 1].min_fitness(),
+        }
+    }
+    pub fn latest_max_fitness(&self) -> f32 {
+        let len = self.population.len();
+        match len {
+            0 => 0.0,
+            n => self.population[n - 1].max_fitness(),
+        }
+    }
+    pub fn update(&mut self, population_stat: PopulationStatistics) {
+        self.population.push(population_stat);
+    }
+}
+
 // Resources
 pub struct Simulation {
     pub speed: SimulationSpeed,
     pub age: u32,
     pub generation: u32,
     pub ga: ga::GeneticAlgorithm<ga::RouletteWheelSelection>,
-    pub statistics: Statistics,
+    pub statistics: SimulationStatistics,
     // Total active running of the simulation
     pub duration: Duration,
     // Internal. Used to control simulation speed
@@ -60,7 +106,7 @@ impl Simulation {
                 ga::UniformCrossover::default(),
                 ga::GaussianMutation::new(0.01, 0.3),
             ),
-            statistics: Statistics::default(),
+            statistics: SimulationStatistics::default(),
             duration: Duration::ZERO,
             cur_steps_duration: Duration::ZERO,
             cur_steps: 0,
@@ -77,16 +123,15 @@ impl Simulation {
     }
     // Dump current simulation information in a single line string.
     pub fn sprint_state(&self, config: &SimulationConfig) -> String {
-        let (dead, survives, reproduces) = self.statistics.population();
+        let size = self.statistics.latest_size();
+        let dead = self.statistics.latest_dead();
         format!(
-            "Gen: {:03} , Sts: {:.2} , Avg: {:.1} , Pop: {} ({}/{}/{})",
+            "Gen: {:03} , Sts: {:.2} , Avg: {:.1} , Pop: {}/{}",
             self.generation,
             self.sts(config),
-            self.statistics.avg_fitness(),
-            dead + survives + reproduces,
+            self.statistics.latest_avg_fitness(),
             dead,
-            survives,
-            reproduces,
+            size,
         )
     }
 }
@@ -108,7 +153,7 @@ impl Default for EnvironmentConfig {
     fn default() -> Self {
         Self {
             size: Size::new(1200.0, 800.0),
-            wall: false,
+            wall: true,
         }
     }
 }
@@ -117,12 +162,14 @@ impl Default for EnvironmentConfig {
 pub struct SimulationConfig {
     pub generation_length: u32,
     // Number of random animals to spawn in first generation
-    pub min_population: u32,
+    pub start_population: i32,
+    // Minimum number of animals in each generation. Randomized if 'missing'
+    pub min_population: i32,
+    // Number of child one surviving animal spawn in next generation
+    pub fertility_rate: f32,
     // Minimum fitness required at end of generation to survive
-    pub fitness_die_threshold: f32,
-    // Minimum fitness required at participate in reproduction
-    pub fitness_reproduce_threshold: f32,
-    // Average number of food spawning per step
+    pub death_threshold: f32,
+    // Average number of food that spawns per step
     pub food_spawn_rate: f64,
     pub environment: EnvironmentConfig,
 }
@@ -130,11 +177,12 @@ impl Default for SimulationConfig {
     fn default() -> Self {
         Self {
             generation_length: 2500,
-            min_population: 5,
-            fitness_die_threshold: 1.0,
-            fitness_reproduce_threshold: 1.0,
+            start_population: 20,
+            min_population: 1,
+            fertility_rate: 1.1,
+            death_threshold: 2.0,
             environment: EnvironmentConfig::default(),
-            food_spawn_rate: (30.0) / 2500.0,
+            food_spawn_rate: (20.0 * 20.0) / 2500.0,
         }
     }
 }

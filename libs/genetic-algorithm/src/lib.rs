@@ -179,40 +179,35 @@ where
         &self,
         rng: &mut dyn RngCore,
         population: &[I],
-        die_threshold: f32,
-        reproduce_threshold: f32,
-    ) -> (Vec<I>, Statistics)
+        death_threshold: f32,
+        fertility_rate: f32,
+    ) -> (Vec<I>, PopulationStatistics)
     where
         I: Individual,
     {
-        // Start the new population by keep the barely survivors
-        let mut new_chromosomes = population
+        let n_survivors = population
             .iter()
-            .filter(|i| i.fitness() > die_threshold && i.fitness() < reproduce_threshold)
-            .map(|i| i.chromosome().clone())
-            .collect::<Vec<_>>();
-        // Then add two child per reproductors
-        let n_reproductors = population
-            .iter()
-            .filter(|i| i.fitness() > reproduce_threshold)
+            .filter(|i| i.fitness() > death_threshold)
             .count();
-        new_chromosomes.extend(
-            (0..(n_reproductors * 2))
-                .map(|_| {
-                    let parent_a =
-                        self.selection_method
-                            .select(rng, population, reproduce_threshold);
-                    let parent_b =
-                        self.selection_method
-                            .select(rng, population, reproduce_threshold);
-                    self.crossover_method.crossover(
-                        rng,
-                        parent_a.chromosome(),
-                        parent_b.chromosome(),
-                    )
-                })
-                .collect::<Vec<_>>(),
-        );
+        let n_children = n_survivors as f32 * fertility_rate;
+        let n_children = n_children as usize
+            + if rng.gen_bool((n_children % 1.0) as f64) {
+                1
+            } else {
+                0
+            };
+        let new_chromosomes = (0..n_children)
+            .map(|_| {
+                let parent_a = self
+                    .selection_method
+                    .select(rng, population, death_threshold);
+                let parent_b = self
+                    .selection_method
+                    .select(rng, population, death_threshold);
+                self.crossover_method
+                    .crossover(rng, parent_a.chromosome(), parent_b.chromosome())
+            })
+            .collect::<Vec<_>>();
         // Apply mutation and create new individuals
         let new_population = new_chromosomes
             .into_iter()
@@ -222,7 +217,7 @@ where
             })
             .collect::<Vec<_>>();
 
-        let stats = Statistics::new(population, die_threshold, reproduce_threshold);
+        let stats = PopulationStatistics::new(population, death_threshold);
         (new_population, stats)
     }
 }
@@ -281,17 +276,16 @@ mod tests {
     }
 }
 
-pub struct Statistics {
+pub struct PopulationStatistics {
     min_fitness: f32,
     max_fitness: f32,
     avg_fitness: f32,
+    size: usize,
     dead: usize,
-    survivors: usize,
-    reproductors: usize,
 }
 
-impl Statistics {
-    fn new<I>(population: &[I], die_threshold: f32, reproduce_threshold: f32) -> Self
+impl PopulationStatistics {
+    fn new<I>(population: &[I], death_threshold: f32) -> Self
     where
         I: Individual,
     {
@@ -309,22 +303,17 @@ impl Statistics {
             sum_fitness += fitness;
         }
 
+        let size = population.len();
         let dead = population
             .iter()
-            .filter(|i| i.fitness() < die_threshold)
+            .filter(|i| i.fitness() < death_threshold)
             .count();
-        let reproductors = population
-            .iter()
-            .filter(|i| i.fitness() > reproduce_threshold)
-            .count();
-        let survivors = population.len() - dead - reproductors;
         Self {
             min_fitness,
             max_fitness,
             avg_fitness: sum_fitness / (population.len() as f32),
+            size,
             dead,
-            survivors,
-            reproductors,
         }
     }
 
@@ -339,19 +328,21 @@ impl Statistics {
     pub fn avg_fitness(&self) -> f32 {
         self.avg_fitness
     }
-    pub fn population(&self) -> (usize, usize, usize) {
-        (self.dead, self.survivors, self.reproductors)
+    pub fn size(&self) -> usize {
+        self.size
+    }
+    pub fn dead(&self) -> usize {
+        self.dead
     }
 }
-impl Default for Statistics {
+impl Default for PopulationStatistics {
     fn default() -> Self {
         Self {
             min_fitness: 0.0,
             max_fitness: 0.0,
             avg_fitness: 0.0,
+            size: 0,
             dead: 0,
-            survivors: 0,
-            reproductors: 0,
         }
     }
 }

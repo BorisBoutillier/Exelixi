@@ -55,7 +55,7 @@ pub fn spawn_starting_animals(
     config: Res<SimulationConfig>,
 ) {
     let mut rng = thread_rng();
-    for i in 0..config.min_population {
+    for i in 0..config.start_population {
         let selected = i == 0;
         let eye = Eye {
             see_walls: config.environment.wall,

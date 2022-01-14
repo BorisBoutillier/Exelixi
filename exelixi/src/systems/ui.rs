@@ -17,15 +17,15 @@ pub fn debug_ui(
             ui.label("fitness".to_string());
             ui.label(format!(
                 "    min: {:.2}",
-                simulation.statistics.min_fitness()
+                simulation.statistics.latest_min_fitness()
             ));
             ui.label(format!(
                 "    max: {:.2}",
-                simulation.statistics.max_fitness()
+                simulation.statistics.latest_max_fitness()
             ));
             ui.label(format!(
                 "    avg: {:.2}",
-                simulation.statistics.avg_fitness()
+                simulation.statistics.latest_avg_fitness()
             ));
             if let Ok((transform, velocity, stomach, eye)) = selection.get_single() {
                 ui.heading("Selection");
@@ -70,7 +70,37 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
     );
     egui_ctx.ctx().set_fonts(fonts);
 
+    let size_color = egui::Color32::from_rgb(51, 51, 230);
+    let dead_color = egui::Color32::from_rgb(230, 0, 0);
+    let avg_color = egui::Color32::from_rgb(25, 180, 25);
     let mut new_speed = None;
+    let population_size_line = egui::plot::Line::new(egui::plot::Values::from_values_iter(
+        simulation
+            .statistics
+            .population
+            .iter()
+            .enumerate()
+            .map(|(i, s)| egui::plot::Value::new(i as f64, s.size() as f64)),
+    ))
+    .color(size_color);
+    let population_dead_line = egui::plot::Line::new(egui::plot::Values::from_values_iter(
+        simulation
+            .statistics
+            .population
+            .iter()
+            .enumerate()
+            .map(|(i, s)| egui::plot::Value::new(i as f64, s.dead() as f64)),
+    ))
+    .color(dead_color);
+    let population_avg_fitness_line = egui::plot::Line::new(egui::plot::Values::from_values_iter(
+        simulation
+            .statistics
+            .population
+            .iter()
+            .enumerate()
+            .map(|(i, s)| egui::plot::Value::new(i as f64, s.avg_fitness() as f64)),
+    ))
+    .color(avg_color);
     egui::TopBottomPanel::bottom("bottom_panel")
         .frame(
             egui::Frame::default()
@@ -108,6 +138,53 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
                         new_speed = Some(*speed);
                     }
                 }
+                ui.add_space(half_width / 5.0);
+                ui.vertical(|ui| {
+                    let plot = egui::plot::Plot::new("population_plot")
+                        .height(50.0)
+                        .width(half_width * 3.0 / 5.0)
+                        .show_x(false)
+                        .show_y(true)
+                        .center_x_axis(false)
+                        .center_y_axis(false)
+                        .allow_zoom(false)
+                        .allow_drag(false);
+                    plot.show(ui, |plot_ui| {
+                        plot_ui.line(population_dead_line);
+                        plot_ui.line(population_size_line);
+                    });
+                    let plot = egui::plot::Plot::new("fitness_plot")
+                        .height(50.0)
+                        .width(half_width * 3.0 / 5.0)
+                        .show_x(false)
+                        .show_y(true)
+                        .center_x_axis(false)
+                        .center_y_axis(false)
+                        .allow_zoom(false)
+                        .allow_drag(false);
+                    plot.show(ui, |plot_ui| {
+                        plot_ui.line(population_avg_fitness_line);
+                    });
+                });
+                ui.vertical(|ui| {
+                    ui.label(
+                        egui::RichText::new(format!("{}", simulation.statistics.latest_size()))
+                            .color(size_color),
+                    );
+                    ui.add_space(25.0 - 8.0);
+                    ui.label(
+                        egui::RichText::new(format!("{}", simulation.statistics.latest_dead()))
+                            .color(dead_color),
+                    );
+                    ui.add_space(25.0 - 8.0);
+                    ui.label(
+                        egui::RichText::new(format!(
+                            "{:.1}",
+                            simulation.statistics.latest_avg_fitness()
+                        ))
+                        .color(avg_color),
+                    );
+                });
             });
         });
     if let Some(new_speed) = new_speed {
