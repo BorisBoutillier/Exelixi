@@ -1,7 +1,9 @@
 use std::fmt;
 use std::time::Duration;
 
+mod config;
 use crate::prelude::*;
+pub use config::*;
 use ga::PopulationStatistics;
 
 /// Number of simulation step we do per frame in Normal speed mode
@@ -138,51 +140,5 @@ impl Simulation {
 impl Default for Simulation {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-pub struct EnvironmentConfig {
-    // Size of floor
-    pub size: Size,
-    // Presence of wall on the boundary.
-    // Without walls the world is a torus
-    pub wall: bool,
-}
-
-impl Default for EnvironmentConfig {
-    fn default() -> Self {
-        Self {
-            size: Size::new(1200.0, 800.0),
-            wall: true,
-        }
-    }
-}
-//
-// Resources
-pub struct SimulationConfig {
-    pub generation_length: u32,
-    // Number of random animals to spawn in first generation
-    pub start_population: i32,
-    // Minimum number of animals in each generation. Randomized if 'missing'
-    pub min_population: i32,
-    // Number of child one surviving animal spawn in next generation
-    pub fertility_rate: f32,
-    // Minimum fitness required at end of generation to survive
-    pub death_threshold: f32,
-    // Average number of food that spawns per step
-    pub food_spawn_rate: f64,
-    pub environment: EnvironmentConfig,
-}
-impl Default for SimulationConfig {
-    fn default() -> Self {
-        Self {
-            generation_length: 2500,
-            start_population: 20,
-            min_population: 1,
-            fertility_rate: 1.1,
-            death_threshold: 2.0,
-            environment: EnvironmentConfig::default(),
-            food_spawn_rate: (20.0 * 20.0) / 2500.0,
-        }
     }
 }

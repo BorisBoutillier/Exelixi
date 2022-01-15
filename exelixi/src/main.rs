@@ -14,6 +14,7 @@ mod prelude {
     pub use bevy::diagnostic::Diagnostics;
     pub use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
     pub use bevy::ecs::schedule::ShouldRun;
+    pub use bevy::log;
     pub use bevy::prelude::*;
     pub use bevy_egui::{egui, EguiContext, EguiPlugin, EguiSettings};
 
@@ -59,14 +60,14 @@ fn main() {
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(EguiPlugin)
         .add_plugin(CameraPlugin {})
-        .add_startup_system(spawn_starting_animals)
-        .add_startup_system(spawn_floor)
+        .add_system(spawn_starting_animals)
+        .add_system(spawn_floor)
         .add_system(debug_ui)
         .add_system(status_bar_ui)
-        .add_system(simulation_config_update)
         .add_system(simulation_duration)
+        .add_system(save_default_config)
         .insert_resource(Simulation::default())
-        .insert_resource(SimulationConfig::default())
+        .insert_resource(SimulationConfig::get_default_config())
         .add_system_set(
             SystemSet::new()
                 .with_run_criteria(run_simulation_speed)

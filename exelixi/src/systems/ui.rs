@@ -11,8 +11,8 @@ pub fn debug_ui(
         .vscroll(true)
         .show(egui_ctx.ctx(), |ui| {
             ui.heading("Simulation");
-            ui.label(format!("width : {}", config.environment.size.width));
-            ui.label(format!("height: {}", config.environment.size.height));
+            ui.label(format!("width : {}", config.environment.width));
+            ui.label(format!("height: {}", config.environment.height));
             ui.label(simulation.speed.to_string());
             ui.label("fitness".to_string());
             ui.label(format!(

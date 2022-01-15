@@ -1,8 +1,8 @@
 use crate::*;
 
 pub fn movement(mut movables: Query<(&mut Transform, &Velocity)>, config: Res<SimulationConfig>) {
-    let half_width = config.environment.size.width / 2.0;
-    let half_height = config.environment.size.height / 2.0;
+    let half_width = config.environment.width / 2.0;
+    let half_height = config.environment.height / 2.0;
     movables.for_each_mut(|(mut transform, velocity)| {
         // Update transform based on linear and angular velocity
         let delta = transform.rotation * Vec3::new(velocity.linear, 0.0, 0.0);

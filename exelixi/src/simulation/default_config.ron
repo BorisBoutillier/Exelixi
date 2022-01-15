@@ -1,0 +1,12 @@
+(
+    generation_length : 2500
+,   start_population  : 20
+,   min_population    : 1
+,   fertility_rate    : 1.05
+,   death_threshold   : 3
+,   food_spawn_rate   : 0.16
+,   environment:(
+        width  : 1200
+    ,   height : 800
+    ,   wall   : true
+    ))

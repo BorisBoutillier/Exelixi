@@ -14,8 +14,8 @@ pub fn spawn_food(
         };
 
     for _ in 0..n_food_to_spawn {
-        let half_width = config.environment.size.width / 2.0;
-        let half_height = config.environment.size.height / 2.0;
+        let half_width = config.environment.width / 2.0;
+        let half_height = config.environment.height / 2.0;
         commands
             .spawn_bundle(SpriteBundle {
                 sprite: Sprite {

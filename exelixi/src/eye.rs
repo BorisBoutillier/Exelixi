@@ -80,8 +80,8 @@ impl Eye {
         config: &SimulationConfig,
     ) -> Vec<f32> {
         if self.see_walls {
-            let half_width = config.environment.size.width / 2.0;
-            let half_height = config.environment.size.height / 2.0;
+            let half_width = config.environment.width / 2.0;
+            let half_height = config.environment.height / 2.0;
             let (axis, mut rotation_angle) = transform.rotation.to_axis_angle();
             if axis.z < 0.0 {
                 rotation_angle = -rotation_angle;

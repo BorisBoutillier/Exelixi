@@ -32,10 +32,10 @@ fn camera_movement(
     let reset_camera = config.is_changed() || mouse_button_input.just_pressed(MouseButton::Middle);
     if reset_camera {
         let mut camera_ortho = cameras.get_single_mut().expect("No ortho camera found");
-        camera_ortho.left = (-config.environment.size.width / 2.0) * RESET_MARGIN_PCT;
-        camera_ortho.right = (config.environment.size.width / 2.0) * RESET_MARGIN_PCT;
-        camera_ortho.bottom = (config.environment.size.height / 2.0) * RESET_MARGIN_PCT;
-        camera_ortho.top = (-config.environment.size.height / 2.0) * RESET_MARGIN_PCT;
+        camera_ortho.left = (-config.environment.width / 2.0) * RESET_MARGIN_PCT;
+        camera_ortho.right = (config.environment.width / 2.0) * RESET_MARGIN_PCT;
+        camera_ortho.bottom = (config.environment.height / 2.0) * RESET_MARGIN_PCT;
+        camera_ortho.top = (-config.environment.height / 2.0) * RESET_MARGIN_PCT;
         camera_ortho.scale = 1.0;
         camera_ortho.scaling_mode = ScalingMode::None;
     }

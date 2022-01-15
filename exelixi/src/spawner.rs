@@ -10,8 +10,8 @@ pub fn spawn_animal(
     brain: Brain,
     selected: bool,
 ) {
-    let half_width = config.environment.size.width / 2.0;
-    let half_height = config.environment.size.height / 2.0;
+    let half_width = config.environment.width / 2.0;
+    let half_height = config.environment.height / 2.0;
     let mut rng = thread_rng();
     let color = if selected {
         Color::rgb(0.2, 0.9, 0.9)
@@ -54,37 +54,41 @@ pub fn spawn_starting_animals(
     asset_server: Res<AssetServer>,
     config: Res<SimulationConfig>,
 ) {
-    let mut rng = thread_rng();
-    for i in 0..config.start_population {
-        let selected = i == 0;
-        let eye = Eye {
-            see_walls: config.environment.wall,
-            ..Default::default()
-        };
-        let brain = Brain::random(&mut rng, &eye);
-        spawn_animal(
-            &mut commands,
-            &*asset_server,
-            &*config,
-            eye,
-            brain,
-            selected,
-        );
+    if config.is_changed() {
+        let mut rng = thread_rng();
+        for i in 0..config.start_population {
+            let selected = i == 0;
+            let eye = Eye {
+                see_walls: config.environment.wall,
+                ..Default::default()
+            };
+            let brain = Brain::random(&mut rng, &eye);
+            spawn_animal(
+                &mut commands,
+                &*asset_server,
+                &*config,
+                eye,
+                brain,
+                selected,
+            );
+        }
     }
 }
 
 pub fn spawn_floor(mut commands: Commands, config: Res<SimulationConfig>) {
-    commands
-        .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(
-                    config.environment.size.width as f32 + 20.0,
-                    config.environment.size.height as f32 + 20.0,
-                )),
-                color: Color::rgb(0.1, 0.3, 0.1),
+    if config.is_changed() {
+        commands
+            .spawn_bundle(SpriteBundle {
+                sprite: Sprite {
+                    custom_size: Some(Vec2::new(
+                        config.environment.width + 20.0,
+                        config.environment.height + 20.0,
+                    )),
+                    color: Color::rgb(0.1, 0.3, 0.1),
+                    ..Default::default()
+                },
                 ..Default::default()
-            },
-            ..Default::default()
-        })
-        .insert(Floor {});
+            })
+            .insert(Floor {});
+    }
 }

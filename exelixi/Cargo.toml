@@ -12,3 +12,6 @@ bevy = "0.6"
 bevy_egui = "0.10"
 lib-neural-network = { path = "../libs/neural-network" }
 lib-genetic-algorithm = { path = "../libs/genetic-algorithm" }
+ron = "0.7"
+serde = { version = "1", features = ["derive"] }
+dirs = "4.0"
