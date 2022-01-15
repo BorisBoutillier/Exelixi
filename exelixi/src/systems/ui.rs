@@ -121,7 +121,7 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
                     egui::RichText::new(format!("step : {:4}", simulation.age))
                         .text_style(egui::TextStyle::Monospace),
                 );
-                ui.add_space(ui.available_width() - half_width - 30.0 * 2.0);
+                ui.add_space(ui.available_width() - half_width - 30.0 * 2.5);
                 for (text, hover_text, speed) in &[
                     ("⏸", "Pause", SimulationSpeed::Paused),
                     ("▶", "Normal Speed", SimulationSpeed::Normal),
@@ -138,6 +138,13 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
                         new_speed = Some(*speed);
                     }
                 }
+                if ui
+                    .add(egui::Button::new(
+                        egui::RichText::new("⚙").color(egui::Color32::from_rgb(220, 220, 220)),
+                    ))
+                    .on_hover_text("simulation configuration")
+                    .clicked()
+                {}
                 ui.add_space(half_width / 5.0);
                 ui.vertical(|ui| {
                     let plot = egui::plot::Plot::new("population_plot")
