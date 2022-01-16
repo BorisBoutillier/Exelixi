@@ -1,10 +1,25 @@
 use crate::prelude::*;
 
+mod fov_viewer;
+use bevy::sprite::Material2dPlugin;
+pub use fov_viewer::*;
+
 pub const UI_STATUS_BAR_HEIGHT: f32 = 120.0;
+//
+pub struct UiPlugin;
+impl Plugin for UiPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_plugin(Material2dPlugin::<FovViewerMaterial>::default())
+            .add_system(debug_ui)
+            .add_system(status_bar_ui)
+            .add_system(spawn_fov_viewer_on_selected)
+            .add_system(despawn_fov_viewer_on_deselected);
+    }
+}
 
 pub fn debug_ui(
     egui_ctx: Res<EguiContext>,
-    selection: Query<(&Transform, &Velocity, &Stomach, &Eye), With<Selected>>,
+    selection: Query<(&Transform, &Velocity, &Stomach), With<Selected>>,
     simulation: Res<Simulation>,
     config: Res<SimulationConfig>,
     diagnostics: Res<Diagnostics>,
@@ -29,20 +44,20 @@ pub fn debug_ui(
                 "    avg: {:.2}",
                 simulation.statistics.latest_avg_fitness()
             ));
-            if let Ok((transform, velocity, stomach, eye)) = selection.get_single() {
+            if let Ok((transform, velocity, stomach)) = selection.get_single() {
                 ui.heading("Selection");
                 ui.label(format!("x: {:.1}", transform.translation.x));
                 ui.label(format!("y: {:.1}", transform.translation.y));
                 ui.label(format!("linear: {:.1}", velocity.linear));
                 ui.label(format!("angular: {:.1}", velocity.angular));
                 ui.label(format!("satiation: {:.1}", stomach.satiation));
-                ui.label(format!(
-                    "eye wall vision: {}",
-                    eye.process_vision_walls(transform, &config)
-                        .iter()
-                        .map(|f| format!("{:.1} ", f))
-                        .collect::<String>()
-                ));
+                //ui.label(format!(
+                //    "eye wall vision: {}",
+                //    eye.process_vision_walls(transform, &config)
+                //        .iter()
+                //        .map(|f| format!("{:.1} ", f))
+                //        .collect::<String>()
+                //));
             }
             ui.separator();
 

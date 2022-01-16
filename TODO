@@ -1,14 +1,11 @@
 -- User Interaction
 . Improve user camera interaction:
-    . Improve update on window resize 
-    . Keep environment aspect ratio.
     . Make panning around follow environment 'scale'
 . Allow user modification of the simulation configuraton
     Restart a new simulation on change.
 . Save/Load population
 . Save/Load configuration
 . Allow clicking an animal to see its state:
-    . fov_range/fov_angle drawn
     . plot with evolution of the energy level.
     
 

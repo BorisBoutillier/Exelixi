@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 use std::f32::consts::{FRAC_PI_4, PI};
 
-const FOV_RANGE: f32 = 300.0;
+const FOV_RANGE: f32 = 150.0;
 const FOV_ANGLE: f32 = PI + FRAC_PI_4;
 const CELLS: usize = 9;
 
@@ -86,13 +86,14 @@ impl Eye {
             if axis.z < 0.0 {
                 rotation_angle = -rotation_angle;
             }
+            let angle_incr = self.fov_angle / (self.cells as f32);
             // Starting from the lowest fov line we evaluate the distance of the closest wall intersect on this line.
             // and compute an energy
             // Doing it for each cell boundary so cells.length()+1 lines.
-            let start_angle = rotation_angle - self.fov_angle / 2.0;
-            let energies = (0..=self.cells)
+            let start_angle = rotation_angle - self.fov_angle / 2.0 + angle_incr / 2.0;
+            (0..self.cells)
                 .map(|i| {
-                    let angle = start_angle + (i as f32 * self.fov_angle) / (self.cells as f32);
+                    let angle = start_angle + (i as f32 * angle_incr);
                     let mut dist = f32::INFINITY;
                     let dist_right = (half_width - transform.translation.x) / angle.cos();
                     if dist_right > 0.0 {
@@ -102,19 +103,16 @@ impl Eye {
                     if dist_left > 0.0 {
                         dist = dist.min(dist_left);
                     }
-                    let dist_bottom = (half_height - transform.translation.y) / angle.sin();
-                    if dist_bottom > 0.0 {
-                        dist = dist.min(dist_bottom);
-                    }
-                    let dist_top = (-half_height - transform.translation.y) / angle.sin();
+                    let dist_top = (half_height - transform.translation.y) / angle.sin();
                     if dist_top > 0.0 {
                         dist = dist.min(dist_top);
                     }
+                    let dist_bottom = (-half_height - transform.translation.y) / angle.sin();
+                    if dist_bottom > 0.0 {
+                        dist = dist.min(dist_bottom);
+                    }
                     ((self.fov_range - dist) / self.fov_range).max(0.0)
                 })
-                .collect::<Vec<_>>();
-            (0..self.cells)
-                .map(|i| (energies[i] + energies[i + 1]) / 2.0)
                 .collect::<Vec<_>>()
         } else {
             vec![]

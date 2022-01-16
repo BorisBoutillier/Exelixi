@@ -52,9 +52,9 @@ fn camera_movement(
         }
         camera_ortho.left = -visible_width / 2.0;
         camera_ortho.right = visible_width / 2.0;
+        camera_ortho.top = visible_height / 2.0;
         camera_ortho.bottom =
-            visible_height / 2.0 + UI_STATUS_BAR_HEIGHT * visible_height / view_height;
-        camera_ortho.top = -visible_height / 2.0;
+            -visible_height / 2.0 - UI_STATUS_BAR_HEIGHT * visible_height / view_height;
         camera_ortho.scale = 1.0;
         camera_ortho.scaling_mode = ScalingMode::None;
     }
@@ -75,8 +75,8 @@ fn camera_movement(
             let mut camera_ortho = cameras.get_single_mut().expect("No ortho camera found");
             camera_ortho.left -= event.delta.x;
             camera_ortho.right -= event.delta.x;
-            camera_ortho.top -= event.delta.y;
-            camera_ortho.bottom -= event.delta.y;
+            camera_ortho.top += event.delta.y;
+            camera_ortho.bottom += event.delta.y;
         }
     }
 }

@@ -17,7 +17,7 @@ pub fn evolve(
         let current_population = animals
             .iter()
             .map(|(entity, s, b, _)| {
-                commands.entity(entity).despawn();
+                commands.entity(entity).despawn_recursive();
                 AnimalIndividual::from_stomach_and_brain(s, b)
             })
             .collect::<Vec<_>>();
@@ -58,7 +58,7 @@ pub fn evolve(
         }
         // Remove all food
         for entity in foods.iter() {
-            commands.entity(entity).despawn();
+            commands.entity(entity).despawn_recursive();
         }
         simulation.statistics.update(population_stat);
         println!("{}", simulation.sprint_state(&config));
