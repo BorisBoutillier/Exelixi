@@ -1,5 +1,7 @@
 use crate::prelude::*;
 
+pub const UI_STATUS_BAR_HEIGHT: f32 = 120.0;
+
 pub fn debug_ui(
     egui_ctx: Res<EguiContext>,
     selection: Query<(&Transform, &Velocity, &Stomach, &Eye), With<Selected>>,
@@ -104,9 +106,10 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
     egui::TopBottomPanel::bottom("bottom_panel")
         .frame(
             egui::Frame::default()
-                .fill(egui::Color32::from_rgb(0, 0, 0))
+                .fill(egui::Color32::from_rgb(30, 30, 30))
                 .margin(egui::Vec2::new(10.0, 10.0)),
         )
+        .max_height(UI_STATUS_BAR_HEIGHT)
         .show(egui_ctx.ctx(), |ui| {
             let half_width = ui.available_width() / 2.0;
             let mut spacing = ui.spacing_mut();

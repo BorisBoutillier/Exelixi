@@ -7,6 +7,7 @@ mod eye;
 mod simulation;
 mod spawner;
 mod systems;
+mod ui;
 
 mod prelude {
     pub use std::f32::consts::{FRAC_PI_2, PI};
@@ -31,6 +32,7 @@ mod prelude {
     pub use crate::simulation::*;
     pub use crate::spawner::*;
     pub use crate::systems::*;
+    pub use crate::ui::*;
 
     // Minimum linear velocity in pixels/step
     pub const V_LINEAR_MIN: f32 = 1.0;

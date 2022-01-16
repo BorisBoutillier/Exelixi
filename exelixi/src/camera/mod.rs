@@ -1,9 +1,10 @@
 use bevy::{
     input::mouse::{MouseMotion, MouseWheel},
     render::camera::ScalingMode,
+    window::WindowResized,
 };
 
-const RESET_MARGIN_PCT: f32 = 1.1;
+const ENV_VIEW_RESET_MARGIN_PCT: f32 = 1.1;
 const ZOOM_FACTOR: f32 = 1.1;
 
 use crate::prelude::*;
@@ -27,15 +28,33 @@ fn camera_movement(
     mut mouse_wheel_events: EventReader<MouseWheel>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     config: Res<SimulationConfig>,
+    windows: Res<Windows>,
+    mut window_resized_events: EventReader<WindowResized>,
 ) {
+    let window = windows.get_primary().expect("No primary window found.");
+    let window_resized = window_resized_events.iter().any(|e| e.id == window.id());
     // Camera reset trigger on simulation config changed or Middle mouse button click
-    let reset_camera = config.is_changed() || mouse_button_input.just_pressed(MouseButton::Middle);
+    let reset_camera = config.is_changed()
+        || mouse_button_input.just_pressed(MouseButton::Middle)
+        || window_resized;
     if reset_camera {
-        let mut camera_ortho = cameras.get_single_mut().expect("No ortho camera found");
-        camera_ortho.left = (-config.environment.width / 2.0) * RESET_MARGIN_PCT;
-        camera_ortho.right = (config.environment.width / 2.0) * RESET_MARGIN_PCT;
-        camera_ortho.bottom = (config.environment.height / 2.0) * RESET_MARGIN_PCT;
-        camera_ortho.top = (-config.environment.height / 2.0) * RESET_MARGIN_PCT;
+        let mut camera_ortho = cameras.get_single_mut().expect("No ortho camera found.");
+        let view_width = window.width();
+        let view_height = window.height() - UI_STATUS_BAR_HEIGHT;
+        let view_ratio = view_width / view_height;
+        let mut visible_width = config.environment.width * ENV_VIEW_RESET_MARGIN_PCT;
+        let mut visible_height = config.environment.height * ENV_VIEW_RESET_MARGIN_PCT;
+        let visible_ratio = visible_width / visible_height;
+        if visible_ratio > view_ratio {
+            visible_height = visible_width / view_ratio;
+        } else {
+            visible_width = visible_height * view_ratio;
+        }
+        camera_ortho.left = -visible_width / 2.0;
+        camera_ortho.right = visible_width / 2.0;
+        camera_ortho.bottom =
+            visible_height / 2.0 + UI_STATUS_BAR_HEIGHT * visible_height / view_height;
+        camera_ortho.top = -visible_height / 2.0;
         camera_ortho.scale = 1.0;
         camera_ortho.scaling_mode = ScalingMode::None;
     }

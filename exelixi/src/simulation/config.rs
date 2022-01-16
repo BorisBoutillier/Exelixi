@@ -75,7 +75,7 @@ impl SimulationConfig {
                     log::info!("SimulationConfig loaded from {:?}", path.as_os_str());
                     return Some(config);
                 } else {
-                    log::error!("SimulationConfig could not be loaded from {:?}, invalid content in the file.",path.as_os_str());
+                    log::warn!("SimulationConfig could not be loaded from {:?}, invalid content in the file.",path.as_os_str());
                 }
             }
         }
