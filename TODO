@@ -1,17 +1,27 @@
+-- Code
+. Make simulation systems and needed components as a plugin
+. Improve multi-ticks per frame behaviour:
+    . Does this need an exclusive system wiht a custom schedule ?
+
 -- User Interaction
 . Improve user camera interaction:
     . Make panning around follow environment 'scale'
-. Allow user modification of the simulation configuraton
-    Restart a new simulation on change.
+. User edition of the simulation configuration
+    . As a modal pane ?
+. Generation statistics:
+    . avg energy per tick ?
+. Population statistics:
+    . chromosome histograms:
+        histogram on number of eyes.
 . Save/Load population
-. Save/Load configuration
+. Update on simulation interaction:
+    . Allow to trigger N generation advances:
+        Then run at normal speed
+        And show last generation statitiscs
 . Allow clicking an animal to see its state:
     . plot with evolution of the energy level.
-    
 
 -- Simulation
-. Single system for doing simulation steps ?
-    . This would allow a kind of 'step per frame' ?
 . Replace Stomach Satiation, with body energy management:
     . Give a cost to each action:
         . process vision
@@ -28,3 +38,4 @@
 . New genes to control the fov_range/fov_angle:
     Impacts on energy based on 'visible' area.
 . New genes to control number of eyes.
+. Add a new kind of carnivor animal, able to eat herbivors.
