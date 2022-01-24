@@ -1,14 +1,38 @@
 use crate::*;
 
 pub fn process_brain(
-    mut animals: Query<(&Transform, &mut Velocity, &Eye, &Brain, Option<&Selected>)>,
+    mut animals: Query<(
+        Entity,
+        &Transform,
+        &mut Velocity,
+        &Eye,
+        &Brain,
+        Option<&Selected>,
+    )>,
     food_transforms: Query<&Transform, With<Food>>,
+    animal_transforms: Query<(Entity, &Transform), With<Animal>>,
     config: Res<SimulationConfig>,
 ) {
     let food_transforms = food_transforms.iter().collect::<Vec<_>>();
     animals.for_each_mut(
-        |(animal_transform, mut animal_velocity, animal_eye, animal_brain, selected)| {
-            let vision = animal_eye.process_vision(animal_transform, &food_transforms, &config);
+        |(
+            animal_entity,
+            animal_transform,
+            mut animal_velocity,
+            animal_eye,
+            animal_brain,
+            selected,
+        )| {
+            let animal_transforms = animal_transforms
+                .iter()
+                .filter_map(|(e, t)| if e != animal_entity { Some(t) } else { None })
+                .collect::<Vec<_>>();
+            let vision = animal_eye.process_vision(
+                animal_transform,
+                &food_transforms,
+                &animal_transforms,
+                &config,
+            );
             let response = animal_brain.nn.propagate(&vision);
             let linear_accel = (response[0].clamp(0.0, 2.0) - 1.0) * V_LINEAR_ACCEL;
             let angular = (response[1].clamp(0.0, 2.0) - 1.0) * V_ANGULAR_MAX;

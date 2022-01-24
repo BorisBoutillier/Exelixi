@@ -33,7 +33,9 @@ pub fn evolve(
             .for_each(|(i, individual)| {
                 let selected = i == 0;
                 let eye = Eye {
-                    see_walls: config.environment.wall,
+                    see_walls: config.environment.wall && config.animals.see_walls,
+                    see_foods: config.animals.see_foods,
+                    see_animals: config.animals.see_animals,
                     ..Default::default()
                 };
                 let brain = individual.clone().into_brain(&eye);
@@ -50,7 +52,9 @@ pub fn evolve(
         let missing_population = config.min_population - new_population.len() as i32;
         for _ in 0..missing_population {
             let eye = Eye {
-                see_walls: config.environment.wall,
+                see_walls: config.environment.wall && config.animals.see_walls,
+                see_foods: config.animals.see_foods,
+                see_animals: config.animals.see_animals,
                 ..Default::default()
             };
             let brain = Brain::random(&mut rng, &eye);

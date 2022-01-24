@@ -24,10 +24,10 @@ impl Brain {
     fn topology(eye: &Eye) -> [nn::LayerTopology; 3] {
         [
             nn::LayerTopology {
-                neurons: eye.sensors(),
+                neurons: eye.n_sensors(),
             },
             nn::LayerTopology {
-                neurons: 2 * eye.sensors(),
+                neurons: 2 * eye.n_sensors(),
             },
             nn::LayerTopology { neurons: 2 },
         ]

@@ -1,12 +1,18 @@
 (
-    generation_length : 2500
-,   start_population  : 20
-,   min_population    : 1
+    generation_length : 5000
+,   start_population  : 100
+,   min_population    : 20
 ,   fertility_rate    : 1.05
 ,   death_threshold   : 3
 ,   food_spawn_rate   : 0.16
 ,   environment:(
-        width  : 1200
-    ,   height : 800
+        width  : 3500
+    ,   height : 2000
     ,   wall   : true
-    ))
+    )
+,   animals: (
+        see_foods:   true
+    ,   see_walls:   true
+    ,   see_animals: true
+    )
+)

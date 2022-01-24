@@ -59,7 +59,8 @@ pub fn spawn_starting_animals(
         for i in 0..config.start_population {
             let selected = i == 0;
             let eye = Eye {
-                see_walls: config.environment.wall,
+                see_walls: config.environment.wall && config.animals.see_walls,
+                see_animals: config.animals.see_animals,
                 ..Default::default()
             };
             let brain = Brain::random(&mut rng, &eye);

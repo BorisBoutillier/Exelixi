@@ -3,6 +3,18 @@ use crate::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
+pub struct AnimalsConfig {
+    // Does the eyes senses the foods.
+    // will add n_eyes inputs to the neural networks
+    pub see_foods: bool,
+    // Does the eyes senses the walls.
+    // will add n_eyes inputs to the neural networks
+    pub see_walls: bool,
+    // Does the eyes senses other animals.
+    // Will add n_eyes inputs to the neural networks for each animal type
+    pub see_animals: bool,
+}
+#[derive(Serialize, Deserialize)]
 pub struct EnvironmentConfig {
     // Width of the floor
     pub width: f32,
@@ -29,7 +41,10 @@ pub struct SimulationConfig {
     pub death_threshold: f32,
     // Average number of food that spawns per step
     pub food_spawn_rate: f64,
+    // Configuration information regarding the environment
     pub environment: EnvironmentConfig,
+    // Configuration information regarding the animals
+    pub animals: AnimalsConfig,
 }
 impl SimulationConfig {
     pub fn get_default_config() -> Self {

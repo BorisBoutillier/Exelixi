@@ -10,7 +10,7 @@ pub struct UiPlugin;
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(Material2dPlugin::<FovViewerMaterial>::default())
-            .add_system(debug_ui)
+            //.add_system(debug_ui)
             .add_system(status_bar_ui)
             .add_system(spawn_fov_viewer_on_selected)
             .add_system(despawn_fov_viewer_on_deselected);
