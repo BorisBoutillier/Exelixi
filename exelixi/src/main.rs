@@ -44,8 +44,6 @@ mod prelude {
     pub const V_ANGULAR_MAX: f32 = PI / 30.0;
 }
 
-use std::time::Duration;
-
 use prelude::*;
 
 fn main() {
@@ -55,7 +53,7 @@ fn main() {
             width: 1500.0,
             height: 900.0,
             title: "Exelixi".to_string(),
-            vsync: false,
+            vsync: true,
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)
@@ -65,19 +63,10 @@ fn main() {
         .add_plugin(UiPlugin {})
         .add_system(spawn_starting_animals)
         .add_system(spawn_floor)
-        .add_system(simulation_duration)
         .add_system(save_default_config)
+        .add_startup_system(insert_simulation_steps_schedule)
+        .add_system(simulation_steps.exclusive_system())
         .insert_resource(Simulation::default())
         .insert_resource(SimulationConfig::get_default_config())
-        .add_system_set(
-            SystemSet::new()
-                .with_run_criteria(simulation_run_criteria)
-                .with_system(movement)
-                .with_system(collision)
-                .with_system(process_brain)
-                .with_system(evolve)
-                .with_system(spawn_food)
-                .with_system(decay),
-        )
         .run();
 }

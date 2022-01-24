@@ -70,7 +70,11 @@ pub fn debug_ui(
             ui.label(format!("sts: {:.2}", simulation.sts(&config)));
         });
 }
-pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulation>) {
+pub fn status_bar_ui(
+    egui_ctx: Res<EguiContext>,
+    mut simulation: ResMut<Simulation>,
+    diagnostics: Res<Diagnostics>,
+) {
     let mut fonts = egui::FontDefinitions::default();
     fonts.family_and_size.insert(
         egui::TextStyle::Body,
@@ -137,6 +141,13 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
                     egui::RichText::new(format!("step : {:4}", simulation.steps))
                         .text_style(egui::TextStyle::Monospace),
                 );
+                let mut fps_s = "N/A".to_string();
+                if let Some(fps) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {
+                    if let Some(average) = fps.average() {
+                        fps_s = format!("{:.1}", average);
+                    }
+                }
+                ui.label(format!("fps: {}", fps_s));
                 ui.add_space(ui.available_width() - half_width - 30.0 * 2.5);
                 // ⚙
                 if ui
