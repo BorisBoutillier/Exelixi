@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 pub fn simulation_duration(time: Res<Time>, mut simulation: ResMut<Simulation>) {
-    if simulation.speed != SimulationSpeed::Paused {
+    if simulation.control.state != SimulationControlState::Paused {
         simulation.duration += time.delta();
     }
 }

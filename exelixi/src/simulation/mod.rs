@@ -1,43 +1,12 @@
-use std::fmt;
 use std::time::Duration;
 
 mod config;
+mod control;
 use crate::prelude::*;
 pub use config::*;
+pub use control::*;
 use ga::PopulationStatistics;
 
-/// Number of simulation step we do per frame in Normal speed mode
-pub const STEP_PER_FRAME_NORMAL: usize = 1;
-/// Number of simulation step we do per frame in Fast speed mode
-pub const STEP_PER_FRAME_FAST: usize = 4;
-/// Maximum duration the simulation steps car run per frame
-pub const MAX_SIMULATION_DURATION_PER_FRAME: f32 = 1.0 / 60.0;
-
-#[derive(Clone, Copy, PartialEq, Debug)]
-pub enum SimulationSpeed {
-    /// Simulation is paused, no steps are done
-    Paused,
-    /// Simulation speed of 60 step per seconds
-    Normal,
-    /// Simulation speed of 180 steps per seconds
-    Fast,
-    /// Fastest number of steps per seconds
-    Fastest,
-}
-impl fmt::Display for SimulationSpeed {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                SimulationSpeed::Paused => "Paused",
-                SimulationSpeed::Normal => "Normal",
-                SimulationSpeed::Fast => "Fast",
-                SimulationSpeed::Fastest => "Fastest",
-            }
-        )
-    }
-}
 #[derive(Default)]
 pub struct SimulationStatistics {
     pub population: Vec<PopulationStatistics>,
@@ -83,24 +52,20 @@ impl SimulationStatistics {
         self.population.push(population_stat);
     }
 }
-
 // Resources
 pub struct Simulation {
-    pub speed: SimulationSpeed,
+    pub control: SimulationControl,
     pub age: u32,
     pub generation: u32,
     pub ga: ga::GeneticAlgorithm<ga::RouletteWheelSelection>,
     pub statistics: SimulationStatistics,
     // Total active running of the simulation
     pub duration: Duration,
-    // Internal. Used to control simulation speed
-    pub cur_steps: usize,
-    pub cur_steps_duration: Duration,
 }
 impl Simulation {
     pub fn new() -> Self {
         Self {
-            speed: SimulationSpeed::Paused,
+            control: SimulationControl::default(),
             age: 0,
             generation: 0,
             ga: ga::GeneticAlgorithm::new(
@@ -110,8 +75,6 @@ impl Simulation {
             ),
             statistics: SimulationStatistics::default(),
             duration: Duration::ZERO,
-            cur_steps_duration: Duration::ZERO,
-            cur_steps: 0,
         }
     }
     // Number simulation steps per seconds for this simulation

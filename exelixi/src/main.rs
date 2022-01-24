@@ -71,7 +71,7 @@ fn main() {
         .insert_resource(SimulationConfig::get_default_config())
         .add_system_set(
             SystemSet::new()
-                .with_run_criteria(run_simulation_speed)
+                .with_run_criteria(simulation_run_criteria)
                 .with_system(movement)
                 .with_system(collision)
                 .with_system(process_brain)
@@ -79,33 +79,4 @@ fn main() {
                 .with_system(spawn_food),
         )
         .run();
-}
-
-fn run_simulation_speed(time: Res<Time>, mut simulation: ResMut<Simulation>) -> ShouldRun {
-    if simulation.speed == SimulationSpeed::Paused {
-        return ShouldRun::No;
-    }
-    simulation.cur_steps_duration += time.delta();
-    let do_one_step = match simulation.speed {
-        SimulationSpeed::Paused => false,
-        SimulationSpeed::Normal => simulation.cur_steps < STEP_PER_FRAME_NORMAL,
-        SimulationSpeed::Fast => simulation.cur_steps < STEP_PER_FRAME_FAST,
-        SimulationSpeed::Fastest => true,
-    };
-    if do_one_step {
-        simulation.cur_steps += 1;
-        if simulation.cur_steps_duration.as_secs_f32() >= MAX_SIMULATION_DURATION_PER_FRAME {
-            simulation.cur_steps = 0;
-            simulation.cur_steps_duration = Duration::ZERO;
-            ShouldRun::Yes
-        } else {
-            ShouldRun::YesAndCheckAgain
-        }
-    } else {
-        if simulation.cur_steps_duration.as_secs_f32() >= MAX_SIMULATION_DURATION_PER_FRAME {
-            simulation.cur_steps = 0;
-            simulation.cur_steps_duration = Duration::ZERO;
-        }
-        ShouldRun::No
-    }
 }

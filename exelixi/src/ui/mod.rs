@@ -30,7 +30,6 @@ pub fn debug_ui(
             ui.heading("Simulation");
             ui.label(format!("width : {}", config.environment.width));
             ui.label(format!("height: {}", config.environment.height));
-            ui.label(simulation.speed.to_string());
             ui.label("fitness".to_string());
             ui.label(format!(
                 "    min: {:.2}",
@@ -90,7 +89,6 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
     let size_color = egui::Color32::from_rgb(51, 51, 230);
     let dead_color = egui::Color32::from_rgb(230, 0, 0);
     let avg_color = egui::Color32::from_rgb(25, 180, 25);
-    let mut new_speed = None;
     let population_size_line = egui::plot::Line::new(egui::plot::Values::from_values_iter(
         simulation
             .statistics
@@ -140,34 +138,64 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
                         .text_style(egui::TextStyle::Monospace),
                 );
                 ui.add_space(ui.available_width() - half_width - 30.0 * 2.5);
-                for (text, hover_text, speed) in &[
-                    ("⏸", "Pause", SimulationSpeed::Paused),
-                    ("▶", "Normal Speed", SimulationSpeed::Normal),
-                    ("⏩", "Fast Speed", SimulationSpeed::Fast),
-                    ("⏭", "Maximum Speed", SimulationSpeed::Fastest),
-                ] {
-                    if ui
-                        .add(egui::Button::new(
-                            egui::RichText::new(*text).color(egui::Color32::from_rgb(0, 255, 0)),
-                        ))
-                        .on_hover_text(*hover_text)
-                        .clicked()
-                    {
-                        new_speed = Some(*speed);
-                    }
+                // ⚙
+                if ui
+                    .add(egui::Button::new(
+                        egui::RichText::new("⏹").color(egui::Color32::from_rgb(0, 255, 0)),
+                    ))
+                    .on_hover_text("Stop")
+                    .clicked()
+                {
+                    simulation.control.speed_factor = 1;
+                    simulation.control.state = SimulationControlState::Paused;
+                }
+                let (text, hover_text, control) =
+                    if simulation.control.state == SimulationControlState::Paused {
+                        ("▶", "Run", SimulationControlState::Run)
+                    } else {
+                        ("⏸", "Pause", SimulationControlState::Paused)
+                    };
+                if ui
+                    .add(egui::Button::new(
+                        egui::RichText::new(text).color(egui::Color32::from_rgb(0, 255, 0)),
+                    ))
+                    .on_hover_text(hover_text)
+                    .clicked()
+                {
+                    simulation.control.state = control;
                 }
                 if ui
                     .add(egui::Button::new(
-                        egui::RichText::new("⚙").color(egui::Color32::from_rgb(220, 220, 220)),
+                        egui::RichText::new("⬇").color(egui::Color32::from_rgb(0, 255, 0)),
+                    ))
+                    .on_hover_text("Decrease speed")
+                    .clicked()
+                {
+                    simulation.control.speed_factor = (simulation.control.speed_factor / 2).max(1);
+                }
+                if ui
+                    .add(egui::Button::new(
+                        egui::RichText::new("⬆").color(egui::Color32::from_rgb(0, 255, 0)),
+                    ))
+                    .on_hover_text("Increase speed")
+                    .clicked()
+                {
+                    simulation.control.speed_factor *= 2;
+                }
+                if ui
+                    .add(egui::Button::new(
+                        egui::RichText::new("⏭").color(egui::Color32::from_rgb(0, 255, 0)),
                     ))
                     .on_hover_text("simulation configuration")
                     .clicked()
-                {}
-                ui.add_space(half_width / 5.0);
+                {
+                    simulation.control.state = SimulationControlState::Fastest;
+                }
+                ui.add_space(half_width / 6.0);
                 ui.vertical(|ui| {
                     let plot = egui::plot::Plot::new("population_plot")
                         .height(50.0)
-                        .width(half_width * 3.0 / 5.0)
+                        .width(half_width / 1.7)
                         .show_x(false)
                         .show_y(true)
                         .center_x_axis(false)
@@ -180,7 +208,7 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
                     });
                     let plot = egui::plot::Plot::new("fitness_plot")
                         .height(50.0)
-                        .width(half_width * 3.0 / 5.0)
+                        .width(half_width / 1.7)
                         .show_x(false)
                         .show_y(true)
                         .center_x_axis(false)
@@ -212,7 +240,4 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
                 });
             });
         });
-    if let Some(new_speed) = new_speed {
-        simulation.speed = new_speed;
-    }
 }
