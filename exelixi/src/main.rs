@@ -76,7 +76,8 @@ fn main() {
                 .with_system(collision)
                 .with_system(process_brain)
                 .with_system(evolve)
-                .with_system(spawn_food),
+                .with_system(spawn_food)
+                .with_system(decay),
         )
         .run();
 }

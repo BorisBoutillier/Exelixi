@@ -23,6 +23,10 @@ pub struct EnvironmentConfig {
     // Presence of wall on the boundary.
     // Without walls the world is a torus
     pub wall: bool,
+    // Average number of food that spawns per step
+    pub food_spawn_rate: f64,
+    // Number of steps after appearance that a food disappear
+    pub food_decay_time: u32,
 }
 
 //
@@ -39,8 +43,6 @@ pub struct SimulationConfig {
     pub fertility_rate: f32,
     // Minimum fitness required at end of generation to survive
     pub death_threshold: f32,
-    // Average number of food that spawns per step
-    pub food_spawn_rate: f64,
     // Configuration information regarding the environment
     pub environment: EnvironmentConfig,
     // Configuration information regarding the animals

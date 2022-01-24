@@ -8,11 +8,10 @@ pub fn evolve(
     foods: Query<Entity, With<Food>>,
     asset_server: Res<AssetServer>,
 ) {
-    simulation.age += 1;
-    if simulation.age == config.generation_length {
+    simulation.steps += 1;
+    if simulation.steps == config.generation_length {
         let mut rng = thread_rng();
-        simulation.age = 0;
-        simulation.generation += 1;
+        simulation.steps = 0;
 
         let current_population = animals
             .iter()
@@ -60,11 +59,13 @@ pub fn evolve(
             let brain = Brain::random(&mut rng, &eye);
             spawn_animal(&mut commands, &*asset_server, &*config, eye, brain, false);
         }
-        // Remove all food
+        // Remove all remaining food
         for entity in foods.iter() {
+            simulation.statistics.food_decay += 1;
             commands.entity(entity).despawn_recursive();
         }
         simulation.statistics.update(population_stat);
         println!("{}", simulation.sprint_state(&config));
+        simulation.new_generation();
     }
 }

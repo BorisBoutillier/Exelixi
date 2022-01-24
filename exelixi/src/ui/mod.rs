@@ -134,7 +134,7 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
                         .text_style(egui::TextStyle::Monospace),
                 );
                 ui.label(
-                    egui::RichText::new(format!("step : {:4}", simulation.age))
+                    egui::RichText::new(format!("step : {:4}", simulation.steps))
                         .text_style(egui::TextStyle::Monospace),
                 );
                 ui.add_space(ui.available_width() - half_width - 30.0 * 2.5);
@@ -186,7 +186,7 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
                     .add(egui::Button::new(
                         egui::RichText::new("⏭").color(egui::Color32::from_rgb(0, 255, 0)),
                     ))
-                    .on_hover_text("simulation configuration")
+                    .on_hover_text("Fastest")
                     .clicked()
                 {
                     simulation.control.state = SimulationControlState::Fastest;
@@ -223,12 +223,14 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
                     ui.label(
                         egui::RichText::new(format!("{}", simulation.statistics.latest_size()))
                             .color(size_color),
-                    );
+                    )
+                    .on_hover_text("Total number of animals");
                     ui.add_space(25.0 - 8.0);
                     ui.label(
                         egui::RichText::new(format!("{}", simulation.statistics.latest_dead()))
                             .color(dead_color),
-                    );
+                    )
+                    .on_hover_text("Number of dead animals");
                     ui.add_space(25.0 - 8.0);
                     ui.label(
                         egui::RichText::new(format!(
@@ -236,7 +238,8 @@ pub fn status_bar_ui(egui_ctx: Res<EguiContext>, mut simulation: ResMut<Simulati
                             simulation.statistics.latest_avg_fitness()
                         ))
                         .color(avg_color),
-                    );
+                    )
+                    .on_hover_text("Average energy of all animals");
                 });
             });
         });

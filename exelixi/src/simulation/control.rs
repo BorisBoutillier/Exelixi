@@ -52,7 +52,6 @@ pub fn simulation_run_criteria(
     // Give back control when reaching a new generation
     // Allows gui updates and minium user control
     if simulation.generation > internal.cur_generation {
-        println!("NEW GEN {}", internal.cur_step);
         internal.cur_generation = simulation.generation;
         internal.cur_step = 0;
         internal.cur_duration = Duration::ZERO;

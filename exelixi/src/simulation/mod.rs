@@ -10,6 +10,7 @@ use ga::PopulationStatistics;
 #[derive(Default)]
 pub struct SimulationStatistics {
     pub population: Vec<PopulationStatistics>,
+    pub food_decay: u32,
 }
 
 impl SimulationStatistics {
@@ -55,7 +56,7 @@ impl SimulationStatistics {
 // Resources
 pub struct Simulation {
     pub control: SimulationControl,
-    pub age: u32,
+    pub steps: u32,
     pub generation: u32,
     pub ga: ga::GeneticAlgorithm<ga::RouletteWheelSelection>,
     pub statistics: SimulationStatistics,
@@ -66,7 +67,7 @@ impl Simulation {
     pub fn new() -> Self {
         Self {
             control: SimulationControl::default(),
-            age: 0,
+            steps: 0,
             generation: 0,
             ga: ga::GeneticAlgorithm::new(
                 ga::RouletteWheelSelection::default(),
@@ -82,7 +83,7 @@ impl Simulation {
         if self.duration.is_zero() {
             0.0
         } else {
-            (self.generation * config.generation_length + self.age) as f32
+            (self.generation * config.generation_length + self.steps) as f32
                 / self.duration.as_secs_f32()
         }
     }
@@ -91,13 +92,20 @@ impl Simulation {
         let size = self.statistics.latest_size();
         let dead = self.statistics.latest_dead();
         format!(
-            "Gen: {:03} , Sts: {:.2} , Avg: {:.1} , Pop: {}/{}",
+            "Gen: {:03} , Sts: {:.2} , Avg: {:.1} , Pop: {}/{} , Lost food: {}",
             self.generation,
             self.sts(config),
             self.statistics.latest_avg_fitness(),
             dead,
             size,
+            self.statistics.food_decay
         )
+    }
+
+    // Triggers a new generation
+    pub fn new_generation(&mut self) {
+        self.generation += 1;
+        self.statistics.food_decay = 0;
     }
 }
 impl Default for Simulation {

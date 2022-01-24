@@ -6,8 +6,8 @@ pub fn spawn_food(
     config: Res<SimulationConfig>,
 ) {
     let mut rng = thread_rng();
-    let n_food_to_spawn = config.food_spawn_rate as u32
-        + if rng.gen_bool(config.food_spawn_rate % 1.0) {
+    let n_food_to_spawn = config.environment.food_spawn_rate as u32
+        + if rng.gen_bool(config.environment.food_spawn_rate % 1.0) {
             1
         } else {
             0
@@ -34,6 +34,9 @@ pub fn spawn_food(
                 texture: asset_server.load("food.png"),
                 ..Default::default()
             })
-            .insert(Food { eaten: false });
+            .insert(Food { eaten: false })
+            .insert(Decay {
+                time: config.environment.food_decay_time as i32,
+            });
     }
 }

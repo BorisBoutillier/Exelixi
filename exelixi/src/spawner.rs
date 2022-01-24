@@ -60,6 +60,7 @@ pub fn spawn_starting_animals(
             let selected = i == 0;
             let eye = Eye {
                 see_walls: config.environment.wall && config.animals.see_walls,
+                see_foods: config.animals.see_foods,
                 see_animals: config.animals.see_animals,
                 ..Default::default()
             };

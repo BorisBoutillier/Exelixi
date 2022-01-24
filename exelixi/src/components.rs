@@ -33,3 +33,9 @@ impl Default for Stomach {
 
 #[derive(Component)]
 pub struct Selected {}
+
+#[derive(Component)]
+pub struct Decay {
+    // Number of steps after which this entity will be despawned
+    pub time: i32,
+}
