@@ -1,7 +1,5 @@
 -- Code
 . Make simulation systems and needed components as a plugin
-. Improve multi-ticks per frame behaviour:
-    . Does this need an exclusive system wiht a custom schedule ?
 
 -- User Interaction
 . Improve user camera interaction:
@@ -31,8 +29,6 @@
         . process_movement:
             exponential cost of linear/angular velocity
     . Eating food raise energy.
-. Allow to see other animals
-    A new set of values from eyes ?
 . Allow an output neuron to control usage of eyes.
     . On output for each eye ?  <0.4 disable, >-.6 enable , in-between don't touch ?
 . New genes to control the fov_range/fov_angle:
