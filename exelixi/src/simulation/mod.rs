@@ -14,6 +14,8 @@ use ga::PopulationStatistics;
 #[derive(Default)]
 pub struct SimulationStatistics {
     pub population: Vec<PopulationStatistics>,
+    pub mean_fov_angle: f32,
+    pub std_dev_fov_angle: f32,
     pub food_decay: u32,
 }
 
@@ -37,20 +39,6 @@ impl SimulationStatistics {
         match len {
             0 => 0.0,
             n => self.population[n - 1].avg_fitness(),
-        }
-    }
-    pub fn latest_min_fitness(&self) -> f32 {
-        let len = self.population.len();
-        match len {
-            0 => 0.0,
-            n => self.population[n - 1].min_fitness(),
-        }
-    }
-    pub fn latest_max_fitness(&self) -> f32 {
-        let len = self.population.len();
-        match len {
-            0 => 0.0,
-            n => self.population[n - 1].max_fitness(),
         }
     }
     pub fn update(&mut self, population_stat: PopulationStatistics) {
@@ -92,13 +80,15 @@ impl Simulation {
         let size = self.statistics.latest_size();
         let dead = self.statistics.latest_dead();
         format!(
-            "Gen: {:03} , Sts: {:.2} , Avg: {:.1} , Pop: {}/{} , Lost food: {}",
+            "Gen: {:03} , Sts: {:.2} , Avg: {:.1} , Pop: {}/{} , Lost food: {} , Fov {:.1}/{:.1}",
             self.generation,
             self.sts(config),
             self.statistics.latest_avg_fitness(),
             dead,
             size,
-            self.statistics.food_decay
+            self.statistics.food_decay,
+            self.statistics.mean_fov_angle,
+            self.statistics.std_dev_fov_angle,
         )
     }
 
@@ -113,4 +103,25 @@ impl Default for Simulation {
     fn default() -> Self {
         Self::new()
     }
+}
+
+pub fn mean(data: &[f32]) -> f32 {
+    let sum = data.iter().sum::<f32>();
+    let count = data.len();
+    sum / count as f32
+}
+
+pub fn std_deviation(data: &[f32]) -> f32 {
+    let count = data.len();
+    let variance = data
+        .iter()
+        .map(|value| {
+            let diff = mean(data) - (*value as f32);
+
+            diff * diff
+        })
+        .sum::<f32>()
+        / count as f32;
+
+    variance.sqrt()
 }

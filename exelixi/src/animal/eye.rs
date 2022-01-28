@@ -1,15 +1,14 @@
 use crate::prelude::*;
 
-use std::f32::consts::{FRAC_PI_4, PI};
+use std::f32::consts::PI;
 
 const FOV_RANGE: f32 = 150.0;
-const FOV_ANGLE: f32 = PI + FRAC_PI_4;
-const CELLS: usize = 9;
 
 #[derive(Debug, Component)]
 pub struct Eye {
     pub fov_range: f32,
     pub fov_angle: f32,
+    pub n_sectors: usize,
     pub n_cells: usize,
     pub see_foods: bool,
     pub see_walls: bool,
@@ -17,25 +16,62 @@ pub struct Eye {
 }
 
 impl Eye {
-    pub fn new(
-        fov_range: f32,
-        fov_angle: f32,
-        n_cells: usize,
-        see_foods: bool,
-        see_walls: bool,
-        see_animals: bool,
-    ) -> Self {
-        assert!(fov_range > 0.0);
-        assert!(fov_angle > 0.0);
-        assert!(n_cells > 0);
+    pub fn random(rng: &mut dyn RngCore, config: &SimulationConfig) -> Self {
+        let (_n_sectors, n_cells) = match config.animals.n_eye_cells {
+            ConfigValue::Fixed(v) => (v, v),
+            ConfigValue::Gene { min, max } => (rng.gen_range(min..=max), max),
+        };
+        let fov_angle = match config.animals.eye_fov_angle {
+            ConfigValue::Fixed(v) => v,
+            ConfigValue::Gene { min, max } => (rng.gen_range(min..=max)),
+        };
         Self {
-            fov_range,
+            see_walls: config.environment.wall && config.animals.see_walls,
+            see_foods: config.animals.see_foods,
+            see_animals: config.animals.see_animals,
+            fov_range: FOV_RANGE,
             fov_angle,
-            n_cells,
-            see_foods,
-            see_walls,
-            see_animals,
+            n_sectors: n_cells as usize,
+            n_cells: n_cells as usize,
         }
+    }
+    pub fn from_genes(genes: impl IntoIterator<Item = f32>, config: &SimulationConfig) -> Self {
+        let mut genes = genes.into_iter();
+        let fov_angle = match config.animals.eye_fov_angle {
+            ConfigValue::Fixed(v) => v,
+            ConfigValue::Gene { min, max } => {
+                let gene = genes.next().expect("Missing gene for the fov_angle");
+                gene.clamp(min, max)
+            }
+        };
+        let (_n_sectors, n_cells) = match config.animals.n_eye_cells {
+            ConfigValue::Fixed(v) => (v, v),
+            ConfigValue::Gene { min, max } => {
+                let gene = genes.next().expect("Missing gene for the n_eye_cells");
+                ((gene as u8).clamp(min, max), max)
+            }
+        };
+        Self {
+            see_walls: config.environment.wall && config.animals.see_walls,
+            see_foods: config.animals.see_foods,
+            see_animals: config.animals.see_animals,
+            fov_range: FOV_RANGE,
+            fov_angle,
+            n_sectors: n_cells as usize,
+            n_cells: n_cells as usize,
+        }
+    }
+    pub fn as_chromosome(&self, config: &SimulationConfig) -> ga::Chromosome {
+        let mut genes = vec![];
+        match config.animals.eye_fov_angle {
+            ConfigValue::Fixed(_) => (),
+            ConfigValue::Gene { min: _, max: _ } => genes.push(self.fov_angle),
+        }
+        match config.animals.n_eye_cells {
+            ConfigValue::Fixed(_) => (),
+            ConfigValue::Gene { min: _, max: _ } => genes.push(self.n_sectors as f32),
+        }
+        genes.into_iter().collect()
     }
     pub fn process_vision(
         &self,
@@ -82,13 +118,13 @@ impl Eye {
             }
 
             let angle = angle + self.fov_angle / 2.0;
-            let cell = angle / self.fov_angle;
-            let cell = cell * (self.n_cells as f32);
-            let cell = (cell as usize).min(self.n_cells - 1);
+            let sector = angle / self.fov_angle;
+            let sector = sector * (self.n_sectors as f32);
+            let sector = (sector as usize).min(self.n_sectors - 1);
 
             let energy = (self.fov_range - dist) / self.fov_range;
 
-            cells[cell] += energy;
+            cells[sector] += energy;
         }
         cells
     }
@@ -141,11 +177,5 @@ impl Eye {
             n_sensors += self.n_cells;
         }
         n_sensors
-    }
-}
-
-impl Default for Eye {
-    fn default() -> Self {
-        Self::new(FOV_RANGE, FOV_ANGLE, CELLS, true, true, false)
     }
 }

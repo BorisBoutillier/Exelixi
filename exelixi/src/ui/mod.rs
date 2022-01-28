@@ -17,7 +17,7 @@ impl Plugin for UiPlugin {
     }
 }
 
-pub fn debug_ui(
+pub fn _debug_ui(
     egui_ctx: Res<EguiContext>,
     selection: Query<(&Transform, &Velocity, &Stomach), With<Selected>>,
     simulation: Res<Simulation>,
@@ -31,14 +31,6 @@ pub fn debug_ui(
             ui.label(format!("width : {}", config.environment.width));
             ui.label(format!("height: {}", config.environment.height));
             ui.label("fitness".to_string());
-            ui.label(format!(
-                "    min: {:.2}",
-                simulation.statistics.latest_min_fitness()
-            ));
-            ui.label(format!(
-                "    max: {:.2}",
-                simulation.statistics.latest_max_fitness()
-            ));
             ui.label(format!(
                 "    avg: {:.2}",
                 simulation.statistics.latest_avg_fitness()

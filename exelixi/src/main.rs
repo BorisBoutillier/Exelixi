@@ -1,9 +1,7 @@
 #![allow(clippy::type_complexity)]
-mod animal_individual;
-mod brain;
+mod animal;
 mod camera;
 mod components;
-mod eye;
 mod simulation;
 mod spawner;
 mod systems;
@@ -24,11 +22,9 @@ mod prelude {
     pub use lib_genetic_algorithm as ga;
     pub use lib_neural_network as nn;
 
-    pub use crate::animal_individual::*;
-    pub use crate::brain::*;
+    pub use crate::animal::*;
     pub use crate::camera::*;
     pub use crate::components::*;
-    pub use crate::eye::*;
     pub use crate::simulation::*;
     pub use crate::spawner::*;
     pub use crate::systems::*;

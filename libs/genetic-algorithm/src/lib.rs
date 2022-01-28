@@ -45,6 +45,9 @@ impl Chromosome {
     pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut f32> {
         self.genes.iter_mut()
     }
+    pub fn extend(&mut self, iter: impl IntoIterator<Item = f32>) {
+        self.genes.extend(iter);
+    }
 }
 impl Index<usize> for Chromosome {
     type Output = f32;

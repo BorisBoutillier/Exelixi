@@ -12,7 +12,10 @@
     ,   food_decay_time   : 1000
     )
 ,   animals: (
-        see_foods:   true
+        //n_eye_cells: Gene(min:1,max:15)
+        eye_fov_angle: Gene(min:0.1,max:4.71)
+    ,   n_eye_cells: Fixed(9)
+    ,   see_foods:   true
     ,   see_walls:   true
     ,   see_animals: true
     )

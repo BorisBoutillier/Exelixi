@@ -12,9 +12,9 @@ impl Brain {
         }
     }
 
-    pub fn from_chromosome(chromosome: ga::Chromosome, eye: &Eye) -> Self {
+    pub fn from_genes(genes: impl IntoIterator<Item = f32>, eye: &Eye) -> Self {
         Self {
-            nn: nn::Network::from_weights(&Self::topology(eye), chromosome),
+            nn: nn::Network::from_weights(&Self::topology(eye), genes),
         }
     }
     pub fn as_chromosome(&self) -> ga::Chromosome {

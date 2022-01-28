@@ -3,15 +3,27 @@ use crate::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
+pub enum ConfigValue<T> {
+    Fixed(T),
+    Gene { min: T, max: T },
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct AnimalsConfig {
+    // Fov angle of the eye
+    pub eye_fov_angle: ConfigValue<f32>,
+    // Number of eye cells.
+    // The eye fov angle is seperated in n_eye_cells sectors.
+    // Each cells accumulate information of content in its sector
+    pub n_eye_cells: ConfigValue<u8>,
     // Does the eyes senses the foods.
     // will add n_eyes inputs to the neural networks
     pub see_foods: bool,
     // Does the eyes senses the walls.
-    // will add n_eyes inputs to the neural networks
+    // will add n_eye_cells inputs to the neural networks
     pub see_walls: bool,
     // Does the eyes senses other animals.
-    // Will add n_eyes inputs to the neural networks for each animal type
+    // Will add n_eye_cells inputs to the neural networks for each animal type
     pub see_animals: bool,
 }
 #[derive(Serialize, Deserialize)]

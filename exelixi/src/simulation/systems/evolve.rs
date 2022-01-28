@@ -13,11 +13,13 @@ pub fn evolve(
         let mut rng = thread_rng();
         simulation.steps = 0;
 
+        let mut fov_angles = vec![];
         let current_population = animals
             .iter()
-            .map(|(entity, s, b, _)| {
+            .map(|(entity, s, b, e)| {
                 commands.entity(entity).despawn_recursive();
-                AnimalIndividual::from_stomach_and_brain(s, b)
+                fov_angles.push(e.fov_angle);
+                AnimalIndividual::from_components(&config, s, e, b)
             })
             .collect::<Vec<_>>();
         let (new_population, population_stat) = simulation.ga.evolve(
@@ -31,13 +33,7 @@ pub fn evolve(
             .enumerate()
             .for_each(|(i, individual)| {
                 let selected = i == 0;
-                let eye = Eye {
-                    see_walls: config.environment.wall && config.animals.see_walls,
-                    see_foods: config.animals.see_foods,
-                    see_animals: config.animals.see_animals,
-                    ..Default::default()
-                };
-                let brain = individual.clone().into_brain(&eye);
+                let (eye, brain) = individual.clone().into_components(&config);
                 spawn_animal(
                     &mut commands,
                     &*asset_server,
@@ -50,12 +46,7 @@ pub fn evolve(
         // If not enough survived, add random animals
         let missing_population = config.min_population - new_population.len() as i32;
         for _ in 0..missing_population {
-            let eye = Eye {
-                see_walls: config.environment.wall && config.animals.see_walls,
-                see_foods: config.animals.see_foods,
-                see_animals: config.animals.see_animals,
-                ..Default::default()
-            };
+            let eye = Eye::random(&mut rng, &config);
             let brain = Brain::random(&mut rng, &eye);
             spawn_animal(&mut commands, &*asset_server, &*config, eye, brain, false);
         }
@@ -65,6 +56,8 @@ pub fn evolve(
             commands.entity(entity).despawn_recursive();
         }
         simulation.statistics.update(population_stat);
+        simulation.statistics.mean_fov_angle = mean(&fov_angles);
+        simulation.statistics.std_dev_fov_angle = std_deviation(&fov_angles);
         println!("{}", simulation.sprint_state(&config));
         simulation.new_generation();
     }
