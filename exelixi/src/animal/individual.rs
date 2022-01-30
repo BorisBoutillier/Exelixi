@@ -1,8 +1,7 @@
 use crate::*;
 
-#[derive(Clone)]
 pub struct AnimalIndividual {
-    fitness: f32,
+    pub energy: f32,
     chromosome: ga::Chromosome,
 }
 
@@ -12,18 +11,18 @@ impl ga::Individual for AnimalIndividual {
     }
     fn create(chromosome: ga::Chromosome) -> Self {
         Self {
-            fitness: 0.0,
+            energy: 0.0,
             chromosome,
         }
     }
     fn fitness(&self) -> f32 {
-        self.fitness
+        self.energy
     }
 }
 impl AnimalIndividual {
     pub fn from_components(
         config: &SimulationConfig,
-        stomach: &Stomach,
+        body: &Body,
         eye: &Eye,
         brain: &Brain,
     ) -> Self {
@@ -33,7 +32,7 @@ impl AnimalIndividual {
         eye_chromosome.extend(brain_chromosome);
         //println!("  -> {}", eye_chromosome.len());
         Self {
-            fitness: stomach.satiation as f32,
+            energy: body.energy,
             chromosome: eye_chromosome,
         }
     }
@@ -42,5 +41,11 @@ impl AnimalIndividual {
         let eye = Eye::from_genes(&mut genes, config);
         let brain = Brain::from_genes(&mut genes, &eye);
         (eye, brain)
+    }
+    pub fn random(mut rng: &mut dyn RngCore, config: &SimulationConfig) -> Self {
+        let eye = Eye::random(&mut rng, config);
+        let brain = Brain::random(&mut rng, &eye);
+        let body = Body::new(config);
+        Self::from_components(config, &body, &eye, &brain)
     }
 }

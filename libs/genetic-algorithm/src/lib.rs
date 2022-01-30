@@ -11,7 +11,7 @@ pub trait Individual {
 
 pub trait SelectionMethod {
     // Select one individual among the provided population with its fitness higher than the threshold
-    fn select<'a, I>(&self, rng: &mut dyn RngCore, population: &'a [I], threshold: f32) -> &'a I
+    fn select<'a, I>(&self, rng: &mut dyn RngCore, population: &'a [I]) -> &'a I
     where
         I: Individual;
 }
@@ -85,19 +85,12 @@ impl Default for RouletteWheelSelection {
     }
 }
 impl SelectionMethod for RouletteWheelSelection {
-    fn select<'a, I>(&self, rng: &mut dyn RngCore, population: &'a [I], threshold: f32) -> &'a I
+    fn select<'a, I>(&self, rng: &mut dyn RngCore, population: &'a [I]) -> &'a I
     where
         I: Individual,
     {
         population
-            .choose_weighted(rng, |individual| {
-                let f = individual.fitness();
-                if f > threshold {
-                    f
-                } else {
-                    0.0
-                }
-            })
+            .choose_weighted(rng, |individual| individual.fitness())
             .expect("Got an empty population to choose from")
     }
 }
@@ -182,170 +175,38 @@ where
         &self,
         rng: &mut dyn RngCore,
         population: &[I],
-        death_threshold: f32,
         fertility_rate: f32,
-    ) -> (Vec<I>, PopulationStatistics)
+        minimum_population: usize,
+    ) -> Vec<I>
     where
         I: Individual,
     {
-        let n_survivors = population
-            .iter()
-            .filter(|i| i.fitness() > death_threshold)
-            .count();
-        let n_children = n_survivors as f32 * fertility_rate;
+        if population.is_empty() {
+            return vec![];
+        }
+        let n_children = population.len() as f32 * fertility_rate;
         let n_children = n_children as usize
             + if rng.gen_bool((n_children % 1.0) as f64) {
                 1
             } else {
                 0
             };
+        let n_children = n_children.max(minimum_population);
         let new_chromosomes = (0..n_children)
             .map(|_| {
-                let parent_a = self
-                    .selection_method
-                    .select(rng, population, death_threshold);
-                let parent_b = self
-                    .selection_method
-                    .select(rng, population, death_threshold);
+                let parent_a = self.selection_method.select(rng, population);
+                let parent_b = self.selection_method.select(rng, population);
                 self.crossover_method
                     .crossover(rng, parent_a.chromosome(), parent_b.chromosome())
             })
             .collect::<Vec<_>>();
         // Apply mutation and create new individuals
-        let new_population = new_chromosomes
+        new_chromosomes
             .into_iter()
             .map(|mut c| {
                 self.mutation_method.mutate(rng, &mut c);
                 I::create(c)
             })
-            .collect::<Vec<_>>();
-
-        let stats = PopulationStatistics::new(population, death_threshold);
-        (new_population, stats)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use std::collections::BTreeMap;
-
-    use super::*;
-    use rand::SeedableRng;
-    use rand_chacha::ChaCha8Rng;
-
-    #[derive(Clone, Debug, PartialEq)]
-    pub struct TestIndividual {
-        fitness: f32,
-    }
-
-    impl TestIndividual {
-        pub fn new(fitness: f32) -> Self {
-            Self { fitness }
-        }
-    }
-
-    impl Individual for TestIndividual {
-        fn fitness(&self) -> f32 {
-            self.fitness
-        }
-        fn chromosome(&self) -> &Chromosome {
-            panic!()
-        }
-        fn create(_chromosome: Chromosome) -> Self {
-            panic!()
-        }
-    }
-
-    #[test]
-    fn test() {
-        let mut rng = ChaCha8Rng::from_seed(Default::default());
-
-        let population = vec![
-            TestIndividual::new(2.0),
-            TestIndividual::new(1.0),
-            TestIndividual::new(4.0),
-            TestIndividual::new(3.0),
-        ];
-        let mut actual_histogram = BTreeMap::new();
-
-        for _ in 0..1000 {
-            let fitness = RouletteWheelSelection::new()
-                .select(&mut rng, &population, 0.0)
-                .fitness() as i32;
-            *actual_histogram.entry(fitness).or_insert(0) += 1;
-        }
-        let expected_histogram = BTreeMap::from_iter(vec![(1, 98), (2, 202), (3, 278), (4, 422)]);
-        assert_eq!(actual_histogram, expected_histogram);
-    }
-}
-
-pub struct PopulationStatistics {
-    min_fitness: f32,
-    max_fitness: f32,
-    avg_fitness: f32,
-    size: usize,
-    dead: usize,
-}
-
-impl PopulationStatistics {
-    fn new<I>(population: &[I], death_threshold: f32) -> Self
-    where
-        I: Individual,
-    {
-        assert!(!population.is_empty());
-
-        let mut min_fitness = population[0].fitness();
-        let mut max_fitness = min_fitness;
-        let mut sum_fitness = 0.0;
-
-        for individual in population {
-            let fitness = individual.fitness();
-
-            min_fitness = min_fitness.min(fitness);
-            max_fitness = max_fitness.max(fitness);
-            sum_fitness += fitness;
-        }
-
-        let size = population.len();
-        let dead = population
-            .iter()
-            .filter(|i| i.fitness() < death_threshold)
-            .count();
-        Self {
-            min_fitness,
-            max_fitness,
-            avg_fitness: sum_fitness / (population.len() as f32),
-            size,
-            dead,
-        }
-    }
-
-    pub fn min_fitness(&self) -> f32 {
-        self.min_fitness
-    }
-
-    pub fn max_fitness(&self) -> f32 {
-        self.max_fitness
-    }
-
-    pub fn avg_fitness(&self) -> f32 {
-        self.avg_fitness
-    }
-    pub fn size(&self) -> usize {
-        self.size
-    }
-    pub fn dead(&self) -> usize {
-        self.dead
-    }
-}
-impl Default for PopulationStatistics {
-    fn default() -> Self {
-        Self {
-            min_fitness: 0.0,
-            max_fitness: 0.0,
-            avg_fitness: 0.0,
-            size: 0,
-            dead: 0,
-        }
+            .collect::<Vec<_>>()
     }
 }

@@ -19,7 +19,7 @@ impl Plugin for UiPlugin {
 
 pub fn _debug_ui(
     egui_ctx: Res<EguiContext>,
-    selection: Query<(&Transform, &Velocity, &Stomach), With<Selected>>,
+    selection: Query<(&Velocity, &Body), With<Selected>>,
     simulation: Res<Simulation>,
     config: Res<SimulationConfig>,
     diagnostics: Res<Diagnostics>,
@@ -30,25 +30,11 @@ pub fn _debug_ui(
             ui.heading("Simulation");
             ui.label(format!("width : {}", config.environment.width));
             ui.label(format!("height: {}", config.environment.height));
-            ui.label("fitness".to_string());
-            ui.label(format!(
-                "    avg: {:.2}",
-                simulation.statistics.latest_avg_fitness()
-            ));
-            if let Ok((transform, velocity, stomach)) = selection.get_single() {
+            if let Ok((velocity, body)) = selection.get_single() {
                 ui.heading("Selection");
-                ui.label(format!("x: {:.1}", transform.translation.x));
-                ui.label(format!("y: {:.1}", transform.translation.y));
                 ui.label(format!("linear: {:.1}", velocity.linear));
                 ui.label(format!("angular: {:.1}", velocity.angular));
-                ui.label(format!("satiation: {:.1}", stomach.satiation));
-                //ui.label(format!(
-                //    "eye wall vision: {}",
-                //    eye.process_vision_walls(transform, &config)
-                //        .iter()
-                //        .map(|f| format!("{:.1} ", f))
-                //        .collect::<String>()
-                //));
+                ui.label(format!("energy: {:.1}", body.energy));
             }
             ui.separator();
 
@@ -88,28 +74,28 @@ pub fn status_bar_ui(
     let population_size_line = egui::plot::Line::new(egui::plot::Values::from_values_iter(
         simulation
             .statistics
-            .population
+            .generations
             .iter()
             .enumerate()
-            .map(|(i, s)| egui::plot::Value::new(i as f64, s.size() as f64)),
+            .map(|(i, s)| egui::plot::Value::new(i as f64, s.start_size as f64)),
     ))
     .color(size_color);
     let population_dead_line = egui::plot::Line::new(egui::plot::Values::from_values_iter(
         simulation
             .statistics
-            .population
+            .generations
             .iter()
             .enumerate()
-            .map(|(i, s)| egui::plot::Value::new(i as f64, s.dead() as f64)),
+            .map(|(i, s)| egui::plot::Value::new(i as f64, (s.start_size - s.end_size) as f64)),
     ))
     .color(dead_color);
-    let population_avg_fitness_line = egui::plot::Line::new(egui::plot::Values::from_values_iter(
+    let plot_bottom = egui::plot::Line::new(egui::plot::Values::from_values_iter(
         simulation
             .statistics
-            .population
+            .generations
             .iter()
             .enumerate()
-            .map(|(i, s)| egui::plot::Value::new(i as f64, s.avg_fitness() as f64)),
+            .map(|(i, s)| egui::plot::Value::new(i as f64, s.food_decay as f64)),
     ))
     .color(avg_color);
     egui::TopBottomPanel::bottom("bottom_panel")
@@ -209,7 +195,7 @@ pub fn status_bar_ui(
                         plot_ui.line(population_dead_line);
                         plot_ui.line(population_size_line);
                     });
-                    let plot = egui::plot::Plot::new("fitness_plot")
+                    let plot = egui::plot::Plot::new("bottom_plot")
                         .height(50.0)
                         .width(half_width / 1.7)
                         .show_x(false)
@@ -219,15 +205,18 @@ pub fn status_bar_ui(
                         .allow_zoom(false)
                         .allow_drag(false);
                     plot.show(ui, |plot_ui| {
-                        plot_ui.line(population_avg_fitness_line);
+                        plot_ui.line(plot_bottom);
                     });
                 });
                 ui.vertical(|ui| {
                     ui.label(
-                        egui::RichText::new(format!("{}", simulation.statistics.latest_size()))
-                            .color(size_color),
+                        egui::RichText::new(format!(
+                            "{}",
+                            simulation.statistics.latest_start_size()
+                        ))
+                        .color(size_color),
                     )
-                    .on_hover_text("Total number of animals");
+                    .on_hover_text("Starting number of animals");
                     ui.add_space(25.0 - 8.0);
                     ui.label(
                         egui::RichText::new(format!("{}", simulation.statistics.latest_dead()))
@@ -238,11 +227,11 @@ pub fn status_bar_ui(
                     ui.label(
                         egui::RichText::new(format!(
                             "{:.1}",
-                            simulation.statistics.latest_avg_fitness()
+                            simulation.statistics.latest_food_decay()
                         ))
                         .color(avg_color),
                     )
-                    .on_hover_text("Average energy of all animals");
+                    .on_hover_text("Number food decayed");
                 });
             });
         });

@@ -10,26 +10,19 @@ pub struct Animal {}
 #[derive(Component)]
 pub struct Food {
     pub eaten: bool,
+    pub energy: f32,
+}
+impl Food {
+    pub fn new(config: &SimulationConfig) -> Self {
+        Self {
+            eaten: false,
+            energy: config.environment.food_energy,
+        }
+    }
 }
 
 #[derive(Component)]
 pub struct Floor {}
-
-#[derive(Component)]
-pub struct Stomach {
-    pub satiation: f32,
-}
-impl Stomach {
-    pub fn new() -> Self {
-        Self { satiation: 0.0 }
-    }
-}
-
-impl Default for Stomach {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 #[derive(Component)]
 pub struct Selected {}

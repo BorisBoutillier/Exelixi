@@ -4,7 +4,7 @@ pub fn evolve(
     mut commands: Commands,
     mut simulation: ResMut<Simulation>,
     config: Res<SimulationConfig>,
-    animals: Query<(Entity, &Stomach, &Brain, &Eye)>,
+    animals: Query<(Entity, &Body, &Brain, &Eye)>,
     foods: Query<Entity, With<Food>>,
     asset_server: Res<AssetServer>,
 ) {
@@ -16,24 +16,49 @@ pub fn evolve(
         let mut fov_angles = vec![];
         let current_population = animals
             .iter()
-            .map(|(entity, s, b, e)| {
+            .map(|(entity, body, brain, eye)| {
                 commands.entity(entity).despawn_recursive();
-                fov_angles.push(e.fov_angle);
-                AnimalIndividual::from_components(&config, s, e, b)
+                fov_angles.push(eye.fov_angle);
+                AnimalIndividual::from_components(&config, body, eye, brain)
             })
             .collect::<Vec<_>>();
-        let (new_population, population_stat) = simulation.ga.evolve(
+        simulation.statistics.end_of_generation(&current_population);
+        //simulation.statistics.mean_fov_angle = mean(&fov_angles);
+        //simulation.statistics.std_dev_fov_angle = std_deviation(&fov_angles);
+        println!("{}", simulation.sprint_state(&config));
+
+        let mut new_population = simulation.ga.evolve(
             &mut rng,
             &current_population,
-            config.death_threshold,
             config.fertility_rate,
+            config.min_population,
         );
+        // If not enough survived, add random animals
+        let missing_population = config.min_population as i32 - new_population.len() as i32;
+        for _ in 0..missing_population {
+            new_population.push(AnimalIndividual::random(&mut rng, &config));
+        }
+        simulation
+            .statistics
+            .start_of_new_generation(&new_population);
+
+        simulation.new_generation();
+        // Remove all remaining food
+        {
+            let mut food_decay = 0;
+            for entity in foods.iter() {
+                commands.entity(entity).despawn_recursive();
+                food_decay += 1;
+            }
+            simulation.statistics.add_food_decay(food_decay);
+        }
+        // Spawn new Animals
         new_population
-            .iter()
+            .into_iter()
             .enumerate()
             .for_each(|(i, individual)| {
                 let selected = i == 0;
-                let (eye, brain) = individual.clone().into_components(&config);
+                let (eye, brain) = individual.into_components(&config);
                 spawn_animal(
                     &mut commands,
                     &*asset_server,
@@ -43,22 +68,5 @@ pub fn evolve(
                     selected,
                 );
             });
-        // If not enough survived, add random animals
-        let missing_population = config.min_population - new_population.len() as i32;
-        for _ in 0..missing_population {
-            let eye = Eye::random(&mut rng, &config);
-            let brain = Brain::random(&mut rng, &eye);
-            spawn_animal(&mut commands, &*asset_server, &*config, eye, brain, false);
-        }
-        // Remove all remaining food
-        for entity in foods.iter() {
-            simulation.statistics.food_decay += 1;
-            commands.entity(entity).despawn_recursive();
-        }
-        simulation.statistics.update(population_stat);
-        simulation.statistics.mean_fov_angle = mean(&fov_angles);
-        simulation.statistics.std_dev_fov_angle = std_deviation(&fov_angles);
-        println!("{}", simulation.sprint_state(&config));
-        simulation.new_generation();
     }
 }

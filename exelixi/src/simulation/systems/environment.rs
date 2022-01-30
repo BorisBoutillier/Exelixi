@@ -34,7 +34,7 @@ pub fn spawn_food(
                 texture: asset_server.load("food.png"),
                 ..Default::default()
             })
-            .insert(Food { eaten: false })
+            .insert(Food::new(&config))
             .insert(Decay {
                 time: config.environment.food_decay_time as i32,
             });

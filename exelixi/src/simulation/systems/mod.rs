@@ -1,6 +1,7 @@
 mod brain;
 mod collision;
 mod decay;
+mod energy;
 mod environment;
 mod evolve;
 mod movement;
@@ -8,6 +9,7 @@ mod movement;
 pub use brain::*;
 pub use collision::*;
 pub use decay::*;
+pub use energy::*;
 pub use environment::*;
 pub use evolve::*;
 pub use movement::*;
@@ -22,12 +24,14 @@ const MAX_SIMULATION_DURATION_PER_FRAME: f32 = 1.0 / (FPS as f32);
 pub fn insert_simulation_steps_schedule(mut commands: Commands) {
     let mut schedule = Schedule::default();
     schedule.add_stage("main", SystemStage::parallel());
+    schedule.add_stage("evolve", SystemStage::parallel());
     schedule.add_system_to_stage("main", movement);
     schedule.add_system_to_stage("main", collision);
     schedule.add_system_to_stage("main", process_brain);
-    schedule.add_system_to_stage("main", evolve);
-    schedule.add_system_to_stage("main", spawn_food);
+    schedule.add_system_to_stage("main", energy);
     schedule.add_system_to_stage("main", decay);
+    schedule.add_system_to_stage("main", spawn_food);
+    schedule.add_system_to_stage("evolve", evolve);
     commands.insert_resource(schedule);
 }
 

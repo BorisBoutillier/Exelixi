@@ -40,7 +40,7 @@ pub fn spawn_animal(
             linear: rng.gen_range(V_LINEAR_MIN..V_LINEAR_MAX),
             angular: 0.0,
         })
-        .insert(Stomach::default())
+        .insert(Body::new(config))
         .insert(eye)
         .insert(brain);
     if selected {
@@ -50,22 +50,34 @@ pub fn spawn_animal(
 pub fn spawn_starting_animals(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    mut simulation: ResMut<Simulation>,
     config: Res<SimulationConfig>,
 ) {
     if config.is_changed() {
         let mut rng = thread_rng();
-        for i in 0..config.start_population {
-            let selected = i == 0;
-            let eye = Eye::random(&mut rng, &config);
-            let brain = Brain::random(&mut rng, &eye);
-            spawn_animal(
-                &mut commands,
-                &*asset_server,
-                &*config,
-                eye,
-                brain,
-                selected,
-            );
-        }
+        // Create a new random population
+        let new_population = (0..config.min_population)
+            .map(|_| AnimalIndividual::random(&mut rng, &config))
+            .collect::<Vec<_>>();
+        simulation
+            .statistics
+            .start_of_new_generation(&new_population);
+        simulation.new_generation();
+        // Spawn the Animals
+        new_population
+            .into_iter()
+            .enumerate()
+            .for_each(|(i, individual)| {
+                let selected = i == 0;
+                let (eye, brain) = individual.into_components(&config);
+                spawn_animal(
+                    &mut commands,
+                    &*asset_server,
+                    &*config,
+                    eye,
+                    brain,
+                    selected,
+                );
+            });
     }
 }

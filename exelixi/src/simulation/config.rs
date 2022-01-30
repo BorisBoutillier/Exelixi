@@ -25,6 +25,8 @@ pub struct AnimalsConfig {
     // Does the eyes senses other animals.
     // Will add n_eye_cells inputs to the neural networks for each animal type
     pub see_animals: bool,
+    pub starting_energy: f32,
+    pub maximum_energy: f32,
 }
 #[derive(Serialize, Deserialize)]
 pub struct EnvironmentConfig {
@@ -39,6 +41,7 @@ pub struct EnvironmentConfig {
     pub food_spawn_rate: f64,
     // Number of steps after appearance that a food disappear
     pub food_decay_time: u32,
+    pub food_energy: f32,
 }
 
 //
@@ -47,14 +50,10 @@ pub struct EnvironmentConfig {
 #[derive(Serialize, Deserialize)]
 pub struct SimulationConfig {
     pub generation_length: u32,
-    // Number of random animals to spawn in first generation
-    pub start_population: i32,
     // Minimum number of animals in each generation. Randomized if 'missing'
-    pub min_population: i32,
+    pub min_population: usize,
     // Number of child one surviving animal spawn in next generation
     pub fertility_rate: f32,
-    // Minimum fitness required at end of generation to survive
-    pub death_threshold: f32,
     // Configuration information regarding the environment
     pub environment: EnvironmentConfig,
     // Configuration information regarding the animals
