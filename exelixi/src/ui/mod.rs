@@ -19,7 +19,7 @@ impl Plugin for UiPlugin {
 
 pub fn _debug_ui(
     egui_ctx: Res<EguiContext>,
-    selection: Query<(&Velocity, &Body), With<Selected>>,
+    selection: Query<(&Locomotion, &Body), With<Selected>>,
     simulation: Res<Simulation>,
     config: Res<SimulationConfig>,
     diagnostics: Res<Diagnostics>,
@@ -30,11 +30,11 @@ pub fn _debug_ui(
             ui.heading("Simulation");
             ui.label(format!("width : {}", config.environment.width));
             ui.label(format!("height: {}", config.environment.height));
-            if let Ok((velocity, body)) = selection.get_single() {
+            if let Ok((locomotion, body)) = selection.get_single() {
                 ui.heading("Selection");
-                ui.label(format!("linear: {:.1}", velocity.linear));
-                ui.label(format!("angular: {:.1}", velocity.angular));
-                ui.label(format!("energy: {:.1}", body.energy));
+                ui.label(format!("linear: {:.1}", locomotion.linear));
+                ui.label(format!("angular: {:.1}", locomotion.angular));
+                ui.label(format!("energy: {:.1}", body.energy()));
             }
             ui.separator();
 

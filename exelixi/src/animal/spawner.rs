@@ -36,10 +36,7 @@ pub fn spawn_animal(
     });
     command
         .insert(Animal {})
-        .insert(Velocity {
-            linear: rng.gen_range(V_LINEAR_MIN..V_LINEAR_MAX),
-            angular: 0.0,
-        })
+        .insert(Locomotion::new(config))
         .insert(Body::new(config))
         .insert(eye)
         .insert(brain);

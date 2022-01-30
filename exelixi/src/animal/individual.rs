@@ -32,19 +32,21 @@ impl AnimalIndividual {
         eye_chromosome.extend(brain_chromosome);
         //println!("  -> {}", eye_chromosome.len());
         Self {
-            energy: body.energy,
+            energy: body.energy(),
             chromosome: eye_chromosome,
         }
     }
     pub fn into_components(self, config: &SimulationConfig) -> (Eye, Brain) {
         let mut genes = self.chromosome.into_iter();
+        let locomotion = Locomotion::new(config);
         let eye = Eye::from_genes(&mut genes, config);
-        let brain = Brain::from_genes(&mut genes, &eye);
+        let brain = Brain::from_genes(&mut genes, &eye, &locomotion);
         (eye, brain)
     }
     pub fn random(mut rng: &mut dyn RngCore, config: &SimulationConfig) -> Self {
+        let locomotion = Locomotion::new(config);
         let eye = Eye::random(&mut rng, config);
-        let brain = Brain::random(&mut rng, &eye);
+        let brain = Brain::random(&mut rng, &eye, &locomotion);
         let body = Body::new(config);
         Self::from_components(config, &body, &eye, &brain)
     }

@@ -11,13 +11,14 @@
     ,   food_energy       : 100.0
     )
 ,   animals: (
-        //eye_fov_angle: Gene(min:0.1,max:4.71)
-        eye_fov_angle: Fixed(3.9)
+        eye_fov_angle: Gene(min:0.1,max:4.71)
+    ,   eye_energy_cost: 0.1
     ,   n_eye_cells: Fixed(9)
     ,   see_foods:   true
     ,   see_walls:   true
     ,   see_animals: true
     ,   starting_energy: 200.0
     ,   maximum_energy: 400.0
+    ,   linear_locomotion: Neuron(min:0.0,max:4.0)
     )
 )

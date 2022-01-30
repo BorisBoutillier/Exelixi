@@ -13,6 +13,7 @@ pub struct Eye {
     pub see_foods: bool,
     pub see_walls: bool,
     pub see_animals: bool,
+    energy_cost: f32,
 }
 
 impl Eye {
@@ -20,19 +21,23 @@ impl Eye {
         let (_n_sectors, n_cells) = match config.animals.n_eye_cells {
             ConfigValue::Fixed(v) => (v, v),
             ConfigValue::Gene { min, max } => (rng.gen_range(min..=max), max),
+            _ => panic!(),
         };
         let fov_angle = match config.animals.eye_fov_angle {
             ConfigValue::Fixed(v) => v,
             ConfigValue::Gene { min, max } => (rng.gen_range(min..=max)),
+            _ => panic!(),
         };
+        let fov_range = FOV_RANGE;
         Self {
             see_walls: config.environment.wall && config.animals.see_walls,
             see_foods: config.animals.see_foods,
             see_animals: config.animals.see_animals,
-            fov_range: FOV_RANGE,
+            fov_range,
             fov_angle,
             n_sectors: n_cells as usize,
             n_cells: n_cells as usize,
+            energy_cost: compure_energy_cost(fov_range, fov_angle, config.animals.eye_energy_cost),
         }
     }
     pub fn from_genes(genes: impl IntoIterator<Item = f32>, config: &SimulationConfig) -> Self {
@@ -43,6 +48,7 @@ impl Eye {
                 let gene = genes.next().expect("Missing gene for the fov_angle");
                 gene.clamp(min, max)
             }
+            _ => panic!(),
         };
         let (_n_sectors, n_cells) = match config.animals.n_eye_cells {
             ConfigValue::Fixed(v) => (v, v),
@@ -50,15 +56,18 @@ impl Eye {
                 let gene = genes.next().expect("Missing gene for the n_eye_cells");
                 ((gene as u8).clamp(min, max), max)
             }
+            _ => panic!(),
         };
+        let fov_range = FOV_RANGE;
         Self {
             see_walls: config.environment.wall && config.animals.see_walls,
             see_foods: config.animals.see_foods,
             see_animals: config.animals.see_animals,
-            fov_range: FOV_RANGE,
+            fov_range,
             fov_angle,
             n_sectors: n_cells as usize,
             n_cells: n_cells as usize,
+            energy_cost: compure_energy_cost(fov_range, fov_angle, config.animals.eye_energy_cost),
         }
     }
     pub fn as_chromosome(&self, config: &SimulationConfig) -> ga::Chromosome {
@@ -66,10 +75,12 @@ impl Eye {
         match config.animals.eye_fov_angle {
             ConfigValue::Fixed(_) => (),
             ConfigValue::Gene { min: _, max: _ } => genes.push(self.fov_angle),
+            _ => panic!(),
         }
         match config.animals.n_eye_cells {
             ConfigValue::Fixed(_) => (),
             ConfigValue::Gene { min: _, max: _ } => genes.push(self.n_sectors as f32),
+            _ => panic!(),
         }
         genes.into_iter().collect()
     }
@@ -164,6 +175,9 @@ impl Eye {
             })
             .collect::<Vec<_>>()
     }
+    pub fn energy_cost(&self) -> f32 {
+        self.energy_cost
+    }
     // Return the number of sensors associated with this eye configuration
     pub fn n_sensors(&self) -> usize {
         let mut n_sensors = 0;
@@ -178,4 +192,8 @@ impl Eye {
         }
         n_sensors
     }
+}
+
+fn compure_energy_cost(fov_range: f32, fov_angle: f32, energy_per_area: f32) -> f32 {
+    (PI * fov_range.powi(2) * 2.0 * PI / fov_angle) * energy_per_area / (PI * 150.0 * 150.0)
 }

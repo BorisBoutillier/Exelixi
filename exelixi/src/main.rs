@@ -29,15 +29,6 @@ mod prelude {
     pub use crate::spawner::*;
     pub use crate::systems::*;
     pub use crate::ui::*;
-
-    // Minimum linear velocity in pixels/step
-    pub const V_LINEAR_MIN: f32 = 1.0;
-    // Maximum linear velocity in pixels/step
-    pub const V_LINEAR_MAX: f32 = 5.0;
-    // Linear acceleration pixels/step^2
-    pub const V_LINEAR_ACCEL: f32 = 40.0;
-    /// Maximum angalur velocity in radians/step
-    pub const V_ANGULAR_MAX: f32 = PI / 30.0;
 }
 
 use prelude::*;

@@ -10,8 +10,7 @@ pub fn collision(
             if !food.eaten {
                 let distance = (animal_transform.translation - food_transform.translation).length();
                 if distance <= 10.0 {
-                    animal_body.energy =
-                        (animal_body.energy + food.energy).min(animal_body.max_energy);
+                    animal_body.add_energy(food.energy);
                     // Storing the eaten state is currently necessary, because despawn will not
                     // happen when we do multiple steps per run_criteria
                     food.eaten = true;

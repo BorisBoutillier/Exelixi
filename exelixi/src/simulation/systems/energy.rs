@@ -1,13 +1,9 @@
 use crate::*;
 
-pub fn energy(
-    mut commands: Commands,
-    mut energy_query: Query<(Entity, &mut Body, Option<&Brain>, Option<&Eye>)>,
-) {
+pub fn energy(mut commands: Commands, mut energy_query: Query<(Entity, &mut Body, &Brain, &Eye)>) {
     let mut deads = vec![];
-    for (entity, mut body, _brain, _eye) in energy_query.iter_mut() {
-        body.energy -= 0.1;
-        if body.energy < 0.0 {
+    for (entity, mut body, brain, eye) in energy_query.iter_mut() {
+        if !body.spend_energy(brain.energy_cost() + eye.energy_cost()) {
             deads.push(entity);
         }
     }

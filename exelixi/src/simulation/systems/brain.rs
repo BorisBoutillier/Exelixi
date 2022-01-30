@@ -4,7 +4,7 @@ pub fn process_brain(
     mut animals: Query<(
         Entity,
         &Transform,
-        &mut Velocity,
+        &mut Locomotion,
         &Eye,
         &Brain,
         Option<&Selected>,
@@ -18,7 +18,7 @@ pub fn process_brain(
         |(
             animal_entity,
             animal_transform,
-            mut animal_velocity,
+            mut animal_locomotion,
             animal_eye,
             animal_brain,
             selected,
@@ -34,18 +34,7 @@ pub fn process_brain(
                 &config,
             );
             let response = animal_brain.nn.propagate(&vision);
-            let linear_accel = (response[0].clamp(0.0, 2.0) - 1.0) * V_LINEAR_ACCEL;
-            let angular = (response[1].clamp(0.0, 2.0) - 1.0) * V_ANGULAR_MAX;
-            if selected.is_some() {
-                //println!("VISION {:?}", vision);
-                //println!(
-                //    "Response {:.3} {:.3} , {:.3} / {:.3}",
-                //    response[0], response[1], linear_accel, angular
-                //);
-            }
-            animal_velocity.linear =
-                (animal_velocity.linear + linear_accel).clamp(V_LINEAR_MIN, V_LINEAR_MAX);
-            animal_velocity.angular = angular;
+            animal_locomotion.actuates(response);
         },
     );
 }

@@ -1,13 +1,13 @@
 use crate::*;
 
-pub fn movement(mut movables: Query<(&mut Transform, &Velocity)>, config: Res<SimulationConfig>) {
+pub fn movement(mut movables: Query<(&mut Transform, &Locomotion)>, config: Res<SimulationConfig>) {
     let half_width = config.environment.width / 2.0;
     let half_height = config.environment.height / 2.0;
-    movables.for_each_mut(|(mut transform, velocity)| {
+    movables.for_each_mut(|(mut transform, locomotion)| {
         // Update transform based on linear and angular velocity
-        let delta = transform.rotation * Vec3::new(velocity.linear, 0.0, 0.0);
+        let delta = transform.rotation * Vec3::new(locomotion.linear, 0.0, 0.0);
         transform.translation += delta;
-        transform.rotation *= Quat::from_axis_angle(Vec3::Z, velocity.angular);
+        transform.rotation *= Quat::from_axis_angle(Vec3::Z, locomotion.angular);
         if config.environment.wall {
             // Detects wall collision and mirror the rotation angle
             let (angle_vec, mut angle) = transform.rotation.to_axis_angle();

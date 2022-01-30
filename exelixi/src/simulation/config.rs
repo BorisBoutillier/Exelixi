@@ -6,12 +6,15 @@ use serde::{Deserialize, Serialize};
 pub enum ConfigValue<T> {
     Fixed(T),
     Gene { min: T, max: T },
+    Neuron { min: T, max: T },
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct AnimalsConfig {
     // Fov angle of the eye
     pub eye_fov_angle: ConfigValue<f32>,
+    // Cost for a full circle of 150.0 radius,
+    pub eye_energy_cost: f32,
     // Number of eye cells.
     // The eye fov angle is seperated in n_eye_cells sectors.
     // Each cells accumulate information of content in its sector
@@ -27,6 +30,7 @@ pub struct AnimalsConfig {
     pub see_animals: bool,
     pub starting_energy: f32,
     pub maximum_energy: f32,
+    pub linear_locomotion: ConfigValue<f32>,
 }
 #[derive(Serialize, Deserialize)]
 pub struct EnvironmentConfig {
