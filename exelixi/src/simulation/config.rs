@@ -13,6 +13,8 @@ pub enum ConfigValue<T> {
 pub struct AnimalsConfig {
     // Fov angle of the eye
     pub eye_fov_angle: ConfigValue<f32>,
+    // Fov angle of the eye
+    pub eye_fov_range: ConfigValue<f32>,
     // Cost for a full circle of 150.0 radius,
     pub eye_energy_cost: f32,
     // Number of eye cells.
@@ -31,6 +33,10 @@ pub struct AnimalsConfig {
     pub starting_energy: f32,
     pub maximum_energy: f32,
     pub linear_locomotion: ConfigValue<f32>,
+    // Cost for will be linear_cost*linear^2
+    pub linear_cost: f32,
+    // Cost for will be angular_cost*angular^2
+    pub angular_cost: f32,
 }
 #[derive(Serialize, Deserialize)]
 pub struct EnvironmentConfig {

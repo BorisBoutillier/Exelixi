@@ -9,6 +9,8 @@ pub struct Locomotion {
     pub angular: f32,
     pub linear_actuator: bool,
     pub linear_max: f32,
+    linear_cost: f32,
+    angular_cost: f32,
 }
 
 impl Locomotion {
@@ -19,12 +21,16 @@ impl Locomotion {
                 angular: 0.0,
                 linear_actuator: false,
                 linear_max: v,
+                linear_cost: config.animals.linear_cost,
+                angular_cost: config.animals.angular_cost,
             },
             ConfigValue::Neuron { min: _, max } => Self {
                 linear: 0.0,
                 angular: 0.0,
                 linear_actuator: true,
                 linear_max: max,
+                linear_cost: config.animals.linear_cost,
+                angular_cost: config.animals.angular_cost,
             },
             _ => panic!(),
         }
@@ -48,5 +54,8 @@ impl Locomotion {
             let angular = (output.clamp(0.0, 1.0) - 0.5) * V_ANGULAR_MAX;
             self.angular = angular;
         }
+    }
+    pub fn energy_cost(&self) -> f32 {
+        self.linear_cost * self.linear.powi(2) + self.angular_cost * self.angular.powi(2)
     }
 }

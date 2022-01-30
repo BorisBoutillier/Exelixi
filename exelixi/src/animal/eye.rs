@@ -2,8 +2,6 @@ use crate::prelude::*;
 
 use std::f32::consts::PI;
 
-const FOV_RANGE: f32 = 150.0;
-
 #[derive(Debug, Component)]
 pub struct Eye {
     pub fov_range: f32,
@@ -28,7 +26,11 @@ impl Eye {
             ConfigValue::Gene { min, max } => (rng.gen_range(min..=max)),
             _ => panic!(),
         };
-        let fov_range = FOV_RANGE;
+        let fov_range = match config.animals.eye_fov_range {
+            ConfigValue::Fixed(v) => v,
+            ConfigValue::Gene { min, max } => (rng.gen_range(min..=max)),
+            _ => panic!(),
+        };
         Self {
             see_walls: config.environment.wall && config.animals.see_walls,
             see_foods: config.animals.see_foods,
@@ -50,6 +52,14 @@ impl Eye {
             }
             _ => panic!(),
         };
+        let fov_range = match config.animals.eye_fov_range {
+            ConfigValue::Fixed(v) => v,
+            ConfigValue::Gene { min, max } => {
+                let gene = genes.next().expect("Missing gene for the fov_range");
+                gene.clamp(min, max)
+            }
+            _ => panic!(),
+        };
         let (_n_sectors, n_cells) = match config.animals.n_eye_cells {
             ConfigValue::Fixed(v) => (v, v),
             ConfigValue::Gene { min, max } => {
@@ -58,7 +68,6 @@ impl Eye {
             }
             _ => panic!(),
         };
-        let fov_range = FOV_RANGE;
         Self {
             see_walls: config.environment.wall && config.animals.see_walls,
             see_foods: config.animals.see_foods,
@@ -75,6 +84,11 @@ impl Eye {
         match config.animals.eye_fov_angle {
             ConfigValue::Fixed(_) => (),
             ConfigValue::Gene { min: _, max: _ } => genes.push(self.fov_angle),
+            _ => panic!(),
+        }
+        match config.animals.eye_fov_range {
+            ConfigValue::Fixed(_) => (),
+            ConfigValue::Gene { min: _, max: _ } => genes.push(self.fov_range),
             _ => panic!(),
         }
         match config.animals.n_eye_cells {
