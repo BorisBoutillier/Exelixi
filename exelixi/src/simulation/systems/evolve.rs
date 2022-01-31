@@ -31,7 +31,7 @@ pub fn evolve(
             &mut rng,
             &current_population,
             config.fertility_rate,
-            config.min_population,
+            (config.min_population as f32 * 0.9) as usize, // If survivors and fertility are not enough keep 10% random
         );
         // If not enough survived, add random animals
         let missing_population = config.min_population as i32 - new_population.len() as i32;
