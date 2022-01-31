@@ -30,6 +30,7 @@ fn spawn_camera(mut commands: Commands) {
         .insert(VisibleArea::default());
 }
 
+#[allow(clippy::too_many_arguments)]
 fn camera_movement(
     mut cameras: Query<(&mut VisibleArea, &mut OrthographicProjection), With<MainCamera>>,
     mouse_button_input: Res<Input<MouseButton>>,
@@ -38,6 +39,7 @@ fn camera_movement(
     config: Res<SimulationConfig>,
     windows: Res<Windows>,
     mut window_resized_events: EventReader<WindowResized>,
+    ui_state: Res<UiState>,
 ) {
     let window = windows.get_primary().expect("No primary window found.");
     let window_resized = window_resized_events.iter().any(|e| e.id == window.id());
@@ -48,12 +50,16 @@ fn camera_movement(
     if reset_camera {
         let (mut visible_area, mut camera_ortho) =
             cameras.get_single_mut().expect("No ortho camera found.");
-        let view_width = window.width();
-        let view_height = window.height() - UI_STATUS_BAR_HEIGHT;
-        visible_area.0.left = 0.0;
-        visible_area.0.right = visible_area.0.left + view_width;
+        visible_area.0.left = if ui_state.stat_panel {
+            UI_LEFT_PANEL_WIDTH
+        } else {
+            0.0
+        };
+        visible_area.0.right = window.width();
         visible_area.0.bottom = UI_STATUS_BAR_HEIGHT;
-        visible_area.0.top = visible_area.0.bottom + view_height;
+        visible_area.0.top = window.height();
+        let view_width = visible_area.0.right - visible_area.0.left;
+        let view_height = visible_area.0.top - visible_area.0.bottom;
         let view_ratio = view_width / view_height;
         let mut visible_width = config.environment.width * ENV_VIEW_RESET_MARGIN_PCT;
         let mut visible_height = config.environment.height * ENV_VIEW_RESET_MARGIN_PCT;
@@ -63,11 +69,11 @@ fn camera_movement(
         } else {
             visible_width = visible_height * view_ratio;
         }
-        camera_ortho.left = -visible_width / 2.0;
+        camera_ortho.left = -visible_width / 2.0 - visible_area.0.left * visible_width / view_width;
         camera_ortho.right = visible_width / 2.0;
         camera_ortho.top = visible_height / 2.0;
         camera_ortho.bottom =
-            -visible_height / 2.0 - UI_STATUS_BAR_HEIGHT * visible_height / view_height;
+            -visible_height / 2.0 - visible_area.0.bottom * visible_height / view_height;
         camera_ortho.scale = 1.0;
         camera_ortho.scaling_mode = ScalingMode::None;
     }
