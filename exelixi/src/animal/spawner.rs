@@ -58,7 +58,7 @@ pub fn spawn_starting_animals(
             .collect::<Vec<_>>();
         simulation
             .statistics
-            .start_of_new_generation(&new_population);
+            .start_of_new_generation(&new_population, &config);
         simulation.new_generation();
         // Spawn the Animals
         new_population
@@ -67,6 +67,7 @@ pub fn spawn_starting_animals(
             .for_each(|(i, individual)| {
                 let selected = i == 0;
                 let (eye, brain) = individual.into_components(&config);
+                simulation.statistics.population.add_entry(&eye);
                 spawn_animal(
                     &mut commands,
                     &*asset_server,

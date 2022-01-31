@@ -65,24 +65,3 @@ impl Default for Simulation {
         Self::new()
     }
 }
-
-pub fn mean(data: &[f32]) -> f32 {
-    let sum = data.iter().sum::<f32>();
-    let count = data.len();
-    sum / count as f32
-}
-
-pub fn std_deviation(data: &[f32]) -> f32 {
-    let count = data.len();
-    let variance = data
-        .iter()
-        .map(|value| {
-            let diff = mean(data) - (*value as f32);
-
-            diff * diff
-        })
-        .sum::<f32>()
-        / count as f32;
-
-    variance.sqrt()
-}

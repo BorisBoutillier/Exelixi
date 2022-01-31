@@ -90,36 +90,6 @@ pub fn panels_ui(
     // Left side panel for Statistics
     //
     if ui_state.stat_panel {
-        let size_color = egui::Color32::from_rgb(100, 100, 255);
-        let dead_color = egui::Color32::from_rgb(230, 25, 25);
-        let avg_color = egui::Color32::from_rgb(25, 180, 25);
-        let population_size_line = egui::plot::Line::new(egui::plot::Values::from_values_iter(
-            simulation
-                .statistics
-                .generations
-                .iter()
-                .enumerate()
-                .map(|(i, s)| egui::plot::Value::new(i as f64, s.start_size as f64)),
-        ))
-        .color(size_color);
-        let population_dead_line = egui::plot::Line::new(egui::plot::Values::from_values_iter(
-            simulation
-                .statistics
-                .generations
-                .iter()
-                .enumerate()
-                .map(|(i, s)| egui::plot::Value::new(i as f64, (s.start_size - s.end_size) as f64)),
-        ))
-        .color(dead_color);
-        let plot_bottom = egui::plot::Line::new(egui::plot::Values::from_values_iter(
-            simulation
-                .statistics
-                .generations
-                .iter()
-                .enumerate()
-                .map(|(i, s)| egui::plot::Value::new(i as f64, s.food_decay as f64)),
-        ))
-        .color(avg_color);
         egui::SidePanel::left("left_panel")
             .frame(
                 egui::Frame::default()
@@ -133,6 +103,35 @@ pub fn panels_ui(
                 egui::CollapsingHeader::new("Simulation")
                     .default_open(true)
                     .show(ui, |ui| {
+                        let size_color = egui::Color32::from_rgb(100, 100, 255);
+                        let dead_color = egui::Color32::from_rgb(230, 25, 25);
+                        let avg_color = egui::Color32::from_rgb(25, 180, 25);
+                        let population_size_line =
+                            egui::plot::Line::new(egui::plot::Values::from_values_iter(
+                                simulation.statistics.generations.iter().enumerate().map(
+                                    |(i, s)| egui::plot::Value::new(i as f64, s.start_size as f64),
+                                ),
+                            ))
+                            .color(size_color);
+                        let population_dead_line =
+                            egui::plot::Line::new(egui::plot::Values::from_values_iter(
+                                simulation.statistics.generations.iter().enumerate().map(
+                                    |(i, s)| {
+                                        egui::plot::Value::new(
+                                            i as f64,
+                                            (s.start_size - s.end_size) as f64,
+                                        )
+                                    },
+                                ),
+                            ))
+                            .color(dead_color);
+                        let plot_bottom =
+                            egui::plot::Line::new(egui::plot::Values::from_values_iter(
+                                simulation.statistics.generations.iter().enumerate().map(
+                                    |(i, s)| egui::plot::Value::new(i as f64, s.food_decay as f64),
+                                ),
+                            ))
+                            .color(avg_color);
                         ui.horizontal(|ui| {
                             ui.label(
                                 egui::RichText::new(format!(
@@ -183,6 +182,50 @@ pub fn panels_ui(
                         plot.show(ui, |plot_ui| {
                             plot_ui.line(plot_bottom);
                         });
+                    });
+                egui::CollapsingHeader::new("Population genetic")
+                    .default_open(true)
+                    .show(ui, |ui| {
+                        if !simulation.statistics.population.fov_angle.is_empty() {
+                            let chart = egui::plot::BarChart::new(
+                                simulation
+                                    .statistics
+                                    .population
+                                    .fov_angle
+                                    .iter()
+                                    .map(|(r, c)| {
+                                        egui::plot::Bar::new((r.start as f64) / 100.0, *c as f64)
+                                            .width((r.end - r.start) as f64 / 200.0)
+                                    })
+                                    .collect(),
+                            )
+                            .color(egui::Color32::from_rgb(100, 100, 255))
+                            .name("FOV angle");
+                            egui::plot::Plot::new("FOV angle")
+                                .height(80.0)
+                                .legend(egui::plot::Legend::default())
+                                .show(ui, |plot_ui| plot_ui.bar_chart(chart));
+                        }
+                        if !simulation.statistics.population.fov_range.is_empty() {
+                            let chart = egui::plot::BarChart::new(
+                                simulation
+                                    .statistics
+                                    .population
+                                    .fov_range
+                                    .iter()
+                                    .map(|(r, c)| {
+                                        egui::plot::Bar::new(r.start as f64, *c as f64)
+                                            .width((r.end - r.start) as f64 / 2.0)
+                                    })
+                                    .collect(),
+                            )
+                            .color(egui::Color32::from_rgb(50, 50, 255))
+                            .name("FOV range");
+                            egui::plot::Plot::new("FOV range")
+                                .height(80.0)
+                                .legend(egui::plot::Legend::default())
+                                .show(ui, |plot_ui| plot_ui.bar_chart(chart));
+                        }
                     });
             });
     }

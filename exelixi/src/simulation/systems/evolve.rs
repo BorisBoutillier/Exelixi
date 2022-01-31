@@ -40,7 +40,7 @@ pub fn evolve(
         }
         simulation
             .statistics
-            .start_of_new_generation(&new_population);
+            .start_of_new_generation(&new_population, &config);
 
         simulation.new_generation();
         // Remove all remaining food
@@ -59,6 +59,7 @@ pub fn evolve(
             .for_each(|(i, individual)| {
                 let selected = i == 0;
                 let (eye, brain) = individual.into_components(&config);
+                simulation.statistics.population.add_entry(&eye);
                 spawn_animal(
                     &mut commands,
                     &*asset_server,
