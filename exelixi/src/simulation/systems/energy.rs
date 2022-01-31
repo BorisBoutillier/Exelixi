@@ -6,7 +6,9 @@ pub fn energy(
 ) {
     let mut deads = vec![];
     for (entity, mut body, brain, eye, locomotion) in energy_query.iter_mut() {
-        if !body.spend_energy(brain.energy_cost() + eye.energy_cost() + locomotion.energy_cost()) {
+        let total_cost =
+            body.energy_cost() + brain.energy_cost() + eye.energy_cost() + locomotion.energy_cost();
+        if !body.spend_energy(total_cost) {
             deads.push(entity);
         }
     }

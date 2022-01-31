@@ -152,7 +152,7 @@ pub fn panels_ui(
                             .on_hover_text("Animal deaths at end");
                         });
                         let plot = egui::plot::Plot::new("population_plot")
-                            .height(50.0)
+                            .height(80.0)
                             .show_x(false)
                             .show_y(true)
                             .center_x_axis(false)
@@ -172,7 +172,7 @@ pub fn panels_ui(
                         )
                         .on_hover_text("Number food that have decayed or have been eaten at end");
                         let plot = egui::plot::Plot::new("Food decay plot")
-                            .height(50.0)
+                            .height(80.0)
                             .show_x(false)
                             .show_y(true)
                             .center_x_axis(false)

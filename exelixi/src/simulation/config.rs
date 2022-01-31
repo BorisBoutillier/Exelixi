@@ -37,6 +37,9 @@ pub struct AnimalsConfig {
     pub linear_cost: f32,
     // Cost for will be angular_cost*angular^2
     pub angular_cost: f32,
+    // Cost to run the body.
+    // This defines a minimum energy consumption per step
+    pub body_cost: f32,
 }
 #[derive(Serialize, Deserialize)]
 pub struct EnvironmentConfig {
