@@ -20,7 +20,7 @@ impl Food {
 pub struct Floor {}
 
 #[derive(Component)]
-pub struct Selected {}
+pub struct Selected;
 
 #[derive(Component)]
 pub struct Decay {

@@ -9,6 +9,11 @@ const ZOOM_FACTOR: f32 = 1.1;
 
 use crate::prelude::*;
 
+#[derive(Component)]
+pub struct MainCamera;
+
+#[derive(Default, Component)]
+pub struct VisibleArea(pub Rect<f32>);
 pub struct CameraPlugin {}
 
 impl Plugin for CameraPlugin {
@@ -19,11 +24,14 @@ impl Plugin for CameraPlugin {
 }
 
 fn spawn_camera(mut commands: Commands) {
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands
+        .spawn_bundle(OrthographicCameraBundle::new_2d())
+        .insert(MainCamera)
+        .insert(VisibleArea::default());
 }
 
 fn camera_movement(
-    mut cameras: Query<&mut OrthographicProjection, With<Camera>>,
+    mut cameras: Query<(&mut VisibleArea, &mut OrthographicProjection), With<MainCamera>>,
     mouse_button_input: Res<Input<MouseButton>>,
     mut mouse_wheel_events: EventReader<MouseWheel>,
     mut mouse_motion_events: EventReader<MouseMotion>,
@@ -38,9 +46,14 @@ fn camera_movement(
         || mouse_button_input.just_pressed(MouseButton::Middle)
         || window_resized;
     if reset_camera {
-        let mut camera_ortho = cameras.get_single_mut().expect("No ortho camera found.");
+        let (mut visible_area, mut camera_ortho) =
+            cameras.get_single_mut().expect("No ortho camera found.");
         let view_width = window.width();
         let view_height = window.height() - UI_STATUS_BAR_HEIGHT;
+        visible_area.0.left = 0.0;
+        visible_area.0.right = visible_area.0.left + view_width;
+        visible_area.0.bottom = UI_STATUS_BAR_HEIGHT;
+        visible_area.0.top = visible_area.0.bottom + view_height;
         let view_ratio = view_width / view_height;
         let mut visible_width = config.environment.width * ENV_VIEW_RESET_MARGIN_PCT;
         let mut visible_height = config.environment.height * ENV_VIEW_RESET_MARGIN_PCT;
@@ -65,14 +78,14 @@ fn camera_movement(
         zoom_update = event.y;
     }
     if zoom_update != 0.0 {
-        let mut camera_ortho = cameras.get_single_mut().expect("No ortho camera found");
+        let (_, mut camera_ortho) = cameras.get_single_mut().expect("No ortho camera found");
         camera_ortho.scale /= ZOOM_FACTOR.powf(zoom_update);
     }
 
-    // Camera panning done pressing mouse button one and moving around.
-    if mouse_button_input.pressed(MouseButton::Left) {
+    // Camera panning done pressing mouse button two and moving around.
+    if mouse_button_input.pressed(MouseButton::Right) {
         for event in mouse_motion_events.iter() {
-            let mut camera_ortho = cameras.get_single_mut().expect("No ortho camera found");
+            let (_, mut camera_ortho) = cameras.get_single_mut().expect("No ortho camera found");
             camera_ortho.left -= event.delta.x;
             camera_ortho.right -= event.delta.x;
             camera_ortho.top += event.delta.y;

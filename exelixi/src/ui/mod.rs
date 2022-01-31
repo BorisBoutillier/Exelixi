@@ -1,8 +1,12 @@
 use crate::prelude::*;
 
 mod fov_viewer;
+mod selection;
+mod user_selection;
 use bevy::sprite::Material2dPlugin;
 pub use fov_viewer::*;
+pub use selection::*;
+pub use user_selection::*;
 
 pub const UI_STATUS_BAR_HEIGHT: f32 = 120.0;
 //
@@ -12,8 +16,10 @@ impl Plugin for UiPlugin {
         app.add_plugin(Material2dPlugin::<FovViewerMaterial>::default())
             //.add_system(debug_ui)
             .add_system(status_bar_ui)
+            .add_system(user_selection)
             .add_system(spawn_fov_viewer_on_selected)
-            .add_system(despawn_fov_viewer_on_deselected);
+            .add_system_to_stage(CoreStage::PostUpdate, despawn_fov_viewer_on_deselected)
+            .add_system_to_stage(CoreStage::PostUpdate, selection_changed);
     }
 }
 

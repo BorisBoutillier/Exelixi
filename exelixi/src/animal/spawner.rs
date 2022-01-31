@@ -41,7 +41,7 @@ pub fn spawn_animal(
         .insert(eye)
         .insert(brain);
     if selected {
-        command.insert(Selected {});
+        command.insert(Selected);
     }
 }
 pub fn spawn_starting_animals(
