@@ -17,7 +17,7 @@ pub fn spawn_food(
         let half_width = config.environment.width / 2.0;
         let half_height = config.environment.height / 2.0;
         commands
-            .spawn_bundle(SpriteBundle {
+            .spawn(SpriteBundle {
                 sprite: Sprite {
                     custom_size: Some(Vec2::new(10.0, 10.0)),
                     color: Color::rgb(0.1, 0.7, 0.1),

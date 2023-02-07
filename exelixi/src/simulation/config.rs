@@ -60,7 +60,7 @@ pub struct EnvironmentConfig {
 //
 // Resources
 //
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Resource)]
 pub struct SimulationConfig {
     pub generation_length: u32,
     // Minimum number of animals in each generation. Randomized if 'missing'

@@ -15,8 +15,8 @@ pub fn user_selection(
         let (visible_area, ortho) = cameras.single();
         if let Some(pos) = window.cursor_position() {
             // Check User has click inside the visible area
-            if (visible_area.0.left..visible_area.0.right).contains(&pos.x)
-                && (visible_area.0.bottom..visible_area.0.top).contains(&pos.y)
+            if (visible_area.left..visible_area.right).contains(&pos.x)
+                && (visible_area.bottom..visible_area.top).contains(&pos.y)
             {
                 // Convert click to world position
                 let world_pos = Vec2::new(

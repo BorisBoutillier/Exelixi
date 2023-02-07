@@ -60,14 +60,7 @@ pub fn evolve(
                 let selected = i == 0;
                 let (eye, brain) = individual.into_components(&config);
                 simulation.statistics.population.add_entry(&eye);
-                spawn_animal(
-                    &mut commands,
-                    &*asset_server,
-                    &*config,
-                    eye,
-                    brain,
-                    selected,
-                );
+                spawn_animal(&mut commands, &asset_server, &config, eye, brain, selected);
             });
     }
 }

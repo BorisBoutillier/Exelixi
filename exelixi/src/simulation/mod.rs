@@ -12,6 +12,7 @@ pub use systems::*;
 
 use crate::prelude::*;
 // Resources
+#[derive(Resource)]
 pub struct Simulation {
     pub control: SimulationControl,
     pub steps: u32,

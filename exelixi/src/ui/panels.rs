@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 // All panels must be declared in the same system as the order of panel creation is important
 pub fn panels_ui(
-    egui_ctx: Res<EguiContext>,
+    mut egui_ctx: ResMut<EguiContext>,
     mut simulation: ResMut<Simulation>,
     mut ui_state: ResMut<UiState>,
 ) {
@@ -15,11 +15,11 @@ pub fn panels_ui(
         .frame(egui::Frame::default().fill(egui::Color32::from_rgb(30, 30, 30)))
         .resizable(false)
         .default_height(UI_STATUS_BAR_HEIGHT)
-        .show(egui_ctx.ctx(), |ui| {
+        .show(egui_ctx.ctx_mut(), |ui| {
             let half_width = ui.available_width() / 2.0;
             let mut spacing = ui.spacing_mut();
             spacing.button_padding = egui::Vec2::new(2.0, 2.0);
-            ui.with_layout(egui::Layout::left_to_right(), |ui| {
+            ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
                 ui.add_space(30.0);
                 ui.heading(format!("Generation: {:4}", simulation.generation));
                 ui.add_space(ui.available_width() - half_width - 30.0 * 3.0);
@@ -94,44 +94,48 @@ pub fn panels_ui(
             .frame(
                 egui::Frame::default()
                     .fill(egui::Color32::from_rgb(30, 30, 30))
-                    .margin(egui::Vec2::new(10.0, 10.0)),
+                    .inner_margin(egui::Vec2::new(10.0, 10.0)),
             )
             .resizable(false)
             .min_width(UI_LEFT_PANEL_WIDTH)
             .max_width(UI_LEFT_PANEL_WIDTH)
-            .show(egui_ctx.ctx(), |ui| {
+            .show(egui_ctx.ctx_mut(), |ui| {
                 egui::CollapsingHeader::new("Simulation")
                     .default_open(true)
                     .show(ui, |ui| {
                         let size_color = egui::Color32::from_rgb(100, 100, 255);
                         let dead_color = egui::Color32::from_rgb(230, 25, 25);
                         let avg_color = egui::Color32::from_rgb(25, 180, 25);
-                        let population_size_line =
-                            egui::plot::Line::new(egui::plot::Values::from_values_iter(
-                                simulation.statistics.generations.iter().enumerate().map(
-                                    |(i, s)| egui::plot::Value::new(i as f64, s.start_size as f64),
-                                ),
-                            ))
-                            .color(size_color);
-                        let population_dead_line =
-                            egui::plot::Line::new(egui::plot::Values::from_values_iter(
-                                simulation.statistics.generations.iter().enumerate().map(
-                                    |(i, s)| {
-                                        egui::plot::Value::new(
-                                            i as f64,
-                                            (s.start_size - s.end_size) as f64,
-                                        )
-                                    },
-                                ),
-                            ))
-                            .color(dead_color);
-                        let plot_bottom =
-                            egui::plot::Line::new(egui::plot::Values::from_values_iter(
-                                simulation.statistics.generations.iter().enumerate().map(
-                                    |(i, s)| egui::plot::Value::new(i as f64, s.food_decay as f64),
-                                ),
-                            ))
-                            .color(avg_color);
+                        let population_size_line = egui::plot::Line::new(
+                            simulation
+                                .statistics
+                                .generations
+                                .iter()
+                                .enumerate()
+                                .map(|(i, s)| [i as f64, s.start_size as f64])
+                                .collect::<Vec<_>>(),
+                        )
+                        .color(size_color);
+                        let population_dead_line = egui::plot::Line::new(
+                            simulation
+                                .statistics
+                                .generations
+                                .iter()
+                                .enumerate()
+                                .map(|(i, s)| [i as f64, (s.start_size - s.end_size) as f64])
+                                .collect::<Vec<_>>(),
+                        )
+                        .color(dead_color);
+                        let plot_bottom = egui::plot::Line::new(
+                            simulation
+                                .statistics
+                                .generations
+                                .iter()
+                                .enumerate()
+                                .map(|(i, s)| [i as f64, s.food_decay as f64])
+                                .collect::<Vec<_>>(),
+                        )
+                        .color(avg_color);
                         ui.horizontal(|ui| {
                             ui.label(
                                 egui::RichText::new(format!(

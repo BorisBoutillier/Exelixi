@@ -16,7 +16,7 @@ pub fn spawn_animal(
     } else {
         Color::rgb(0.8, 0.3, 0.8)
     };
-    let mut command = commands.spawn_bundle(SpriteBundle {
+    let mut command = commands.spawn(SpriteBundle {
         sprite: Sprite {
             custom_size: Some(Vec2::new(25.0, 25.0)),
             color,
@@ -68,14 +68,7 @@ pub fn spawn_starting_animals(
                 let selected = i == 0;
                 let (eye, brain) = individual.into_components(&config);
                 simulation.statistics.population.add_entry(&eye);
-                spawn_animal(
-                    &mut commands,
-                    &*asset_server,
-                    &*config,
-                    eye,
-                    brain,
-                    selected,
-                );
+                spawn_animal(&mut commands, &asset_server, &config, eye, brain, selected);
             });
     }
 }

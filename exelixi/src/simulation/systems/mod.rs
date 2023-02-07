@@ -21,6 +21,9 @@ const FPS: u32 = 60;
 // Maximum duration the simulation steps car run per frame
 const MAX_SIMULATION_DURATION_PER_FRAME: f32 = 1.0 / (FPS as f32);
 
+#[derive(Resource)]
+struct MySchedule(Schedule);
+
 pub fn insert_simulation_steps_schedule(mut commands: Commands) {
     let mut schedule = Schedule::default();
     schedule.add_stage("main", SystemStage::parallel());
@@ -32,7 +35,7 @@ pub fn insert_simulation_steps_schedule(mut commands: Commands) {
     schedule.add_system_to_stage("main", decay);
     schedule.add_system_to_stage("main", spawn_food);
     schedule.add_system_to_stage("evolve", evolve);
-    commands.insert_resource(schedule);
+    commands.insert_resource(MySchedule(schedule));
 }
 
 pub fn simulation_steps(world: &mut World) {
@@ -44,10 +47,10 @@ pub fn simulation_steps(world: &mut World) {
         return;
     }
     let start_time = Instant::now();
-    world.resource_scope(|world: &mut World, mut schedule: Mut<Schedule>| {
+    world.resource_scope(|world: &mut World, mut schedule: Mut<MySchedule>| {
         let mut cur_steps = 0;
         loop {
-            schedule.run(world);
+            schedule.0.run(world);
             cur_steps += 1;
             let cur_generation = world.get_resource::<Simulation>().unwrap().generation;
             // Always give back control on generation increase

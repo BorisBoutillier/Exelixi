@@ -23,12 +23,12 @@ impl Eye {
         };
         let fov_angle = match config.animals.eye_fov_angle {
             ConfigValue::Fixed(v) => v,
-            ConfigValue::Gene { min, max } => (rng.gen_range(min..=max)),
+            ConfigValue::Gene { min, max } => rng.gen_range(min..=max),
             _ => panic!(),
         };
         let fov_range = match config.animals.eye_fov_range {
             ConfigValue::Fixed(v) => v,
-            ConfigValue::Gene { min, max } => (rng.gen_range(min..=max)),
+            ConfigValue::Gene { min, max } => rng.gen_range(min..=max),
             _ => panic!(),
         };
         Self {

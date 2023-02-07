@@ -3,7 +3,7 @@ use crate::*;
 pub fn spawn_floor(mut commands: Commands, config: Res<SimulationConfig>) {
     if config.is_changed() {
         commands
-            .spawn_bundle(SpriteBundle {
+            .spawn(SpriteBundle {
                 sprite: Sprite {
                     custom_size: Some(Vec2::new(
                         config.environment.width + 20.0,

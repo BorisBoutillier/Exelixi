@@ -13,7 +13,12 @@ use crate::prelude::*;
 pub struct MainCamera;
 
 #[derive(Default, Component)]
-pub struct VisibleArea(pub Rect<f32>);
+pub struct VisibleArea {
+    pub left: f32,
+    pub right: f32,
+    pub top: f32,
+    pub bottom: f32,
+}
 pub struct CameraPlugin {}
 
 impl Plugin for CameraPlugin {
@@ -25,7 +30,7 @@ impl Plugin for CameraPlugin {
 
 fn spawn_camera(mut commands: Commands) {
     commands
-        .spawn_bundle(OrthographicCameraBundle::new_2d())
+        .spawn(Camera2dBundle::default())
         .insert(MainCamera)
         .insert(VisibleArea::default());
 }
@@ -50,16 +55,16 @@ fn camera_movement(
     if reset_camera {
         let (mut visible_area, mut camera_ortho) =
             cameras.get_single_mut().expect("No ortho camera found.");
-        visible_area.0.left = if ui_state.stat_panel {
+        visible_area.left = if ui_state.stat_panel {
             UI_LEFT_PANEL_WIDTH
         } else {
             0.0
         };
-        visible_area.0.right = window.width();
-        visible_area.0.bottom = UI_STATUS_BAR_HEIGHT;
-        visible_area.0.top = window.height();
-        let view_width = visible_area.0.right - visible_area.0.left;
-        let view_height = visible_area.0.top - visible_area.0.bottom;
+        visible_area.right = window.width();
+        visible_area.bottom = UI_STATUS_BAR_HEIGHT;
+        visible_area.top = window.height();
+        let view_width = visible_area.right - visible_area.left;
+        let view_height = visible_area.top - visible_area.bottom;
         let view_ratio = view_width / view_height;
         let mut visible_width = config.environment.width * ENV_VIEW_RESET_MARGIN_PCT;
         let mut visible_height = config.environment.height * ENV_VIEW_RESET_MARGIN_PCT;
@@ -69,11 +74,11 @@ fn camera_movement(
         } else {
             visible_width = visible_height * view_ratio;
         }
-        camera_ortho.left = -visible_width / 2.0 - visible_area.0.left * visible_width / view_width;
+        camera_ortho.left = -visible_width / 2.0 - visible_area.left * visible_width / view_width;
         camera_ortho.right = visible_width / 2.0;
         camera_ortho.top = visible_height / 2.0;
         camera_ortho.bottom =
-            -visible_height / 2.0 - visible_area.0.bottom * visible_height / view_height;
+            -visible_height / 2.0 - visible_area.bottom * visible_height / view_height;
         camera_ortho.scale = 1.0;
         camera_ortho.scaling_mode = ScalingMode::None;
     }

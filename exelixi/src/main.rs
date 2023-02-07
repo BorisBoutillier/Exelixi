@@ -36,14 +36,15 @@ use prelude::*;
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::BLACK))
-        .insert_resource(WindowDescriptor {
-            width: 1500.0,
-            height: 900.0,
-            title: "Exelixi".to_string(),
-            vsync: true,
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            window: WindowDescriptor {
+                width: 1500.0,
+                height: 900.0,
+                title: "Exelixi".to_string(),
+                ..Default::default()
+            },
             ..Default::default()
-        })
-        .add_plugins(DefaultPlugins)
+        }))
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(EguiPlugin)
         .add_plugin(CameraPlugin {})
@@ -52,7 +53,7 @@ fn main() {
         .add_system(spawn_floor)
         .add_system(save_default_config)
         .add_startup_system(insert_simulation_steps_schedule)
-        .add_system(simulation_steps.exclusive_system())
+        .add_system(simulation_steps)
         .insert_resource(Simulation::default())
         .insert_resource(SimulationConfig::get_default_config())
         .run();

@@ -15,6 +15,7 @@ use bevy::sprite::Material2dPlugin;
 pub const UI_STATUS_BAR_HEIGHT: f32 = 40.0;
 pub const UI_LEFT_PANEL_WIDTH: f32 = 400.0;
 
+#[derive(Resource)]
 pub struct UiState {
     // Does the Left panel for statistics is visible
     pub stat_panel: bool,
@@ -35,7 +36,7 @@ impl Plugin for UiPlugin {
 }
 
 pub fn _debug_ui(
-    egui_ctx: Res<EguiContext>,
+    mut egui_ctx: ResMut<EguiContext>,
     selection: Query<(&Locomotion, &Body), With<Selected>>,
     simulation: Res<Simulation>,
     config: Res<SimulationConfig>,
@@ -43,7 +44,7 @@ pub fn _debug_ui(
 ) {
     egui::Window::new("Debug")
         .vscroll(true)
-        .show(egui_ctx.ctx(), |ui| {
+        .show(egui_ctx.ctx_mut(), |ui| {
             ui.heading("Simulation");
             ui.label(format!("width : {}", config.environment.width));
             ui.label(format!("height: {}", config.environment.height));
@@ -58,10 +59,10 @@ pub fn _debug_ui(
             let mut fps_s = "N/A".to_string();
             if let Some(fps) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {
                 if let Some(average) = fps.average() {
-                    fps_s = format!("{:.1}", average);
+                    fps_s = format!("{average:.1}");
                 }
             }
-            ui.label(format!("fps: {}", fps_s));
+            ui.label(format!("fps: {fps_s}"));
             ui.label(format!("sts: {:.2}", simulation.sts(&config)));
         });
 }
