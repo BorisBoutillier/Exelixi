@@ -27,7 +27,7 @@ struct MySchedule(Schedule);
 pub fn insert_simulation_steps_schedule(mut commands: Commands) {
     let mut schedule = Schedule::default();
     schedule.add_stage("main", SystemStage::parallel());
-    schedule.add_stage("evolve", SystemStage::parallel());
+    schedule.add_stage_after("main", "evolve", SystemStage::parallel());
     schedule.add_system_to_stage("main", movement);
     schedule.add_system_to_stage("main", collision);
     schedule.add_system_to_stage("main", process_brain);
