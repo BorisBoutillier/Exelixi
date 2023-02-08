@@ -1,5 +1,6 @@
 use bevy::render::render_resource::{AsBindGroup, ShaderRef};
 
+use bevy::sprite::Material2dPlugin;
 use bevy::{
     reflect::TypeUuid,
     sprite::{Material2d, MaterialMesh2dBundle},
@@ -7,8 +8,16 @@ use bevy::{
 
 use crate::prelude::*;
 
+pub struct EyeViewerPlugin;
+impl Plugin for EyeViewerPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_plugin(Material2dPlugin::<FovViewerMaterial>::default())
+            .add_system(spawn_fov_viewer_on_selected)
+            .add_system_to_stage(CoreStage::PostUpdate, despawn_fov_viewer_on_deselected);
+    }
+}
 /// a a FOV viewer child whenver a Selected component is added to an entity with an Eye
-pub fn spawn_fov_viewer_on_selected(
+fn spawn_fov_viewer_on_selected(
     mut commands: Commands,
     parents: Query<(Entity, &Eye), Added<Selected>>,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -35,7 +44,7 @@ pub fn spawn_fov_viewer_on_selected(
         commands.entity(parent).add_child(fov_viewer);
     }
 }
-pub fn despawn_fov_viewer_on_deselected(
+fn despawn_fov_viewer_on_deselected(
     mut commands: Commands,
     fov_viewers: Query<&Handle<FovViewerMaterial>>,
     children_query: Query<&Children>,
@@ -52,7 +61,7 @@ pub fn despawn_fov_viewer_on_deselected(
 
 #[derive(Component, Debug, Clone, TypeUuid, AsBindGroup)]
 #[uuid = "516c3ab4-6a1c-4e7d-9795-6161ca083a1d"]
-pub struct FovViewerMaterial {
+struct FovViewerMaterial {
     // Total angle of the FOV to show, will be show from -fov_angle/2 to fov_anglel2
     #[uniform(0)]
     fov_angle: f32,

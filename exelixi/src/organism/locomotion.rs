@@ -15,22 +15,22 @@ pub struct Locomotion {
 
 impl Locomotion {
     pub fn new(config: &SimulationConfig) -> Self {
-        match config.animals.linear_locomotion {
+        match config.organisms.linear_locomotion {
             ConfigValue::Fixed(v) => Self {
                 linear: v,
                 angular: 0.0,
                 linear_actuator: false,
                 linear_max: v,
-                linear_cost: config.animals.linear_cost,
-                angular_cost: config.animals.angular_cost,
+                linear_cost: config.organisms.linear_cost,
+                angular_cost: config.organisms.angular_cost,
             },
             ConfigValue::Neuron { min: _, max } => Self {
                 linear: 0.0,
                 angular: 0.0,
                 linear_actuator: true,
                 linear_max: max,
-                linear_cost: config.animals.linear_cost,
-                angular_cost: config.animals.angular_cost,
+                linear_cost: config.organisms.linear_cost,
+                angular_cost: config.organisms.angular_cost,
             },
             _ => panic!(),
         }

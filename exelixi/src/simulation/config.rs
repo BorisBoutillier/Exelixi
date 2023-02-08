@@ -10,7 +10,7 @@ pub enum ConfigValue<T> {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct AnimalsConfig {
+pub struct OrganismsConfig {
     // Fov angle of the eye
     pub eye_fov_angle: ConfigValue<f32>,
     // Fov angle of the eye
@@ -27,9 +27,9 @@ pub struct AnimalsConfig {
     // Does the eyes senses the walls.
     // will add n_eye_cells inputs to the neural networks
     pub see_walls: bool,
-    // Does the eyes senses other animals.
-    // Will add n_eye_cells inputs to the neural networks for each animal type
-    pub see_animals: bool,
+    // Does the eyes senses other organisms.
+    // Will add n_eye_cells inputs to the neural networks for each organism type
+    pub see_organisms: bool,
     pub starting_energy: f32,
     pub maximum_energy: f32,
     pub linear_locomotion: ConfigValue<f32>,
@@ -63,14 +63,14 @@ pub struct EnvironmentConfig {
 #[derive(Serialize, Deserialize, Resource)]
 pub struct SimulationConfig {
     pub generation_length: u32,
-    // Minimum number of animals in each generation. Randomized if 'missing'
+    // Minimum number of organisms in each generation. Randomized if 'missing'
     pub min_population: usize,
-    // Number of child one surviving animal spawn in next generation
+    // Number of child one surviving organism spawn in next generation
     pub fertility_rate: f32,
     // Configuration information regarding the environment
     pub environment: EnvironmentConfig,
-    // Configuration information regarding the animals
-    pub animals: AnimalsConfig,
+    // Configuration information regarding the organisms
+    pub organisms: OrganismsConfig,
 }
 impl SimulationConfig {
     pub fn get_default_config() -> Self {

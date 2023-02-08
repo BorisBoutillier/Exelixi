@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 #[derive(Component)]
-pub struct Animal {}
+pub struct Organism {}
 #[derive(Component)]
 pub struct Food {
     pub eaten: bool,

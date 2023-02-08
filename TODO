@@ -16,7 +16,7 @@
     . Allow to trigger N generation advances:
         Then run at normal speed
         And show last generation statitiscs
-. Allow clicking an animal to see its state:
+. Allow clicking an organism to see its state:
     . plot with evolution of the energy level.
 
 -- Simulation
@@ -33,4 +33,4 @@
 . New genes to control the fov_range/fov_angle:
     Impacts on energy based on 'visible' area.
 . New genes to control number of eyes.
-. Add a new kind of carnivor animal, able to eat herbivors.
+. Add a new kind of carnivor organism, able to eat herbivors.

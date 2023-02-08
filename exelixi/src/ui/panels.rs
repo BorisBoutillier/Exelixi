@@ -144,7 +144,7 @@ pub fn panels_ui(
                                 ))
                                 .color(size_color),
                             )
-                            .on_hover_text("Animal population at the start");
+                            .on_hover_text("Population at the start");
                             ui.add_space(8.0);
                             ui.label(
                                 egui::RichText::new(format!(
@@ -153,7 +153,7 @@ pub fn panels_ui(
                                 ))
                                 .color(dead_color),
                             )
-                            .on_hover_text("Animal deaths at end");
+                            .on_hover_text("Deaths at end");
                         });
                         let plot = egui::plot::Plot::new("population_plot")
                             .height(80.0)

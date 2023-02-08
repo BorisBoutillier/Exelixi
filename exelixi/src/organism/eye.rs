@@ -10,41 +10,45 @@ pub struct Eye {
     pub n_cells: usize,
     pub see_foods: bool,
     pub see_walls: bool,
-    pub see_animals: bool,
+    pub see_organisms: bool,
     energy_cost: f32,
 }
 
 impl Eye {
     pub fn random(rng: &mut dyn RngCore, config: &SimulationConfig) -> Self {
-        let (_n_sectors, n_cells) = match config.animals.n_eye_cells {
+        let (_n_sectors, n_cells) = match config.organisms.n_eye_cells {
             ConfigValue::Fixed(v) => (v, v),
             ConfigValue::Gene { min, max } => (rng.gen_range(min..=max), max),
             _ => panic!(),
         };
-        let fov_angle = match config.animals.eye_fov_angle {
+        let fov_angle = match config.organisms.eye_fov_angle {
             ConfigValue::Fixed(v) => v,
             ConfigValue::Gene { min, max } => rng.gen_range(min..=max),
             _ => panic!(),
         };
-        let fov_range = match config.animals.eye_fov_range {
+        let fov_range = match config.organisms.eye_fov_range {
             ConfigValue::Fixed(v) => v,
             ConfigValue::Gene { min, max } => rng.gen_range(min..=max),
             _ => panic!(),
         };
         Self {
-            see_walls: config.environment.wall && config.animals.see_walls,
-            see_foods: config.animals.see_foods,
-            see_animals: config.animals.see_animals,
+            see_walls: config.environment.wall && config.organisms.see_walls,
+            see_foods: config.organisms.see_foods,
+            see_organisms: config.organisms.see_organisms,
             fov_range,
             fov_angle,
             n_sectors: n_cells as usize,
             n_cells: n_cells as usize,
-            energy_cost: compure_energy_cost(fov_range, fov_angle, config.animals.eye_energy_cost),
+            energy_cost: compure_energy_cost(
+                fov_range,
+                fov_angle,
+                config.organisms.eye_energy_cost,
+            ),
         }
     }
     pub fn from_genes(genes: impl IntoIterator<Item = f32>, config: &SimulationConfig) -> Self {
         let mut genes = genes.into_iter();
-        let fov_angle = match config.animals.eye_fov_angle {
+        let fov_angle = match config.organisms.eye_fov_angle {
             ConfigValue::Fixed(v) => v,
             ConfigValue::Gene { min, max } => {
                 let gene = genes.next().expect("Missing gene for the fov_angle");
@@ -52,7 +56,7 @@ impl Eye {
             }
             _ => panic!(),
         };
-        let fov_range = match config.animals.eye_fov_range {
+        let fov_range = match config.organisms.eye_fov_range {
             ConfigValue::Fixed(v) => v,
             ConfigValue::Gene { min, max } => {
                 let gene = genes.next().expect("Missing gene for the fov_range");
@@ -60,7 +64,7 @@ impl Eye {
             }
             _ => panic!(),
         };
-        let (_n_sectors, n_cells) = match config.animals.n_eye_cells {
+        let (_n_sectors, n_cells) = match config.organisms.n_eye_cells {
             ConfigValue::Fixed(v) => (v, v),
             ConfigValue::Gene { min, max } => {
                 let gene = genes.next().expect("Missing gene for the n_eye_cells");
@@ -69,29 +73,33 @@ impl Eye {
             _ => panic!(),
         };
         Self {
-            see_walls: config.environment.wall && config.animals.see_walls,
-            see_foods: config.animals.see_foods,
-            see_animals: config.animals.see_animals,
+            see_walls: config.environment.wall && config.organisms.see_walls,
+            see_foods: config.organisms.see_foods,
+            see_organisms: config.organisms.see_organisms,
             fov_range,
             fov_angle,
             n_sectors: n_cells as usize,
             n_cells: n_cells as usize,
-            energy_cost: compure_energy_cost(fov_range, fov_angle, config.animals.eye_energy_cost),
+            energy_cost: compure_energy_cost(
+                fov_range,
+                fov_angle,
+                config.organisms.eye_energy_cost,
+            ),
         }
     }
     pub fn as_chromosome(&self, config: &SimulationConfig) -> ga::Chromosome {
         let mut genes = vec![];
-        match config.animals.eye_fov_angle {
+        match config.organisms.eye_fov_angle {
             ConfigValue::Fixed(_) => (),
             ConfigValue::Gene { min: _, max: _ } => genes.push(self.fov_angle),
             _ => panic!(),
         }
-        match config.animals.eye_fov_range {
+        match config.organisms.eye_fov_range {
             ConfigValue::Fixed(_) => (),
             ConfigValue::Gene { min: _, max: _ } => genes.push(self.fov_range),
             _ => panic!(),
         }
-        match config.animals.n_eye_cells {
+        match config.organisms.n_eye_cells {
             ConfigValue::Fixed(_) => (),
             ConfigValue::Gene { min: _, max: _ } => genes.push(self.n_sectors as f32),
             _ => panic!(),
@@ -102,7 +110,7 @@ impl Eye {
         &self,
         transform: &Transform,
         food_transforms: &[&Transform],
-        animal_transforms: &[&Transform],
+        organism_transforms: &[&Transform],
         config: &SimulationConfig,
     ) -> Vec<f32> {
         let mut sensors = vec![];
@@ -112,8 +120,8 @@ impl Eye {
         if self.see_walls {
             sensors.extend(self.sense_walls(transform, config));
         }
-        if self.see_animals {
-            sensors.extend(self.sense_objects(transform, animal_transforms));
+        if self.see_organisms {
+            sensors.extend(self.sense_objects(transform, organism_transforms));
         }
         assert_eq!(sensors.len(), self.n_sensors());
         sensors
@@ -201,7 +209,7 @@ impl Eye {
         if self.see_walls {
             n_sensors += self.n_cells;
         }
-        if self.see_animals {
+        if self.see_organisms {
             n_sensors += self.n_cells;
         }
         n_sensors

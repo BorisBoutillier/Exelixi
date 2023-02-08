@@ -4,7 +4,7 @@ pub fn evolve(
     mut commands: Commands,
     mut simulation: ResMut<Simulation>,
     config: Res<SimulationConfig>,
-    animals: Query<(Entity, &Body, &Brain, &Eye)>,
+    organisms: Query<(Entity, &Body, &Brain, &Eye)>,
     foods: Query<Entity, With<Food>>,
     asset_server: Res<AssetServer>,
 ) {
@@ -14,12 +14,12 @@ pub fn evolve(
         simulation.steps = 0;
 
         let mut fov_angles = vec![];
-        let current_population = animals
+        let current_population = organisms
             .iter()
             .map(|(entity, body, brain, eye)| {
                 commands.entity(entity).despawn_recursive();
                 fov_angles.push(eye.fov_angle);
-                AnimalIndividual::from_components(&config, body, eye, brain)
+                OrganismIndividual::from_components(&config, body, eye, brain)
             })
             .collect::<Vec<_>>();
         simulation.statistics.end_of_generation(&current_population);
@@ -33,10 +33,10 @@ pub fn evolve(
             config.fertility_rate,
             (config.min_population as f32 * 0.9) as usize, // If survivors and fertility are not enough keep 10% random
         );
-        // If not enough survived, add random animals
+        // If not enough survived, add random organisms
         let missing_population = config.min_population as i32 - new_population.len() as i32;
         for _ in 0..missing_population {
-            new_population.push(AnimalIndividual::random(&mut rng, &config));
+            new_population.push(OrganismIndividual::random(&mut rng, &config));
         }
         simulation
             .statistics
@@ -52,7 +52,7 @@ pub fn evolve(
             }
             simulation.statistics.add_food_decay(food_decay);
         }
-        // Spawn new Animals
+        // Spawn new organisms
         new_population
             .into_iter()
             .enumerate()
@@ -60,7 +60,7 @@ pub fn evolve(
                 let selected = i == 0;
                 let (eye, brain) = individual.into_components(&config);
                 simulation.statistics.population.add_entry(&eye);
-                spawn_animal(&mut commands, &asset_server, &config, eye, brain, selected);
+                spawn_organism(&mut commands, &asset_server, &config, eye, brain, selected);
             });
     }
 }

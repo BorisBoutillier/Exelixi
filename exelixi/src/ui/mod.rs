@@ -1,16 +1,14 @@
 use crate::prelude::*;
 
-mod fov_viewer;
+mod eye_viewer;
 mod panels;
 mod selection;
 mod user_selection;
 
-pub use fov_viewer::*;
+pub use eye_viewer::*;
 pub use panels::*;
 pub use selection::*;
 pub use user_selection::*;
-
-use bevy::sprite::Material2dPlugin;
 
 pub const UI_STATUS_BAR_HEIGHT: f32 = 40.0;
 pub const UI_LEFT_PANEL_WIDTH: f32 = 400.0;
@@ -24,13 +22,11 @@ pub struct UiState {
 pub struct UiPlugin;
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugin(Material2dPlugin::<FovViewerMaterial>::default())
-            //.add_system(debug_ui)
-            .insert_resource(UiState { stat_panel: true })
+        app.insert_resource(UiState { stat_panel: true })
+            .add_plugin(EyeViewerPlugin)
+            //.add_system(_debug_ui)
             .add_system(panels_ui)
             .add_system(user_selection)
-            .add_system(spawn_fov_viewer_on_selected)
-            .add_system_to_stage(CoreStage::PostUpdate, despawn_fov_viewer_on_deselected)
             .add_system_to_stage(CoreStage::PostUpdate, selection_changed);
     }
 }
@@ -63,6 +59,6 @@ pub fn _debug_ui(
                 }
             }
             ui.label(format!("fps: {fps_s}"));
-            ui.label(format!("sts: {:.2}", simulation.sts(&config)));
+            ui.label(format!("sps: {:.2}", simulation.sps(&config)));
         });
 }

@@ -1,11 +1,11 @@
 use crate::*;
 
-pub struct AnimalIndividual {
+pub struct OrganismIndividual {
     pub energy: f32,
     chromosome: ga::Chromosome,
 }
 
-impl ga::Individual for AnimalIndividual {
+impl ga::Individual for OrganismIndividual {
     fn chromosome(&self) -> &ga::Chromosome {
         &self.chromosome
     }
@@ -19,7 +19,7 @@ impl ga::Individual for AnimalIndividual {
         self.energy
     }
 }
-impl AnimalIndividual {
+impl OrganismIndividual {
     pub fn from_components(
         config: &SimulationConfig,
         body: &Body,

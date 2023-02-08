@@ -10,10 +10,10 @@ pub struct Body {
 impl Body {
     pub fn new(config: &SimulationConfig) -> Self {
         Self {
-            cur_energy: config.animals.starting_energy,
-            max_energy: config.animals.maximum_energy,
+            cur_energy: config.organisms.starting_energy,
+            max_energy: config.organisms.maximum_energy,
             consumed_energy: 0.0,
-            body_cost: config.animals.body_cost,
+            body_cost: config.organisms.body_cost,
         }
     }
     pub fn energy_cost(&self) -> f32 {

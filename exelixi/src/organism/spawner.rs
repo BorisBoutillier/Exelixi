@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-pub fn spawn_animal(
+pub fn spawn_organism(
     commands: &mut Commands,
     asset_server: &AssetServer,
     config: &SimulationConfig,
@@ -35,7 +35,7 @@ pub fn spawn_animal(
         ..Default::default()
     });
     command
-        .insert(Animal {})
+        .insert(Organism {})
         .insert(Locomotion::new(config))
         .insert(Body::new(config))
         .insert(eye)
@@ -44,7 +44,7 @@ pub fn spawn_animal(
         command.insert(Selected);
     }
 }
-pub fn spawn_starting_animals(
+pub fn spawn_starting_organisms(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut simulation: ResMut<Simulation>,
@@ -54,13 +54,13 @@ pub fn spawn_starting_animals(
         let mut rng = thread_rng();
         // Create a new random population
         let new_population = (0..config.min_population)
-            .map(|_| AnimalIndividual::random(&mut rng, &config))
+            .map(|_| OrganismIndividual::random(&mut rng, &config))
             .collect::<Vec<_>>();
         simulation
             .statistics
             .start_of_new_generation(&new_population, &config);
         simulation.new_generation();
-        // Spawn the Animals
+        // Spawn the organisms
         new_population
             .into_iter()
             .enumerate()
@@ -68,7 +68,7 @@ pub fn spawn_starting_animals(
                 let selected = i == 0;
                 let (eye, brain) = individual.into_components(&config);
                 simulation.statistics.population.add_entry(&eye);
-                spawn_animal(&mut commands, &asset_server, &config, eye, brain, selected);
+                spawn_organism(&mut commands, &asset_server, &config, eye, brain, selected);
             });
     }
 }

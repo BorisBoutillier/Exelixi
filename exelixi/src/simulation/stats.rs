@@ -19,7 +19,7 @@ pub struct PopulationStatistics {
 impl PopulationStatistics {
     pub fn new(config: &SimulationConfig) -> Self {
         let mut s = Self::default();
-        if let ConfigValue::Gene { min, max } = config.animals.eye_fov_range {
+        if let ConfigValue::Gene { min, max } = config.organisms.eye_fov_range {
             let min = min as u32;
             let max = max as u32;
             let step = (max - min) / 20;
@@ -27,7 +27,7 @@ impl PopulationStatistics {
                 s.fov_range.insert(i..(i + step), 0);
             }
         }
-        if let ConfigValue::Gene { min, max } = config.animals.eye_fov_angle {
+        if let ConfigValue::Gene { min, max } = config.organisms.eye_fov_angle {
             let min = (min * 100.0) as u32;
             let max = (max * 100.0) as u32;
             let step = (max - min) / 20;
@@ -88,13 +88,13 @@ impl SimulationStatistics {
     }
     pub fn start_of_new_generation(
         &mut self,
-        population: &[AnimalIndividual],
+        population: &[OrganismIndividual],
         config: &SimulationConfig,
     ) {
         self.cur_generation.start_size = population.len();
         self.population = PopulationStatistics::new(config);
     }
-    pub fn end_of_generation(&mut self, population: &[AnimalIndividual]) {
+    pub fn end_of_generation(&mut self, population: &[OrganismIndividual]) {
         let mut cur = self.cur_generation;
         cur.end_size = population.len();
         cur.avg_energy = population.iter().map(|i| i.energy).sum::<f32>() / (cur.end_size as f32);

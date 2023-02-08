@@ -1,7 +1,7 @@
 #![allow(clippy::type_complexity)]
-mod animal;
 mod camera;
 mod components;
+mod organism;
 mod simulation;
 mod spawner;
 mod systems;
@@ -22,9 +22,9 @@ mod prelude {
     pub use lib_genetic_algorithm as ga;
     pub use lib_neural_network as nn;
 
-    pub use crate::animal::*;
     pub use crate::camera::*;
     pub use crate::components::*;
+    pub use crate::organism::*;
     pub use crate::simulation::*;
     pub use crate::spawner::*;
     pub use crate::systems::*;
@@ -49,7 +49,7 @@ fn main() {
         .add_plugin(EguiPlugin)
         .add_plugin(CameraPlugin {})
         .add_plugin(UiPlugin {})
-        .add_system(spawn_starting_animals)
+        .add_system(spawn_starting_organisms)
         .add_system(spawn_floor)
         .add_system(save_default_config)
         .add_startup_system(insert_simulation_steps_schedule)

@@ -6,7 +6,7 @@ pub fn user_selection(
     windows: Res<Windows>,
     // query to get camera transform
     cameras: Query<(&VisibleArea, &OrthographicProjection), With<MainCamera>>,
-    animals: Query<(Entity, &Transform), With<Animal>>,
+    organisms: Query<(Entity, &Transform), With<Organism>>,
     selected: Query<Entity, With<Selected>>,
 ) {
     // Detect mouse click
@@ -26,18 +26,18 @@ pub fn user_selection(
                         * ortho.scale,
                 );
 
-                // Find closest animal
-                let mut animal_dists = animals
+                // Find closest organism
+                let mut organism_dists = organisms
                     .iter()
                     .map(|(e, t)| (e, (t.translation.truncate() - world_pos).length()))
                     .collect::<Vec<_>>();
-                animal_dists.sort_by(|(_, d1), (_, d2)| d1.partial_cmp(d2).unwrap());
-                if let Some((closest_entity, _)) = animal_dists.first() {
-                    // Deselect currently selected animals
+                organism_dists.sort_by(|(_, d1), (_, d2)| d1.partial_cmp(d2).unwrap());
+                if let Some((closest_entity, _)) = organism_dists.first() {
+                    // Deselect currently selected organisms
                     for selected_entity in selected.iter() {
                         commands.entity(selected_entity).remove::<Selected>();
                     }
-                    // Select the closet animal
+                    // Select the closet organism
                     commands.entity(*closest_entity).insert(Selected);
                 }
             }
