@@ -1,13 +1,15 @@
 [package]
 name = "exelixi"
 version = "0.1.0"
+authors = [ "Boris Boutillier <boris.boutillier@gmail.com>" ]
 edition = "2021"
-authors = [ "Boris Boutillier [boris.boutillier@gmail.com]" ]
+license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = "0.8"
+rand = "0.8.5"
+rand_chacha = "0.3"
 bevy = "0.9"
 bevy_egui = "0.19"
 lib-neural-network = { path = "../libs/neural-network" }
@@ -15,3 +17,4 @@ lib-genetic-algorithm = { path = "../libs/genetic-algorithm" }
 ron = "0.7"
 serde = { version = "1", features = ["derive"] }
 dirs = "4.0"
+clap = { version = "4.1.4", features = ["derive"] }

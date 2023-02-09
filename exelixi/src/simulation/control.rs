@@ -1,18 +1,22 @@
+use serde::{Deserialize, Serialize};
+
+use super::SimulationConfig;
+
 #[derive(Copy, Clone)]
 pub struct SimulationControl {
     pub state: SimulationControlState,
     // Speed_factor, a speed of 1 is 60 steps per seconds,
     pub speed_factor: u32,
 }
-impl Default for SimulationControl {
-    fn default() -> Self {
+impl SimulationControl {
+    pub fn new(config: &SimulationConfig) -> Self {
         Self {
-            state: SimulationControlState::Paused,
+            state: config.start_state,
             speed_factor: 1,
         }
     }
 }
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum SimulationControlState {
     // Simulation is currently paused
     Paused,

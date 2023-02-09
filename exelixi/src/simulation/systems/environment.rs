@@ -4,10 +4,10 @@ pub fn spawn_food(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     config: Res<SimulationConfig>,
+    mut rng: ResMut<MyRng>,
 ) {
-    let mut rng = thread_rng();
     let n_food_to_spawn = config.environment.food_spawn_rate as u32
-        + if rng.gen_bool(config.environment.food_spawn_rate % 1.0) {
+        + if rng.0.gen_bool(config.environment.food_spawn_rate % 1.0) {
             1
         } else {
             0
@@ -25,8 +25,8 @@ pub fn spawn_food(
                 },
                 transform: Transform {
                     translation: Vec3::new(
-                        rng.gen_range(-half_width..half_width),
-                        rng.gen_range(-half_height..half_height),
+                        rng.0.gen_range(-half_width..half_width),
+                        rng.0.gen_range(-half_height..half_height),
                         1.0,
                     ),
                     ..Default::default()

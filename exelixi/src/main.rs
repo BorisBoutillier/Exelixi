@@ -4,10 +4,11 @@ mod components;
 mod organism;
 mod simulation;
 mod spawner;
-mod systems;
 mod ui;
 
 mod prelude {
+    use rand_chacha::ChaCha8Rng;
+
     pub use std::f32::consts::{FRAC_PI_2, PI};
 
     pub use bevy::diagnostic::Diagnostics;
@@ -17,7 +18,7 @@ mod prelude {
     pub use bevy::prelude::*;
     pub use bevy_egui::{egui, EguiContext, EguiPlugin, EguiSettings};
 
-    pub use rand::{thread_rng, Rng, RngCore};
+    pub use rand::{Rng, RngCore};
 
     pub use lib_genetic_algorithm as ga;
     pub use lib_neural_network as nn;
@@ -27,15 +28,35 @@ mod prelude {
     pub use crate::organism::*;
     pub use crate::simulation::*;
     pub use crate::spawner::*;
-    pub use crate::systems::*;
     pub use crate::ui::*;
+
+    #[derive(Resource)]
+    pub struct MyRng(pub ChaCha8Rng);
 }
 
+use std::path::PathBuf;
+
+use clap::Parser;
 use prelude::*;
+use rand::SeedableRng;
+use rand_chacha::ChaCha8Rng;
+
+// Organism evolution simulation
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about)]
+struct Args {
+    /// Path to the simulation config to use
+    #[arg(short, long)]
+    config: Option<PathBuf>,
+}
 
 fn main() {
+    let args = Args::parse();
+    let start_config = SimulationConfig::from_path(args.config);
+    let rng = ChaCha8Rng::seed_from_u64(0);
     App::new()
         .insert_resource(ClearColor(Color::BLACK))
+        .insert_resource(MyRng(rng))
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
                 width: 1500.0,
@@ -49,12 +70,12 @@ fn main() {
         .add_plugin(EguiPlugin)
         .add_plugin(CameraPlugin {})
         .add_plugin(UiPlugin {})
-        .add_system(spawn_starting_organisms)
-        .add_system(spawn_floor)
-        .add_system(save_default_config)
+        .add_system_to_stage(CoreStage::PreUpdate, spawn_starting_organisms)
+        .add_system_to_stage(CoreStage::PreUpdate, spawn_floor)
         .add_startup_system(insert_simulation_steps_schedule)
         .add_system(simulation_steps)
-        .insert_resource(Simulation::default())
-        .insert_resource(SimulationConfig::get_default_config())
+        .add_system(exit_at_generation)
+        .insert_resource(Simulation::new(&start_config))
+        .insert_resource(start_config)
         .run();
 }

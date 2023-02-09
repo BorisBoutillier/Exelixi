@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::prelude::*;
 
 use serde::{Deserialize, Serialize};
@@ -67,59 +69,41 @@ pub struct SimulationConfig {
     pub min_population: usize,
     // Number of child one surviving organism spawn in next generation
     pub fertility_rate: f32,
+    // Defines if the simulation must be stopped after reaching a given generation.
+    pub exit_at_generation: Option<u32>,
+    // Defines how the simulation behaves at the start. One of Paused, Run or Fastest
+    pub start_state: SimulationControlState,
     // Configuration information regarding the environment
     pub environment: EnvironmentConfig,
     // Configuration information regarding the organisms
     pub organisms: OrganismsConfig,
 }
 impl SimulationConfig {
-    pub fn get_default_config() -> Self {
-        match Self::load_from_default_file() {
-            Some(config) => config,
+    pub fn from_path(path: Option<PathBuf>) -> Self {
+        match path {
             None => {
-                let config = ron::from_str(include_str!("default_config.ron"))
+                let config = ron::from_str(include_str!("../../../configs/default.ron"))
                     .expect("default_config.ron is not correct");
                 log::info!("SimulationConfig loaded from default_config.ron");
                 config
             }
-        }
-    }
-    pub fn save_as_default_file(&self) {
-        if let Some(mut path) = dirs::config_dir() {
-            path.push("exelixi");
-            if std::fs::create_dir_all(path.as_path()).is_err() {
-                println!(
-                    "Could not create configuration directory {:?}",
-                    path.as_os_str()
-                );
-                return;
-            }
-
-            path.push("default_simulation_configuration");
-            path.set_extension("ron");
-            let ron_string = ron::to_string(&self).expect("Cannot Ronify the SimulationConfig");
-            if std::fs::write(path.as_path(), ron_string).is_err() {
-                println!(
-                    "Could not write SimulationConfig to file {:?}",
-                    path.as_os_str()
-                );
-            }
-        }
-    }
-    pub fn load_from_default_file() -> Option<Self> {
-        if let Some(mut path) = dirs::config_dir() {
-            path.push("exelixi");
-            path.push("default_simulation_configuration");
-            path.set_extension("ron");
-            if let Ok(ron_string) = std::fs::read_to_string(path.as_path()) {
-                if let Ok(config) = ron::from_str::<SimulationConfig>(&ron_string) {
-                    log::info!("SimulationConfig loaded from {:?}", path.as_os_str());
-                    return Some(config);
+            Some(path) => {
+                if let Ok(ron_string) = std::fs::read_to_string(path.as_path()) {
+                    if let Ok(config) = ron::from_str::<SimulationConfig>(&ron_string) {
+                        log::info!("SimulationConfig loaded from {:?}", path.as_os_str());
+                        config
+                    } else {
+                        log::error!("SimulationConfig could not be loaded from {:?}, invalid content in the file.",path.as_os_str());
+                        panic!();
+                    }
                 } else {
-                    log::warn!("SimulationConfig could not be loaded from {:?}, invalid content in the file.",path.as_os_str());
+                    log::error!(
+                        "SimulationConfig could not be loaded from {:?}, file does not exists.",
+                        path.as_os_str()
+                    );
+                    panic!();
                 }
             }
         }
-        None
     }
 }

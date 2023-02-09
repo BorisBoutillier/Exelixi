@@ -7,10 +7,10 @@ pub fn evolve(
     organisms: Query<(Entity, &Body, &Brain, &Eye)>,
     foods: Query<Entity, With<Food>>,
     asset_server: Res<AssetServer>,
+    mut rng: ResMut<MyRng>,
 ) {
     simulation.steps += 1;
     if simulation.steps == config.generation_length {
-        let mut rng = thread_rng();
         simulation.steps = 0;
 
         let mut fov_angles = vec![];
@@ -28,7 +28,7 @@ pub fn evolve(
         println!("{}", simulation.sprint_state(&config));
 
         let mut new_population = simulation.ga.evolve(
-            &mut rng,
+            &mut rng.0,
             &current_population,
             config.fertility_rate,
             (config.min_population as f32 * 0.9) as usize, // If survivors and fertility are not enough keep 10% random
@@ -36,7 +36,7 @@ pub fn evolve(
         // If not enough survived, add random organisms
         let missing_population = config.min_population as i32 - new_population.len() as i32;
         for _ in 0..missing_population {
-            new_population.push(OrganismIndividual::random(&mut rng, &config));
+            new_population.push(OrganismIndividual::random(&mut rng.0, &config));
         }
         simulation
             .statistics
@@ -60,7 +60,15 @@ pub fn evolve(
                 let selected = i == 0;
                 let (eye, brain) = individual.into_components(&config);
                 simulation.statistics.population.add_entry(&eye);
-                spawn_organism(&mut commands, &asset_server, &config, eye, brain, selected);
+                spawn_organism(
+                    &mut commands,
+                    &asset_server,
+                    &config,
+                    eye,
+                    brain,
+                    selected,
+                    &mut rng,
+                );
             });
     }
 }

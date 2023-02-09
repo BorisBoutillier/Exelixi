@@ -23,9 +23,9 @@ pub struct Simulation {
     pub generation_start_time: Instant,
 }
 impl Simulation {
-    pub fn new() -> Self {
+    pub fn new(config: &SimulationConfig) -> Self {
         Self {
-            control: SimulationControl::default(),
+            control: SimulationControl::new(config),
             steps: 0,
             generation: 0,
             ga: ga::GeneticAlgorithm::new(
@@ -45,12 +45,12 @@ impl Simulation {
     // Dump current simulation information in a single line string.
     pub fn sprint_state(&self, config: &SimulationConfig) -> String {
         format!(
-            "Gen: {:03} , Sps: {:.2} , Avg: {:.1} , Pop: {}/{} , Lost food: {}",
+            "Gen: {:03} , Sps: {:.2} , Avg: {:.1} , Pop start: {}, Pop end: {} , Uneaten food: {}",
             self.generation,
             self.sps(config),
             self.statistics.latest_avg_energy(),
-            self.statistics.latest_end_size(),
             self.statistics.latest_start_size(),
+            self.statistics.latest_end_size(),
             self.statistics.latest_food_decay(),
         )
     }
@@ -59,10 +59,5 @@ impl Simulation {
     pub fn new_generation(&mut self) {
         self.generation += 1;
         self.generation_start_time = Instant::now();
-    }
-}
-impl Default for Simulation {
-    fn default() -> Self {
-        Self::new()
     }
 }

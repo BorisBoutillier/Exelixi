@@ -7,10 +7,10 @@ pub fn spawn_organism(
     eye: Eye,
     brain: Brain,
     selected: bool,
+    rng: &mut MyRng,
 ) {
     let half_width = config.environment.width / 2.0;
     let half_height = config.environment.height / 2.0;
-    let mut rng = thread_rng();
     let color = if selected {
         Color::rgb(0.2, 0.9, 0.9)
     } else {
@@ -24,11 +24,11 @@ pub fn spawn_organism(
         },
         transform: Transform {
             translation: Vec3::new(
-                rng.gen_range(-half_width..half_width),
-                rng.gen_range(-half_height..half_height),
+                rng.0.gen_range(-half_width..half_width),
+                rng.0.gen_range(-half_height..half_height),
                 1.0,
             ),
-            rotation: Quat::from_axis_angle(Vec3::Z, rng.gen_range(-PI..PI)),
+            rotation: Quat::from_axis_angle(Vec3::Z, rng.0.gen_range(-PI..PI)),
             ..Default::default()
         },
         texture: asset_server.load("bird.png"),
@@ -49,12 +49,12 @@ pub fn spawn_starting_organisms(
     asset_server: Res<AssetServer>,
     mut simulation: ResMut<Simulation>,
     config: Res<SimulationConfig>,
+    mut rng: ResMut<MyRng>,
 ) {
     if config.is_changed() {
-        let mut rng = thread_rng();
         // Create a new random population
         let new_population = (0..config.min_population)
-            .map(|_| OrganismIndividual::random(&mut rng, &config))
+            .map(|_| OrganismIndividual::random(&mut rng.0, &config))
             .collect::<Vec<_>>();
         simulation
             .statistics
@@ -68,7 +68,15 @@ pub fn spawn_starting_organisms(
                 let selected = i == 0;
                 let (eye, brain) = individual.into_components(&config);
                 simulation.statistics.population.add_entry(&eye);
-                spawn_organism(&mut commands, &asset_server, &config, eye, brain, selected);
+                spawn_organism(
+                    &mut commands,
+                    &asset_server,
+                    &config,
+                    eye,
+                    brain,
+                    selected,
+                    &mut rng,
+                );
             });
     }
 }

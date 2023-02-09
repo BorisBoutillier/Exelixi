@@ -6,6 +6,7 @@ mod environment;
 mod evolve;
 mod movement;
 
+use bevy::app::AppExit;
 pub use brain::*;
 pub use collision::*;
 pub use decay::*;
@@ -67,4 +68,18 @@ pub fn simulation_steps(world: &mut World) {
             }
         }
     });
+}
+
+pub fn exit_at_generation(
+    simulation: Res<Simulation>,
+    config: Res<SimulationConfig>,
+    mut app_exit_event: EventWriter<AppExit>,
+) {
+    if config
+        .exit_at_generation
+        .map(|g| simulation.generation >= g)
+        == Some(true)
+    {
+        app_exit_event.send_default();
+    }
 }
