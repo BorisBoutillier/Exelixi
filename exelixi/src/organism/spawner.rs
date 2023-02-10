@@ -9,26 +9,20 @@ pub fn spawn_organism(
     selected: bool,
     rng: &mut MyRng,
 ) {
-    let half_width = config.environment.width / 2.0;
-    let half_height = config.environment.height / 2.0;
+    let half_width = config.environment.width / 2;
+    let half_height = config.environment.height / 2;
     let color = if selected {
         Color::rgb(0.2, 0.9, 0.9)
     } else {
         Color::rgb(0.8, 0.3, 0.8)
     };
+    let angle = rng.0.gen_range(-PI..PI);
+    let x = rng.0.gen_range(-half_width..half_width);
+    let y = rng.0.gen_range(-half_height..half_height);
     let mut command = commands.spawn(SpriteBundle {
         sprite: Sprite {
             custom_size: Some(Vec2::new(25.0, 25.0)),
             color,
-            ..Default::default()
-        },
-        transform: Transform {
-            translation: Vec3::new(
-                rng.0.gen_range(-half_width..half_width),
-                rng.0.gen_range(-half_height..half_height),
-                1.0,
-            ),
-            rotation: Quat::from_axis_angle(Vec3::Z, rng.0.gen_range(-PI..PI)),
             ..Default::default()
         },
         texture: asset_server.load("bird.png"),
@@ -36,6 +30,7 @@ pub fn spawn_organism(
     });
     command
         .insert(Organism {})
+        .insert(Position::new(x, y, angle))
         .insert(Locomotion::new(config))
         .insert(Body::new(config))
         .insert(eye)

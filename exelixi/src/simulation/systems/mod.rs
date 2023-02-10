@@ -27,15 +27,19 @@ struct MySchedule(Schedule);
 
 pub fn insert_simulation_steps_schedule(mut commands: Commands) {
     let mut schedule = Schedule::default();
-    schedule.add_stage("main", SystemStage::parallel());
-    schedule.add_stage_after("main", "evolve", SystemStage::parallel());
-    schedule.add_system_to_stage("main", movement);
+    schedule.add_stage("movement", SystemStage::parallel());
+    schedule.add_stage_after("movement", "main", SystemStage::parallel());
+    schedule.add_stage_after("main", "energy", SystemStage::parallel());
+    schedule.add_stage_after("energy", "evolve", SystemStage::parallel());
+    schedule.add_stage_after("evolve", "debug", SystemStage::parallel());
+    schedule.add_system_to_stage("movement", movement);
     schedule.add_system_to_stage("main", collision);
     schedule.add_system_to_stage("main", process_brain);
-    schedule.add_system_to_stage("main", energy);
-    schedule.add_system_to_stage("main", decay);
-    schedule.add_system_to_stage("main", spawn_food);
+    schedule.add_system_to_stage("energy", energy);
+    schedule.add_system_to_stage("energy", decay);
     schedule.add_system_to_stage("evolve", evolve);
+    schedule.add_system_to_stage("evolve", spawn_food);
+    schedule.add_system_to_stage("debug", dump_debug_info);
     commands.insert_resource(MySchedule(schedule));
 }
 

@@ -5,7 +5,7 @@ pub struct Organism {}
 #[derive(Component)]
 pub struct Food {
     pub eaten: bool,
-    pub energy: f32,
+    pub energy: i32,
 }
 impl Food {
     pub fn new(config: &SimulationConfig) -> Self {

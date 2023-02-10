@@ -54,8 +54,8 @@ fn main() {
     let args = Args::parse();
     let start_config = SimulationConfig::from_path(args.config);
     let rng = ChaCha8Rng::seed_from_u64(0);
-    App::new()
-        .insert_resource(ClearColor(Color::BLACK))
+    let mut app = App::new();
+    app.insert_resource(ClearColor(Color::BLACK))
         .insert_resource(MyRng(rng))
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
@@ -75,6 +75,7 @@ fn main() {
         .add_startup_system(insert_simulation_steps_schedule)
         .add_system(simulation_steps)
         .add_system(exit_at_generation)
+        .add_system(transform_update)
         .insert_resource(Simulation::new(&start_config))
         .insert_resource(start_config)
         .run();

@@ -1,16 +1,17 @@
 (
-    generation_length : 50
+    generation_length : 500
 ,   min_population    : 5
 ,   fertility_rate    : 2
 ,   exit_at_generation: Some(5)
 ,   start_state : Fastest
+,   dump_debug_info: true
 ,   environment:(
         width  : 500
     ,   height : 300
     ,   wall   : true
     ,   food_spawn_rate   : 0.2
     ,   food_decay_time   : 1000
-    ,   food_energy       : 100.0
+    ,   food_energy       : 10000
     )
 ,   organisms: (
         eye_fov_angle: Fixed(3.14)
@@ -20,11 +21,11 @@
     ,   see_foods:   true
     ,   see_walls:   true
     ,   see_organisms: false
-    ,   starting_energy: 100.0
-    ,   maximum_energy: 400.0
-    ,   linear_locomotion: Fixed(4.0)
+    ,   starting_energy: 10000
+    ,   maximum_energy: 40000
+    ,   linear_locomotion: Fixed(4)
     ,   linear_cost: 0.000
     ,   angular_cost: 0.000
-    ,   body_cost: 0.06
+    ,   body_cost: 6
     )
 )

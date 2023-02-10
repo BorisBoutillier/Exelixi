@@ -32,23 +32,23 @@ pub struct OrganismsConfig {
     // Does the eyes senses other organisms.
     // Will add n_eye_cells inputs to the neural networks for each organism type
     pub see_organisms: bool,
-    pub starting_energy: f32,
-    pub maximum_energy: f32,
-    pub linear_locomotion: ConfigValue<f32>,
+    pub starting_energy: i32,
+    pub maximum_energy: i32,
+    pub linear_locomotion: ConfigValue<i32>,
     // Cost for will be linear_cost*linear^2
     pub linear_cost: f32,
     // Cost for will be angular_cost*angular^2
     pub angular_cost: f32,
     // Cost to run the body.
     // This defines a minimum energy consumption per step
-    pub body_cost: f32,
+    pub body_cost: i32,
 }
 #[derive(Serialize, Deserialize)]
 pub struct EnvironmentConfig {
     // Width of the floor
-    pub width: f32,
+    pub width: i32,
     // Height of the floor
-    pub height: f32,
+    pub height: i32,
     // Presence of wall on the boundary.
     // Without walls the world is a torus
     pub wall: bool,
@@ -56,7 +56,7 @@ pub struct EnvironmentConfig {
     pub food_spawn_rate: f64,
     // Number of steps after appearance that a food disappear
     pub food_decay_time: u32,
-    pub food_energy: f32,
+    pub food_energy: i32,
 }
 
 //
@@ -73,6 +73,9 @@ pub struct SimulationConfig {
     pub exit_at_generation: Option<u32>,
     // Defines how the simulation behaves at the start. One of Paused, Run or Fastest
     pub start_state: SimulationControlState,
+    // Defines if debug information is dumped in a temporary file, each step of the simulation
+    #[serde(default)]
+    pub dump_debug_info: bool,
     // Configuration information regarding the environment
     pub environment: EnvironmentConfig,
     // Configuration information regarding the organisms
@@ -84,7 +87,7 @@ impl SimulationConfig {
             None => {
                 let config = ron::from_str(include_str!("../../../configs/default.ron"))
                     .expect("default_config.ron is not correct");
-                log::info!("SimulationConfig loaded from default_config.ron");
+                log::info!("SimulationConfig loaded from configs/default.ron");
                 config
             }
             Some(path) => {

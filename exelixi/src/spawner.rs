@@ -6,8 +6,8 @@ pub fn spawn_floor(mut commands: Commands, config: Res<SimulationConfig>) {
             .spawn(SpriteBundle {
                 sprite: Sprite {
                     custom_size: Some(Vec2::new(
-                        config.environment.width + 20.0,
-                        config.environment.height + 20.0,
+                        config.environment.width as f32 + 20.0,
+                        config.environment.height as f32 + 20.0,
                     )),
                     color: Color::rgb(0.1, 0.3, 0.1),
                     ..Default::default()

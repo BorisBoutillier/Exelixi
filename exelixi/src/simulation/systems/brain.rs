@@ -1,7 +1,7 @@
 use crate::*;
 
 pub fn process_brain(
-    mut organisms: Query<(Entity, &Transform, &mut Locomotion, &Eye, &Brain)>,
+    mut organisms: Query<(Entity, &Position, &Transform, &mut Locomotion, &Eye, &Brain)>,
     food_transforms: Query<&Transform, With<Food>>,
     organism_transforms: Query<(Entity, &Transform), With<Organism>>,
     config: Res<SimulationConfig>,
@@ -10,6 +10,7 @@ pub fn process_brain(
     organisms.for_each_mut(
         |(
             organism_entity,
+            organism_position,
             organism_transform,
             mut organism_locomotion,
             organism_eye,
@@ -20,6 +21,7 @@ pub fn process_brain(
                 .filter_map(|(e, t)| if e != organism_entity { Some(t) } else { None })
                 .collect::<Vec<_>>();
             let vision = organism_eye.process_vision(
+                organism_position,
                 organism_transform,
                 &food_transforms,
                 &organism_transforms,

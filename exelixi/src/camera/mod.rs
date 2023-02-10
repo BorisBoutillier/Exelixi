@@ -66,8 +66,8 @@ fn camera_movement(
         let view_width = visible_area.right - visible_area.left;
         let view_height = visible_area.top - visible_area.bottom;
         let view_ratio = view_width / view_height;
-        let mut visible_width = config.environment.width * ENV_VIEW_RESET_MARGIN_PCT;
-        let mut visible_height = config.environment.height * ENV_VIEW_RESET_MARGIN_PCT;
+        let mut visible_width = config.environment.width as f32 * ENV_VIEW_RESET_MARGIN_PCT;
+        let mut visible_height = config.environment.height as f32 * ENV_VIEW_RESET_MARGIN_PCT;
         let visible_ratio = visible_width / visible_height;
         if visible_ratio > view_ratio {
             visible_height = visible_width / view_ratio;
