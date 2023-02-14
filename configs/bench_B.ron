@@ -4,6 +4,7 @@
 ,   fertility_rate    : 1.5
 ,   exit_at_generation: Some(100)
 ,   start_state : Fastest
+,   dump_debug_info: false
 ,   environment:(
         width  : 3500
     ,   height : 3000

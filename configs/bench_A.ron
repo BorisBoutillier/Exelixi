@@ -4,7 +4,7 @@
 ,   fertility_rate    : 2
 ,   exit_at_generation: Some(5)
 ,   start_state : Fastest
-,   dump_debug_info: true
+,   dump_debug_info: false
 ,   environment:(
         width  : 500
     ,   height : 300

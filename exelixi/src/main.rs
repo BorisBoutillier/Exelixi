@@ -48,12 +48,20 @@ struct Args {
     /// Path to the simulation config to use
     #[arg(short, long)]
     config: Option<PathBuf>,
+    // Define the initial seed for the simulation
+    // If not provided will be 'randomized'
+    #[arg(short, long)]
+    seed: Option<u64>,
 }
 
 fn main() {
     let args = Args::parse();
     let start_config = SimulationConfig::from_path(args.config);
-    let rng = ChaCha8Rng::seed_from_u64(0);
+    let rng = if let Some(seed) = args.seed {
+        ChaCha8Rng::seed_from_u64(seed)
+    } else {
+        ChaCha8Rng::from_entropy()
+    };
     let mut app = App::new();
     app.insert_resource(ClearColor(Color::BLACK))
         .insert_resource(MyRng(rng))

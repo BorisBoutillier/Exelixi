@@ -1,0 +1,11 @@
+This file store historical performance and reproductibility analysis.
+
+###### Commit 1639f0fe4965157bf3d647ba8275e8a4afbd6780
+time cargo run --release --  --config configs/bench_A.ron --seed 0
+   Gen: 004 , Sps: 11976.38 , Avg: 27474.3 , Pop start: 40, Pop end: 40 , Uneaten food: 19
+
+   user    0m0,385s
+time cargo run --release --  --config configs/bench_B.ron --seed 0 
+   Gen: 099 , Sps: 3316.11 , Avg: 30051.5 , Pop start: 152, Pop end: 98 , Uneaten food: 420
+
+   user    2m44,813s
