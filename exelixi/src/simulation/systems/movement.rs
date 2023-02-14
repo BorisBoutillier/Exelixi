@@ -5,22 +5,25 @@ pub fn movement(mut movables: Query<(&mut Position, &Locomotion)>, config: Res<S
     let half_height = config.environment.height / 2;
     movables.for_each_mut(|(mut position, locomotion)| {
         // Update transform based on linear and angular velocity
-        let delta_x = (position.angle().cos() * locomotion.linear as f32) as i32;
-        let delta_y = (position.angle().sin() * locomotion.linear as f32) as i32;
+        let delta_x = (position.angle().cos() * locomotion.linear as f32).round() as i32;
+        let delta_y = (position.angle().sin() * locomotion.linear as f32).round() as i32;
         position.x += delta_x;
         position.y += delta_y;
-        position.angle_crad += locomotion.angular;
+        let new_angle_crad = position.angle_crad() + locomotion.angular_crad;
+        position.set_angle_crad(new_angle_crad);
         if config.environment.wall {
             // Detects wall collision and mirror the rotation angle
             if (position.x < -half_width && delta_x < 0) || (position.x > half_width && delta_x > 0)
             {
-                position.angle_crad = -position.angle_crad + (PI * 100.0) as i32;
+                let new_angle_crad = -position.angle_crad() + (PI * 100.0) as i32;
+                position.set_angle_crad(new_angle_crad);
                 position.x = i32::clamp(position.x, -half_width, half_width);
             }
             if (position.y < -half_height && delta_y < 0)
                 || (position.y > half_height && delta_y > 0)
             {
-                position.angle_crad = -position.angle_crad;
+                let new_angle_crad = -position.angle_crad();
+                position.set_angle_crad(new_angle_crad);
                 position.y = i32::clamp(position.y, -half_height, half_height);
             }
         } else {

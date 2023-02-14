@@ -24,7 +24,7 @@ impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(UiState { stat_panel: true })
             .add_plugin(EyeViewerPlugin)
-            //.add_system(_debug_ui)
+            .add_system(_debug_ui)
             .add_system(panels_ui)
             .add_system(user_selection)
             .add_system_to_stage(CoreStage::PostUpdate, selection_changed);
@@ -33,7 +33,7 @@ impl Plugin for UiPlugin {
 
 pub fn _debug_ui(
     mut egui_ctx: ResMut<EguiContext>,
-    selection: Query<(&Locomotion, &Body), With<Selected>>,
+    selection: Query<(&Position, &Locomotion, &Body), With<Selected>>,
     simulation: Res<Simulation>,
     config: Res<SimulationConfig>,
     diagnostics: Res<Diagnostics>,
@@ -44,10 +44,16 @@ pub fn _debug_ui(
             ui.heading("Simulation");
             ui.label(format!("width : {}", config.environment.width));
             ui.label(format!("height: {}", config.environment.height));
-            if let Ok((locomotion, body)) = selection.get_single() {
+            if let Ok((position, locomotion, body)) = selection.get_single() {
                 ui.heading("Selection");
+                ui.label(format!(
+                    "position: ({},{}) @:{}",
+                    position.x,
+                    position.y,
+                    position.angle_crad()
+                ));
                 ui.label(format!("linear: {:.1}", locomotion.linear));
-                ui.label(format!("angular: {:.1}", locomotion.angular));
+                ui.label(format!("angular_crad: {:.1}", locomotion.angular_crad));
                 ui.label(format!("energy: {:.1}", body.energy()));
             }
             ui.separator();

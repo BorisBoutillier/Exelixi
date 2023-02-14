@@ -1,14 +1,14 @@
 use crate::prelude::*;
 //
 /// Maximum angalur velocity in radians/step
-pub const V_ANGULAR_MAX: f32 = PI / 30.0;
+pub const V_ANGULAR_CRAD_MAX: i32 = 10;
 
 #[derive(Component)]
 pub struct Locomotion {
     // Linear  velocity in unit per step
     pub linear: i32,
     // Angular velocity in centi radians per step
-    pub angular: i32,
+    pub angular_crad: i32,
     pub linear_actuator: bool,
     pub linear_max: i32,
     linear_cost: f32,
@@ -20,7 +20,7 @@ impl Locomotion {
         match config.organisms.linear_locomotion {
             ConfigValue::Fixed(v) => Self {
                 linear: v,
-                angular: 0,
+                angular_crad: 0,
                 linear_actuator: false,
                 linear_max: v,
                 linear_cost: config.organisms.linear_cost,
@@ -28,7 +28,7 @@ impl Locomotion {
             },
             ConfigValue::Neuron { min: _, max } => Self {
                 linear: 0,
-                angular: 0,
+                angular_crad: 0,
                 linear_actuator: true,
                 linear_max: max,
                 linear_cost: config.organisms.linear_cost,
@@ -46,19 +46,19 @@ impl Locomotion {
         if self.linear_actuator {
             let output = outputs
                 .next()
-                .expect("Not enough otuput neurons")
+                .expect("Not enough output neurons")
                 .clamp(0.0, 1.0);
             self.linear = output as i32 * self.linear_max;
         }
         // Angular
         {
             let output = outputs.next().expect("Not enough otuput neurons");
-            let angular = (output.clamp(0.0, 1.0) - 0.5) * V_ANGULAR_MAX;
-            self.angular = angular as i32;
+            let angular = (output.clamp(0.0, 1.0) - 0.5) * V_ANGULAR_CRAD_MAX as f32;
+            self.angular_crad = angular.round() as i32;
         }
     }
     pub fn energy_cost(&self) -> f32 {
         self.linear_cost * self.linear.pow(2) as f32
-            + self.angular_cost * self.angular.pow(2) as f32
+            + self.angular_cost * (self.angular_crad as f32 / 100.0).powi(2)
     }
 }

@@ -13,7 +13,7 @@ pub struct GenerationStatistics {
 pub struct PopulationStatistics {
     pub count: usize,
     pub fov_range: HashMap<Range<u32>, usize>,
-    pub fov_angle: HashMap<Range<u32>, usize>,
+    pub fov_angle: HashMap<Range<i32>, usize>,
 }
 
 impl PopulationStatistics {
@@ -27,9 +27,7 @@ impl PopulationStatistics {
                 s.fov_range.insert(i..(i + step), 0);
             }
         }
-        if let ConfigValue::Gene { min, max } = config.organisms.eye_fov_angle {
-            let min = (min * 100.0) as u32;
-            let max = (max * 100.0) as u32;
+        if let ConfigValue::Gene { min, max } = config.organisms.eye_fov_angle_crad {
             let step = (max - min) / 20;
             for i in (min..max).step_by(step as usize) {
                 s.fov_angle.insert(i..(i + step), 0);
@@ -48,9 +46,8 @@ impl PopulationStatistics {
             }
         }
         if !self.fov_angle.is_empty() {
-            let fov_angle = (eye.fov_angle * 100.0) as u32;
             for (range, count) in self.fov_angle.iter_mut() {
-                if range.contains(&fov_angle) {
+                if range.contains(&eye.fov_angle_crad) {
                     *count += 1;
                 }
             }

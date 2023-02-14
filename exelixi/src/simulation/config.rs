@@ -13,10 +13,10 @@ pub enum ConfigValue<T> {
 
 #[derive(Serialize, Deserialize)]
 pub struct OrganismsConfig {
-    // Fov angle of the eye
-    pub eye_fov_angle: ConfigValue<f32>,
-    // Fov angle of the eye
-    pub eye_fov_range: ConfigValue<f32>,
+    // Fov angle of the eye in centi radians
+    pub eye_fov_angle_crad: ConfigValue<i32>,
+    // Distance that the eye can see
+    pub eye_fov_range: ConfigValue<i32>,
     // Cost for a full circle of 150.0 radius,
     pub eye_energy_cost: f32,
     // Number of eye cells.

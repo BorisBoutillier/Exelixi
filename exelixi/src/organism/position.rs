@@ -1,11 +1,11 @@
 use crate::prelude::*;
 
-#[derive(Clone, Copy, Component)]
+#[derive(Clone, Copy, Component, Debug)]
 pub struct Position {
     pub x: i32,
     pub y: i32,
     // Orientation in centi-radian
-    pub angle_crad: i32,
+    angle_crad: i32,
 }
 
 impl Position {
@@ -18,5 +18,12 @@ impl Position {
     }
     pub fn angle(&self) -> f32 {
         self.angle_crad as f32 / 100.0
+    }
+    pub fn angle_crad(&self) -> i32 {
+        self.angle_crad
+    }
+    pub fn set_angle_crad(&mut self, angle_crad: i32) {
+        // Keep within  -PI..PI
+        self.angle_crad = (angle_crad + 314) % (2 * 314) - 314;
     }
 }
