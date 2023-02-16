@@ -29,7 +29,7 @@ fn spawn_fov_viewer_on_selected(
                 mesh: meshes.add(Mesh::from(shape::Quad::default())).into(),
                 transform: Transform {
                     translation: Vec3::new(0.0, 0.0, 1.0),
-                    scale: Vec3::new(eye.fov_range as f32 * 2.0, eye.fov_range as f32 * 2.0, 1.0),
+                    scale: Vec3::new(eye.fov_range * 2.0, eye.fov_range * 2.0, 1.0),
                     ..Default::default()
                 },
                 material: materials.add(FovViewerMaterial {

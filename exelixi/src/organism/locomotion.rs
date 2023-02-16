@@ -6,11 +6,11 @@ pub const V_ANGULAR_MAX: f32 = 0.1;
 #[derive(Component)]
 pub struct Locomotion {
     // Linear  velocity in unit per step
-    pub linear: i32,
+    pub linear: f32,
     // Angular velocity in centi radians per step
     pub angular: f32,
     pub linear_actuator: bool,
-    pub linear_max: i32,
+    pub linear_max: f32,
     linear_cost: f32,
     angular_cost: f32,
 }
@@ -27,7 +27,7 @@ impl Locomotion {
                 angular_cost: config.organisms.angular_cost,
             },
             ConfigValue::Neuron { min: _, max } => Self {
-                linear: 0,
+                linear: 0.0,
                 angular: 0.0,
                 linear_actuator: true,
                 linear_max: max,
@@ -48,7 +48,7 @@ impl Locomotion {
                 .next()
                 .expect("Not enough output neurons")
                 .clamp(0.0, 1.0);
-            self.linear = output as i32 * self.linear_max;
+            self.linear = output * self.linear_max;
         }
         // Angular
         {
@@ -57,6 +57,6 @@ impl Locomotion {
         }
     }
     pub fn energy_cost(&self) -> f32 {
-        self.linear_cost * self.linear.pow(2) as f32 + self.angular_cost * self.angular.powi(2)
+        self.linear_cost * self.linear.powi(2) + self.angular_cost * self.angular.powi(2)
     }
 }

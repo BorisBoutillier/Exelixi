@@ -29,7 +29,7 @@ pub fn spawn_food(
                 ..Default::default()
             })
             .insert(Food::new(&config))
-            .insert(Position::new(x, y, 0.0))
+            .insert(Position::new(x as f32, y as f32, 0.0))
             .insert(Decay {
                 time: config.environment.food_decay_time as i32,
             });

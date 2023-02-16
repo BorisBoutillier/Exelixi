@@ -16,7 +16,7 @@ pub struct OrganismsConfig {
     // Fov angle of the eye in centi radians
     pub eye_fov_angle: ConfigValue<f32>,
     // Distance that the eye can see
-    pub eye_fov_range: ConfigValue<i32>,
+    pub eye_fov_range: ConfigValue<f32>,
     // Cost for a full circle of 150.0 radius,
     pub eye_energy_cost: f32,
     // Number of eye cells.
@@ -34,7 +34,7 @@ pub struct OrganismsConfig {
     pub see_organisms: bool,
     pub starting_energy: i32,
     pub maximum_energy: i32,
-    pub linear_locomotion: ConfigValue<i32>,
+    pub linear_locomotion: ConfigValue<f32>,
     // Cost for will be linear_cost*linear^2
     pub linear_cost: f32,
     // Cost for will be angular_cost*angular^2

@@ -8,9 +8,9 @@ pub fn collision(
     for (mut organism_body, organism_position) in organisms.iter_mut() {
         for (entity, food_position, mut food) in foods.iter_mut() {
             if !food.eaten {
-                let distance = (organism_position.x - food_position.x).pow(2)
-                    + (organism_position.y - food_position.y).pow(2);
-                if distance <= 100 {
+                let dist_pow2 = (organism_position.x - food_position.x).powi(2)
+                    + (organism_position.y - food_position.y).powi(2);
+                if dist_pow2 <= 100.0 {
                     organism_body.add_energy(food.energy);
                     // Storing the eaten state is currently necessary, because despawn will not
                     // happen when we do multiple steps per run_criteria

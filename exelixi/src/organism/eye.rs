@@ -4,7 +4,7 @@ use std::f32::consts::PI;
 
 #[derive(Debug, Component)]
 pub struct Eye {
-    pub fov_range: i32,
+    pub fov_range: f32,
     pub fov_angle: f32,
     pub n_sectors: usize,
     pub n_cells: usize,
@@ -60,7 +60,7 @@ impl Eye {
             ConfigValue::Fixed(v) => v,
             ConfigValue::Gene { min, max } => {
                 let gene = genes.next().expect("Missing gene for the fov_range");
-                (gene as i32).clamp(min, max)
+                gene.clamp(min, max)
             }
             _ => panic!(),
         };
@@ -96,7 +96,7 @@ impl Eye {
         }
         match config.organisms.eye_fov_range {
             ConfigValue::Fixed(_) => (),
-            ConfigValue::Gene { min: _, max: _ } => genes.push(self.fov_range as f32),
+            ConfigValue::Gene { min: _, max: _ } => genes.push(self.fov_range),
             _ => panic!(),
         }
         match config.organisms.n_eye_cells {
@@ -132,15 +132,13 @@ impl Eye {
         let mut cells = vec![0.0; self.n_cells];
         //println!("SENSE for {position:?}");
         for object_position in object_positions {
-            let dist_pow2 =
-                (position.x - object_position.x).pow(2) + (position.y - object_position.y).pow(2);
-            if dist_pow2 > self.fov_range.pow(2) {
+            let dx = object_position.x - position.x;
+            let dy = object_position.y - position.y;
+            let dist_pow2 = dx.powi(2) + dy.powi(2);
+            if dist_pow2 > self.fov_range.powi(2) {
                 continue;
             }
-            let view_angle = f32::atan2(
-                (object_position.y - position.y) as f32,
-                (object_position.x - position.x) as f32,
-            );
+            let view_angle = f32::atan2(dy, dx);
             //println!("    FOOD {:?} -> {}", object_position, view_angle);
             if view_angle < -self.fov_angle / 2.0 || view_angle > self.fov_angle / 2.0 {
                 continue;
@@ -150,8 +148,7 @@ impl Eye {
             let sector = (view_angle + self.fov_angle / 2.0) / sector_angle;
             let sector = (sector as usize).min(self.n_sectors - 1);
 
-            let energy =
-                (self.fov_range as f32 - (dist_pow2 as f32).sqrt()) / self.fov_range as f32;
+            let energy = (self.fov_range - dist_pow2.sqrt()) / self.fov_range;
 
             cells[sector] += energy;
         }
@@ -159,8 +156,8 @@ impl Eye {
         cells
     }
     pub fn sense_walls(&self, position: &Position, config: &SimulationConfig) -> Vec<f32> {
-        let half_width = config.environment.width / 2;
-        let half_height = config.environment.height / 2;
+        let half_width = config.environment.width as f32 / 2.0;
+        let half_height = config.environment.height as f32 / 2.0;
         let angle_incr = self.fov_angle / self.n_cells as f32;
         // Starting from the lowest fov line we evaluate the distance of the closest wall intersect on this line.
         // and compute an energy
@@ -170,23 +167,23 @@ impl Eye {
             .map(|i| {
                 let angle = start_angle + (i as f32 * angle_incr);
                 let mut dist = f32::INFINITY;
-                let dist_right = (half_width - position.x) as f32 / angle.cos();
+                let dist_right = (half_width - position.x) / angle.cos();
                 if dist_right > 0.0 {
                     dist = dist.min(dist_right);
                 }
-                let dist_left = (-half_width - position.x) as f32 / angle.cos();
+                let dist_left = (-half_width - position.x) / angle.cos();
                 if dist_left > 0.0 {
                     dist = dist.min(dist_left);
                 }
-                let dist_top = (half_height - position.y) as f32 / angle.sin();
+                let dist_top = (half_height - position.y) / angle.sin();
                 if dist_top > 0.0 {
                     dist = dist.min(dist_top);
                 }
-                let dist_bottom = (-half_height - position.y) as f32 / angle.sin();
+                let dist_bottom = (-half_height - position.y) / angle.sin();
                 if dist_bottom > 0.0 {
                     dist = dist.min(dist_bottom);
                 }
-                ((self.fov_range as f32 - dist) / self.fov_range as f32).max(0.0)
+                ((self.fov_range - dist) / self.fov_range).max(0.0)
             })
             .collect::<Vec<_>>()
     }
@@ -209,6 +206,6 @@ impl Eye {
     }
 }
 
-fn compute_energy_cost(fov_range: i32, fov_angle: f32, energy_per_area: f32) -> f32 {
-    (PI * fov_range.pow(2) as f32 * 2.0 * PI / fov_angle) * energy_per_area / (PI * 150.0 * 150.0)
+fn compute_energy_cost(fov_range: f32, fov_angle: f32, energy_per_area: f32) -> f32 {
+    (PI * fov_range.powi(2) * 2.0 * PI / fov_angle) * energy_per_area / (PI * 150.0 * 150.0)
 }

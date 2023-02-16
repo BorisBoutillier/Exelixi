@@ -30,7 +30,7 @@ pub fn spawn_organism(
     });
     command
         .insert(Organism {})
-        .insert(Position::new(x, y, angle))
+        .insert(Position::new(x as f32, y as f32, angle))
         .insert(Locomotion::new(config))
         .insert(Body::new(config))
         .insert(eye)
