@@ -14,7 +14,7 @@
     ,   food_energy       : 10000
     )
 ,   organisms: (
-        eye_fov_angle_crad: Fixed(314)
+        eye_fov_angle: Fixed(3.14)
     ,   eye_fov_range: Fixed(250)
     ,   eye_energy_cost: 0.000
     ,   n_eye_cells: Fixed(9)

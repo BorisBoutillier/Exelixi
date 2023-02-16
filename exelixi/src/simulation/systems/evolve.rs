@@ -19,7 +19,7 @@ pub fn evolve(
             .iter()
             .map(|(entity, body, brain, eye)| {
                 commands.entity(entity).despawn_recursive();
-                fov_angles.push(eye.fov_angle_crad);
+                fov_angles.push(eye.fov_angle);
                 OrganismIndividual::from_components(&config, body, eye, brain)
             })
             .collect::<Vec<_>>();
@@ -89,10 +89,10 @@ pub fn dump_debug_info(
         organisms.sort_by(|o1, o2| (o1.0.x, o1.0.y).partial_cmp(&(o2.0.x, o2.0.y)).unwrap());
         for (position, locomotion, body) in organisms.iter() {
             println!(
-                "O: ({},{})%{} V:{} ; E:{:.2}",
+                "O: ({:.2},{:.2})%{:.2} V:{} ; E:{:.2}",
                 position.x,
                 position.y,
-                position.angle_crad(),
+                position.angle(),
                 locomotion.linear,
                 body.energy()
             );

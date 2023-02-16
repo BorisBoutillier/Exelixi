@@ -9,21 +9,21 @@ pub fn movement(mut movables: Query<(&mut Position, &Locomotion)>, config: Res<S
         let delta_y = (position.angle().sin() * locomotion.linear as f32).round() as i32;
         position.x += delta_x;
         position.y += delta_y;
-        let new_angle_crad = position.angle_crad() + locomotion.angular_crad;
-        position.set_angle_crad(new_angle_crad);
+        let new_angle = position.angle() + locomotion.angular;
+        position.set_angle(new_angle);
         if config.environment.wall {
             // Detects wall collision and mirror the rotation angle
             if (position.x < -half_width && delta_x < 0) || (position.x > half_width && delta_x > 0)
             {
-                let new_angle_crad = -position.angle_crad() + (PI * 100.0) as i32;
-                position.set_angle_crad(new_angle_crad);
+                let new_angle = -position.angle() + PI;
+                position.set_angle(new_angle);
                 position.x = i32::clamp(position.x, -half_width, half_width);
             }
             if (position.y < -half_height && delta_y < 0)
                 || (position.y > half_height && delta_y > 0)
             {
-                let new_angle_crad = -position.angle_crad();
-                position.set_angle_crad(new_angle_crad);
+                let new_angle = -position.angle();
+                position.set_angle(new_angle);
                 position.y = i32::clamp(position.y, -half_height, half_height);
             }
         } else {

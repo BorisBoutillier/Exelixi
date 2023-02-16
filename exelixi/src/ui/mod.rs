@@ -47,13 +47,13 @@ pub fn _debug_ui(
             if let Ok((position, locomotion, body)) = selection.get_single() {
                 ui.heading("Selection");
                 ui.label(format!(
-                    "position: ({},{}) @:{}",
+                    "position: ({},{}) @:{:.2}",
                     position.x,
                     position.y,
-                    position.angle_crad()
+                    position.angle()
                 ));
                 ui.label(format!("linear: {:.1}", locomotion.linear));
-                ui.label(format!("angular_crad: {:.1}", locomotion.angular_crad));
+                ui.label(format!("angular: {:.2}", locomotion.angular));
                 ui.label(format!("energy: {:.1}", body.energy()));
             }
             ui.separator();

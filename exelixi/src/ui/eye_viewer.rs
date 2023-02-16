@@ -33,7 +33,7 @@ fn spawn_fov_viewer_on_selected(
                     ..Default::default()
                 },
                 material: materials.add(FovViewerMaterial {
-                    fov_angle: eye.fov_angle_crad as f32 / 100.0,
+                    fov_angle: eye.fov_angle,
                     n_sectors: eye.n_cells as u32,
                     color: Color::BLUE,
                     sector_alpha: 0.1,

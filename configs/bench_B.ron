@@ -14,7 +14,7 @@
     ,   food_energy       : 10000
     )
 ,   organisms: (
-        eye_fov_angle_crad: Gene(min:150,max:471)
+        eye_fov_angle: Gene(min:1.5,max:4.71)
     ,   eye_fov_range: Gene(min:70,max:400)
     ,   eye_energy_cost: 0.000
     ,   n_eye_cells: Fixed(9)

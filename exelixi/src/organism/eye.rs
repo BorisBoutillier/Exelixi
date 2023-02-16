@@ -5,7 +5,7 @@ use std::f32::consts::PI;
 #[derive(Debug, Component)]
 pub struct Eye {
     pub fov_range: i32,
-    pub fov_angle_crad: i32,
+    pub fov_angle: f32,
     pub n_sectors: usize,
     pub n_cells: usize,
     pub see_foods: bool,
@@ -21,7 +21,7 @@ impl Eye {
             ConfigValue::Gene { min, max } => (rng.gen_range(min..=max), max),
             _ => panic!(),
         };
-        let fov_angle_crad = match config.organisms.eye_fov_angle_crad {
+        let fov_angle = match config.organisms.eye_fov_angle {
             ConfigValue::Fixed(v) => v,
             ConfigValue::Gene { min, max } => rng.gen_range(min..=max),
             _ => panic!(),
@@ -36,23 +36,23 @@ impl Eye {
             see_foods: config.organisms.see_foods,
             see_organisms: config.organisms.see_organisms,
             fov_range,
-            fov_angle_crad,
+            fov_angle,
             n_sectors: n_cells as usize,
             n_cells: n_cells as usize,
             energy_cost: compute_energy_cost(
                 fov_range,
-                fov_angle_crad,
+                fov_angle,
                 config.organisms.eye_energy_cost,
             ),
         }
     }
     pub fn from_genes(genes: impl IntoIterator<Item = f32>, config: &SimulationConfig) -> Self {
         let mut genes = genes.into_iter();
-        let fov_angle_crad = match config.organisms.eye_fov_angle_crad {
+        let fov_angle = match config.organisms.eye_fov_angle {
             ConfigValue::Fixed(v) => v,
             ConfigValue::Gene { min, max } => {
                 let gene = genes.next().expect("Missing gene for the fov_angle");
-                (gene as i32).clamp(min, max)
+                gene.clamp(min, max)
             }
             _ => panic!(),
         };
@@ -77,21 +77,21 @@ impl Eye {
             see_foods: config.organisms.see_foods,
             see_organisms: config.organisms.see_organisms,
             fov_range,
-            fov_angle_crad,
+            fov_angle,
             n_sectors: n_cells as usize,
             n_cells: n_cells as usize,
             energy_cost: compute_energy_cost(
                 fov_range,
-                fov_angle_crad,
+                fov_angle,
                 config.organisms.eye_energy_cost,
             ),
         }
     }
     pub fn as_chromosome(&self, config: &SimulationConfig) -> ga::Chromosome {
         let mut genes = vec![];
-        match config.organisms.eye_fov_angle_crad {
+        match config.organisms.eye_fov_angle {
             ConfigValue::Fixed(_) => (),
-            ConfigValue::Gene { min: _, max: _ } => genes.push(self.fov_angle_crad as f32),
+            ConfigValue::Gene { min: _, max: _ } => genes.push(self.fov_angle),
             _ => panic!(),
         }
         match config.organisms.eye_fov_range {
@@ -137,19 +137,17 @@ impl Eye {
             if dist_pow2 > self.fov_range.pow(2) {
                 continue;
             }
-            let view_angle_crad = (f32::atan2(
+            let view_angle = f32::atan2(
                 (object_position.y - position.y) as f32,
                 (object_position.x - position.x) as f32,
-            ) * 100.0) as i32;
-            //println!("    FOOD {:?} -> {}", object_position, view_angle_crad);
-            if view_angle_crad < -self.fov_angle_crad / 2
-                || view_angle_crad > self.fov_angle_crad / 2
-            {
+            );
+            //println!("    FOOD {:?} -> {}", object_position, view_angle);
+            if view_angle < -self.fov_angle / 2.0 || view_angle > self.fov_angle / 2.0 {
                 continue;
             }
 
-            let sector_angle_crad = self.fov_angle_crad / self.n_sectors as i32;
-            let sector = (view_angle_crad + self.fov_angle_crad / 2) / sector_angle_crad;
+            let sector_angle = self.fov_angle / self.n_sectors as f32;
+            let sector = (view_angle + self.fov_angle / 2.0) / sector_angle;
             let sector = (sector as usize).min(self.n_sectors - 1);
 
             let energy =
@@ -163,15 +161,14 @@ impl Eye {
     pub fn sense_walls(&self, position: &Position, config: &SimulationConfig) -> Vec<f32> {
         let half_width = config.environment.width / 2;
         let half_height = config.environment.height / 2;
-        let angle_incr_crad = self.fov_angle_crad / self.n_cells as i32;
+        let angle_incr = self.fov_angle / self.n_cells as f32;
         // Starting from the lowest fov line we evaluate the distance of the closest wall intersect on this line.
         // and compute an energy
         // Doing it for each cell boundary so cells.length()+1 lines.
-        let start_angle_crad =
-            position.angle_crad() - self.fov_angle_crad / 2 + angle_incr_crad / 2;
+        let start_angle = position.angle() - self.fov_angle / 2.0 + angle_incr / 2.0;
         (0..self.n_cells as i32)
             .map(|i| {
-                let angle = (start_angle_crad + (i * angle_incr_crad)) as f32 / 100.0;
+                let angle = start_angle + (i as f32 * angle_incr);
                 let mut dist = f32::INFINITY;
                 let dist_right = (half_width - position.x) as f32 / angle.cos();
                 if dist_right > 0.0 {
@@ -212,7 +209,6 @@ impl Eye {
     }
 }
 
-fn compute_energy_cost(fov_range: i32, fov_angle_crad: i32, energy_per_area: f32) -> f32 {
-    (PI * fov_range.pow(2) as f32 * 2.0 * PI / (fov_angle_crad as f32 / 100.0)) * energy_per_area
-        / (PI * 150.0 * 150.0)
+fn compute_energy_cost(fov_range: i32, fov_angle: f32, energy_per_area: f32) -> f32 {
+    (PI * fov_range.pow(2) as f32 * 2.0 * PI / fov_angle) * energy_per_area / (PI * 150.0 * 150.0)
 }
