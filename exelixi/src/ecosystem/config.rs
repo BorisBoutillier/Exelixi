@@ -59,6 +59,9 @@ pub struct EnvironmentConfig {
     pub food_energy: i32,
 }
 
+pub fn bool_true() -> bool {
+    true
+}
 //
 // Resources
 //
@@ -71,9 +74,9 @@ pub struct SimulationConfig {
     pub fertility_rate: f32,
     // Defines if the simulation must be stopped after reaching a given generation.
     pub exit_at_generation: Option<u32>,
-    // Defines how the simulation behaves at the start. One of Paused, Run or Fastest
-    pub start_state: SimulationControlState,
     // Defines if debug information is dumped in a temporary file, each step of the simulation
+    #[serde(default = "bool_true")]
+    pub with_gui: bool,
     #[serde(default)]
     pub dump_debug_info: bool,
     // Configuration information regarding the environment

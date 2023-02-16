@@ -44,11 +44,3 @@ pub fn movement(mut movables: Query<(&mut Position, &Locomotion)>, config: Res<S
         }
     });
 }
-
-pub fn transform_update(mut query: Query<(&mut Transform, &Position), Changed<Position>>) {
-    for (mut transform, position) in query.iter_mut() {
-        transform.translation.x = position.x;
-        transform.translation.y = position.y;
-        transform.rotation = Quat::from_axis_angle(Vec3::Z, position.angle());
-    }
-}

@@ -7,7 +7,6 @@ pub fn evolve(
     config: Res<SimulationConfig>,
     organisms: Query<(Entity, &Body, &Brain, &Eye)>,
     foods: Query<Entity, With<Food>>,
-    asset_server: Res<AssetServer>,
     mut rng: ResMut<MyRng>,
 ) {
     simulation.steps += 1;
@@ -61,15 +60,7 @@ pub fn evolve(
                 let selected = i == 0;
                 let (eye, brain) = individual.into_components(&config);
                 simulation.statistics.population.add_entry(&eye);
-                spawn_organism(
-                    &mut commands,
-                    &asset_server,
-                    &config,
-                    eye,
-                    brain,
-                    selected,
-                    &mut rng,
-                );
+                spawn_organism(&mut commands, &config, eye, brain, selected, &mut rng);
             });
     }
 }

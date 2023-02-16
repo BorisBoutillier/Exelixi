@@ -11,7 +11,11 @@ pub struct SimulationControl {
 impl SimulationControl {
     pub fn new(config: &SimulationConfig) -> Self {
         Self {
-            state: config.start_state,
+            state: if config.with_gui {
+                SimulationControlState::Paused
+            } else {
+                SimulationControlState::Fastest
+            },
             speed_factor: 1,
         }
     }

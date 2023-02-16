@@ -1,12 +1,18 @@
 use std::time::Instant;
 
+mod components;
 mod config;
 mod control;
+mod organism;
+mod spawner;
 mod stats;
 mod systems;
 
+pub use components::*;
 pub use config::*;
 pub use control::*;
+pub use organism::*;
+pub use spawner::*;
 pub use stats::*;
 pub use systems::*;
 

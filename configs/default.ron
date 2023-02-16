@@ -3,7 +3,6 @@
 ,   min_population    : 50
 ,   fertility_rate    : 1.5
 ,   exit_at_generation: None
-,   start_state : Paused
 ,   environment:(
         width  : 3500
     ,   height : 3000

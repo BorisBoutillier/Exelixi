@@ -1,10 +1,6 @@
 #![allow(clippy::type_complexity)]
-mod camera;
-mod components;
-mod organism;
-mod simulation;
-mod spawner;
-mod ui;
+mod ecosystem;
+mod visualization;
 
 mod prelude {
     use rand_chacha::ChaCha8Rng;
@@ -18,17 +14,14 @@ mod prelude {
     pub use bevy::prelude::*;
     pub use bevy_egui::{egui, EguiContext, EguiPlugin, EguiSettings};
 
-    pub use rand::{Rng, RngCore};
+    pub use rand::Rng;
+    pub use rand::RngCore;
 
     pub use lib_genetic_algorithm as ga;
     pub use lib_neural_network as nn;
 
-    pub use crate::camera::*;
-    pub use crate::components::*;
-    pub use crate::organism::*;
-    pub use crate::simulation::*;
-    pub use crate::spawner::*;
-    pub use crate::ui::*;
+    pub use crate::ecosystem::*;
+    pub use crate::visualization::*;
 
     #[derive(Resource)]
     pub struct MyRng(pub ChaCha8Rng);
@@ -48,24 +41,30 @@ struct Args {
     /// Path to the simulation config to use
     #[arg(short, long)]
     config: Option<PathBuf>,
-    // Define the initial seed for the simulation
-    // If not provided will be 'randomized'
+    /// Initial seed for the simulation, randomized when not provided.
     #[arg(short, long)]
     seed: Option<u64>,
+    /// Defines if the simulation is run without GUI
+    #[arg(long = "no-gui", default_value_t = false)]
+    no_gui: bool,
 }
 
 fn main() {
     let args = Args::parse();
-    let start_config = SimulationConfig::from_path(args.config);
+    let mut start_config = SimulationConfig::from_path(args.config);
+    // Handle command line argument overrides
+    if args.no_gui {
+        start_config.with_gui = false;
+    }
     let rng = if let Some(seed) = args.seed {
         ChaCha8Rng::seed_from_u64(seed)
     } else {
         ChaCha8Rng::from_entropy()
     };
     let mut app = App::new();
-    app.insert_resource(ClearColor(Color::BLACK))
-        .insert_resource(MyRng(rng))
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
+    if start_config.with_gui {
+        app.insert_resource(ClearColor(Color::BLACK));
+        app.add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
                 width: 1500.0,
                 height: 900.0,
@@ -75,16 +74,17 @@ fn main() {
             ..Default::default()
         }))
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
-        .add_plugin(EguiPlugin)
-        .add_plugin(CameraPlugin {})
-        .add_plugin(UiPlugin {})
+        .add_plugin(visualization::VisualizationPlugin);
+    } else {
+        app.add_plugins(MinimalPlugins);
+    }
+    app.insert_resource(MyRng(rng))
         .add_system_to_stage(CoreStage::PreUpdate, spawn_starting_organisms)
         .add_system_to_stage(CoreStage::PreUpdate, spawn_floor)
         .add_startup_system(insert_simulation_steps_schedule)
         .add_system(simulation_steps)
         .add_system(exit_at_generation)
-        .add_system(transform_update)
         .insert_resource(Simulation::new(&start_config))
-        .insert_resource(start_config)
-        .run();
+        .insert_resource(start_config);
+    app.run();
 }
