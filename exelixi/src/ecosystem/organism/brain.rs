@@ -6,32 +6,32 @@ pub struct Brain {
 }
 
 impl Brain {
-    pub fn random(rng: &mut dyn RngCore, eye: &Eye, locomotion: &Locomotion) -> Self {
+    pub fn random(rng: &mut dyn RngCore, body: &Body, eye: &Eye, locomotion: &Locomotion) -> Self {
         Self {
-            nn: nn::Network::random(rng, &Self::topology(eye, locomotion)),
+            nn: nn::Network::random(rng, &Self::topology(body, eye, locomotion)),
         }
     }
 
     pub fn from_genes(
         genes: impl IntoIterator<Item = f32>,
+        body: &Body,
         eye: &Eye,
         locomotion: &Locomotion,
     ) -> Self {
         Self {
-            nn: nn::Network::from_weights(&Self::topology(eye, locomotion), genes),
+            nn: nn::Network::from_weights(&Self::topology(body, eye, locomotion), genes),
         }
     }
     pub fn as_chromosome(&self) -> ga::Chromosome {
         self.nn.weights().collect()
     }
 
-    fn topology(eye: &Eye, locomotion: &Locomotion) -> [nn::LayerTopology; 3] {
+    fn topology(body: &Body, eye: &Eye, locomotion: &Locomotion) -> [nn::LayerTopology; 3] {
+        let n_sensors = eye.n_sensors() + body.n_sensors();
         [
+            nn::LayerTopology { neurons: n_sensors },
             nn::LayerTopology {
-                neurons: eye.n_sensors(),
-            },
-            nn::LayerTopology {
-                neurons: 2 * eye.n_sensors(),
+                neurons: 2 * n_sensors,
             },
             nn::LayerTopology {
                 neurons: locomotion.n_actuators(),

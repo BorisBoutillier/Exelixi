@@ -3,6 +3,7 @@ use crate::prelude::*;
 pub fn spawn_organism(
     commands: &mut Commands,
     config: &SimulationConfig,
+    body: Body,
     eye: Eye,
     brain: Brain,
     selected: bool,
@@ -17,7 +18,7 @@ pub fn spawn_organism(
         Organism {},
         Position::new(x as f32, y as f32, angle),
         Locomotion::new(config),
-        Body::new(config),
+        body,
         eye,
         brain,
     ));
@@ -46,9 +47,9 @@ pub fn spawn_starting_organisms(
             .enumerate()
             .for_each(|(i, individual)| {
                 let selected = i == 0;
-                let (eye, brain) = individual.into_components(&config);
+                let (body, eye, brain) = individual.into_components(&config);
                 simulation.statistics.population.add_entry(&eye);
-                spawn_organism(&mut commands, &config, eye, brain, selected, &mut rng);
+                spawn_organism(&mut commands, &config, body, eye, brain, selected, &mut rng);
             });
     }
 }

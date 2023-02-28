@@ -36,18 +36,19 @@ impl OrganismIndividual {
             chromosome: eye_chromosome,
         }
     }
-    pub fn into_components(self, config: &SimulationConfig) -> (Eye, Brain) {
+    pub fn into_components(self, config: &SimulationConfig) -> (Body, Eye, Brain) {
         let mut genes = self.chromosome.into_iter();
+        let body = Body::new(config);
         let locomotion = Locomotion::new(config);
         let eye = Eye::from_genes(&mut genes, config);
-        let brain = Brain::from_genes(&mut genes, &eye, &locomotion);
-        (eye, brain)
+        let brain = Brain::from_genes(&mut genes, &body, &eye, &locomotion);
+        (body, eye, brain)
     }
     pub fn random(mut rng: &mut dyn RngCore, config: &SimulationConfig) -> Self {
+        let body = Body::new(config);
         let locomotion = Locomotion::new(config);
         let eye = Eye::random(&mut rng, config);
-        let brain = Brain::random(&mut rng, &eye, &locomotion);
-        let body = Body::new(config);
+        let brain = Brain::random(&mut rng, &body, &eye, &locomotion);
         Self::from_components(config, &body, &eye, &brain)
     }
 }

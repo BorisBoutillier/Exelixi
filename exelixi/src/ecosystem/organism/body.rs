@@ -31,4 +31,10 @@ impl Body {
     pub fn add_energy(&mut self, energy: i32) {
         self.cur_energy = (self.cur_energy + energy).min(self.max_energy);
     }
+    pub fn get_sensors(&self) -> Vec<f32> {
+        vec![self.cur_energy as f32 / self.max_energy as f32]
+    }
+    pub fn n_sensors(&self) -> usize {
+        1
+    }
 }

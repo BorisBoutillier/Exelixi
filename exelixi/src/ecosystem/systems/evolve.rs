@@ -58,9 +58,9 @@ pub fn evolve(
             .enumerate()
             .for_each(|(i, individual)| {
                 let selected = i == 0;
-                let (eye, brain) = individual.into_components(&config);
+                let (body, eye, brain) = individual.into_components(&config);
                 simulation.statistics.population.add_entry(&eye);
-                spawn_organism(&mut commands, &config, eye, brain, selected, &mut rng);
+                spawn_organism(&mut commands, &config, body, eye, brain, selected, &mut rng);
             });
     }
 }
