@@ -2,11 +2,11 @@
     generation_length : 500
 ,   min_population    : 5
 ,   fertility_rate    : 2
-,   exit_at_generation: Some(5)
+,   exit_at_generation: Some(10)
 ,   dump_debug_info: false
 ,   environment:(
         width  : 500
-    ,   height : 300
+    ,   height : 500
     ,   wall   : true
     ,   food_spawn_rate   : 0.2
     ,   food_decay_time   : 1000

@@ -8,7 +8,8 @@ pub use ui::*;
 pub struct VisualizationPlugin;
 impl Plugin for VisualizationPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugin(EguiPlugin)
+        app
+            //.add_plugin(EguiPlugin)
             .add_plugin(ui::UiPlugin {})
             .add_plugin(camera::CameraPlugin {})
             .add_system(add_visualization)

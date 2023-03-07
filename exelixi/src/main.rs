@@ -9,10 +9,9 @@ mod prelude {
 
     pub use bevy::diagnostic::Diagnostics;
     pub use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
-    pub use bevy::ecs::schedule::ShouldRun;
     pub use bevy::log;
     pub use bevy::prelude::*;
-    pub use bevy_egui::{egui, EguiContext, EguiPlugin, EguiSettings};
+    //pub use bevy_egui::{egui, EguiContext, EguiPlugin, EguiSettings};
 
     pub use rand::Rng;
     pub use rand::RngCore;
@@ -29,6 +28,7 @@ mod prelude {
 
 use std::path::PathBuf;
 
+use bevy::window::WindowResolution;
 use clap::Parser;
 use prelude::*;
 use rand::SeedableRng;
@@ -65,12 +65,11 @@ fn main() {
     if start_config.with_gui {
         app.insert_resource(ClearColor(Color::BLACK));
         app.add_plugins(DefaultPlugins.set(WindowPlugin {
-            window: WindowDescriptor {
-                width: 1500.0,
-                height: 900.0,
+            primary_window: Some(Window {
+                resolution: WindowResolution::new(1500.0, 900.0),
                 title: "Exelixi".to_string(),
                 ..Default::default()
-            },
+            }),
             ..Default::default()
         }))
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
@@ -79,12 +78,12 @@ fn main() {
         app.add_plugins(MinimalPlugins);
     }
     app.insert_resource(MyRng(rng))
-        .add_system_to_stage(CoreStage::PreUpdate, spawn_starting_organisms)
-        .add_system_to_stage(CoreStage::PreUpdate, spawn_floor)
-        .add_startup_system(insert_simulation_steps_schedule)
-        .add_system(simulation_steps)
+        .add_system(spawn_starting_organisms.in_base_set(CoreSet::PreUpdate))
+        .add_system(spawn_floor.in_base_set(CoreSet::PreUpdate))
         .add_system(exit_at_generation)
         .insert_resource(Simulation::new(&start_config))
         .insert_resource(start_config);
+    app.add_schedule(CoreSimulationSchedule, CoreSimulationSchedule::create())
+        .add_system(CoreSimulationSchedule::run);
     app.run();
 }

@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 pub fn selection_changed(
-    deselected: RemovedComponents<Selected>,
+    mut deselected: RemovedComponents<Selected>,
     selected: Query<Entity, Added<Selected>>,
     mut organisms_sprite: Query<&mut Sprite, With<Organism>>,
 ) {

@@ -13,7 +13,7 @@ impl Plugin for EyeViewerPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(Material2dPlugin::<FovViewerMaterial>::default())
             .add_system(spawn_fov_viewer_on_selected)
-            .add_system_to_stage(CoreStage::PostUpdate, despawn_fov_viewer_on_deselected);
+            .add_system(despawn_fov_viewer_on_deselected.in_base_set(CoreSet::PostUpdate));
     }
 }
 /// a a FOV viewer child whenver a Selected component is added to an entity with an Eye
@@ -48,7 +48,7 @@ fn despawn_fov_viewer_on_deselected(
     mut commands: Commands,
     fov_viewers: Query<&Handle<FovViewerMaterial>>,
     children_query: Query<&Children>,
-    deselected: RemovedComponents<Selected>,
+    mut deselected: RemovedComponents<Selected>,
 ) {
     for entity in deselected.iter() {
         for child in children_query.iter_descendants(entity) {
