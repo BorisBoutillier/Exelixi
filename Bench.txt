@@ -1,22 +1,8 @@
 This file store historical performance and reproductibility analysis.
-###### Commit fa34ff02e854ee0f0d636c7bd2df12921e423fa0
+###### Commit 8cc8eb78b59839c56ce6cc9a0bdea5e7a7f0b6b4
 time cargo run --release -- --config configs/bench_A.ron --seed 0 --no-gui
-   Gen: 004 , Sps: 13274.20 , Avg: 29651.3 , Pop start: 40, Pop end: 40 , Uneaten food: 30
-   user    0m0,227s
+   Gen: 009 , Sps: 215.47 , Avg: 7789.1 , Pop start: 1280, Pop end: 1280 , Uneaten food: 0
+   user    0m3,555s
 time cargo run --release -- --config configs/bench_B.ron --seed 0 --no-gui
-   Gen: 099 , Sps: 5062.74 , Avg: 29601.6 , Pop start: 126, Pop end: 74 , Uneaten food: 519
-   user    1m45,649s
-###### Commit 2eaad7176d3f1a79d9625f1ceac8a2eece12df79
-time cargo run --release --  --config configs/bench_A.ron --seed 0
-   Gen: 004 , Sps: 14778.22 , Avg: 25744.8 , Pop start: 40, Pop end: 40 , Uneaten food: 24
-   user    0m0,341s
-time cargo run --release --  --config configs/bench_B.ron --seed 0 
-   Gen: 099 , Sps: 3073.33 , Avg: 31351.2 , Pop start: 159, Pop end: 103 , Uneaten food: 359
-   user    2m13,169s
-###### Commit 1639f0fe4965157bf3d647ba8275e8a4afbd6780
-time cargo run --release --  --config configs/bench_A.ron --seed 0
-   Gen: 004 , Sps: 11976.38 , Avg: 27474.3 , Pop start: 40, Pop end: 40 , Uneaten food: 19
-   user    0m0,385s
-time cargo run --release --  --config configs/bench_B.ron --seed 0 
-   Gen: 099 , Sps: 3316.11 , Avg: 30051.5 , Pop start: 152, Pop end: 98 , Uneaten food: 420
-   user    2m44,813s
+   Gen: 049 , Sps: 6530.13 , Avg: 31152.4 , Pop start: 89, Pop end: 61 , Uneaten food: 655
+   user    0m30,479s
