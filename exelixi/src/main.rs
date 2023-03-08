@@ -11,7 +11,7 @@ mod prelude {
     pub use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
     pub use bevy::log;
     pub use bevy::prelude::*;
-    //pub use bevy_egui::{egui, EguiContext, EguiPlugin, EguiSettings};
+    pub use bevy_egui::{egui, EguiContexts, EguiPlugin, EguiSettings};
 
     pub use rand::Rng;
     pub use rand::RngCore;

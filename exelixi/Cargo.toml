@@ -11,8 +11,7 @@ license = "MIT OR Apache-2.0"
 rand = "0.8.5"
 rand_chacha = "0.3"
 bevy = "0.10"
-#bevy_egui = "0.19"
-#bevy_egui = { git = "https://github.com/DGriffin91/bevy_egui" , branch = "bevy_main" }
+bevy_egui = "0.20"
 lib-neural-network = { path = "../libs/neural-network" }
 lib-genetic-algorithm = { path = "../libs/genetic-algorithm" }
 ron = "0.7"

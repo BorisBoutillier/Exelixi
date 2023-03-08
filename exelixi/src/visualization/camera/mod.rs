@@ -67,8 +67,8 @@ fn camera_movement(
     if mouse_button_input.pressed(MouseButton::Right) {
         for event in mouse_motion_events.iter() {
             let mut camera_ortho = cameras.get_single_mut().expect("No ortho camera found");
-            camera_ortho.viewport_origin.x += event.delta.x / 100.0;
-            camera_ortho.viewport_origin.y += event.delta.y / 100.0;
+            camera_ortho.viewport_origin.x -= event.delta.x / 200.0;
+            camera_ortho.viewport_origin.y -= event.delta.y / 200.0;
         }
     }
 }

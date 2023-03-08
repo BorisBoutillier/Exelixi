@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 // All panels must be declared in the same system as the order of panel creation is important
 pub fn panels_ui(
-    mut egui_ctx: ResMut<EguiContext>,
+    mut contexts: EguiContexts,
     mut simulation: ResMut<Simulation>,
     mut ui_state: ResMut<UiState>,
 ) {
@@ -15,7 +15,7 @@ pub fn panels_ui(
         .frame(egui::Frame::default().fill(egui::Color32::from_rgb(30, 30, 30)))
         .resizable(false)
         .default_height(UI_STATUS_BAR_HEIGHT)
-        .show(egui_ctx.ctx_mut(), |ui| {
+        .show(contexts.ctx_mut(), |ui| {
             let half_width = ui.available_width() / 2.0;
             let mut spacing = ui.spacing_mut();
             spacing.button_padding = egui::Vec2::new(2.0, 2.0);
@@ -99,7 +99,7 @@ pub fn panels_ui(
             .resizable(false)
             .min_width(UI_LEFT_PANEL_WIDTH)
             .max_width(UI_LEFT_PANEL_WIDTH)
-            .show(egui_ctx.ctx_mut(), |ui| {
+            .show(contexts.ctx_mut(), |ui| {
                 egui::CollapsingHeader::new("Simulation")
                     .default_open(true)
                     .show(ui, |ui| {
