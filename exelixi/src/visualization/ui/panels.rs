@@ -3,8 +3,9 @@ use crate::prelude::*;
 // All panels must be declared in the same system as the order of panel creation is important
 pub fn panels_ui(
     mut contexts: EguiContexts,
-    mut simulation: ResMut<Simulation>,
+    simulation: Res<Simulation>,
     mut ui_state: ResMut<UiState>,
+    mut action_state: ResMut<ActionState<SimulationSpeedAction>>,
 ) {
     //
     // Bottom status bar
@@ -23,21 +24,11 @@ pub fn panels_ui(
                 ui.add_space(30.0);
                 ui.heading(format!("Generation: {:4}", simulation.generation));
                 ui.add_space(ui.available_width() - half_width - 30.0 * 3.0);
-                if ui
-                    .add(egui::Button::new(
-                        egui::RichText::new("⏹").color(egui::Color32::from_rgb(0, 255, 0)),
-                    ))
-                    .on_hover_text("Stop")
-                    .clicked()
-                {
-                    simulation.control.speed_factor = 1;
-                    simulation.control.state = SimulationControlState::Paused;
-                }
-                let (text, hover_text, control) =
+                let (text, hover_text) =
                     if simulation.control.state == SimulationControlState::Paused {
-                        ("▶", "Run", SimulationControlState::Run)
+                        ("▶", "Run")
                     } else {
-                        ("⏸", "Pause", SimulationControlState::Paused)
+                        ("⏸", "Pause")
                     };
                 if ui
                     .add(egui::Button::new(
@@ -46,7 +37,7 @@ pub fn panels_ui(
                     .on_hover_text(hover_text)
                     .clicked()
                 {
-                    simulation.control.state = control;
+                    action_state.press(SimulationSpeedAction::PauseUnpause);
                 }
                 if ui
                     .add(egui::Button::new(
@@ -55,7 +46,7 @@ pub fn panels_ui(
                     .on_hover_text("Decrease speed")
                     .clicked()
                 {
-                    simulation.control.speed_factor = (simulation.control.speed_factor / 2).max(1);
+                    action_state.press(SimulationSpeedAction::Decelerate);
                 }
                 if ui
                     .add(egui::Button::new(
@@ -64,7 +55,7 @@ pub fn panels_ui(
                     .on_hover_text("Increase speed")
                     .clicked()
                 {
-                    simulation.control.speed_factor *= 2;
+                    action_state.press(SimulationSpeedAction::Accelerate);
                 }
                 if ui
                     .add(egui::Button::new(
@@ -73,7 +64,7 @@ pub fn panels_ui(
                     .on_hover_text("Fastest")
                     .clicked()
                 {
-                    simulation.control.state = SimulationControlState::Fastest;
+                    action_state.press(SimulationSpeedAction::Fastest);
                 }
                 if ui
                     .add(egui::Button::new(
@@ -204,7 +195,7 @@ pub fn panels_ui(
                                     .collect(),
                             )
                             .color(egui::Color32::from_rgb(100, 100, 255))
-                            .name("FOV angle");
+                            .name("FOV _angle");
                             egui::plot::Plot::new("FOV angle")
                                 .height(80.0)
                                 .legend(egui::plot::Legend::default())

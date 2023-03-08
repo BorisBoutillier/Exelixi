@@ -12,6 +12,7 @@ mod prelude {
     pub use bevy::log;
     pub use bevy::prelude::*;
     pub use bevy_egui::{egui, EguiContexts, EguiPlugin, EguiSettings};
+    pub use leafwing_input_manager::prelude::*;
 
     pub use rand::Rng;
     pub use rand::RngCore;
@@ -85,5 +86,8 @@ fn main() {
         .insert_resource(start_config);
     app.add_schedule(CoreSimulationSchedule, CoreSimulationSchedule::create())
         .add_system(CoreSimulationSchedule::run);
+    app.add_plugin(InputManagerPlugin::<SimulationSpeedAction>::default());
+    app.add_startup_system(setup_simulation_speed_action);
+    app.add_system(simulation_speed_action_input);
     app.run();
 }
