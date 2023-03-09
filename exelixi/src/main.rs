@@ -75,6 +75,9 @@ fn main() {
         }))
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(visualization::VisualizationPlugin);
+        app.add_plugin(InputManagerPlugin::<SimulationSpeedAction>::default());
+        app.add_startup_system(setup_simulation_speed_action);
+        app.add_system(simulation_speed_action_input);
     } else {
         app.add_plugins(MinimalPlugins);
     }
@@ -86,8 +89,5 @@ fn main() {
         .insert_resource(start_config);
     app.add_schedule(CoreSimulationSchedule, CoreSimulationSchedule::create())
         .add_system(CoreSimulationSchedule::run);
-    app.add_plugin(InputManagerPlugin::<SimulationSpeedAction>::default());
-    app.add_startup_system(setup_simulation_speed_action);
-    app.add_system(simulation_speed_action_input);
     app.run();
 }

@@ -18,5 +18,4 @@ ron = "0.7"
 serde = { version = "1", features = ["derive"] }
 dirs = "4.0"
 clap = { version = "4.1.4", features = ["derive"] }
-# leafwing-input-manager = "0.8.0"
-leafwing-input-manager = { git = "https://github.com/TimJentzsch/leafwing-input-manager" , branch = "bevy-0.10" }
+leafwing-input-manager = "0.9.0"
