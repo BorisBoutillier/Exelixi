@@ -87,6 +87,7 @@ fn main() {
         .add_system(exit_at_generation)
         .insert_resource(Simulation::new(&start_config))
         .insert_resource(start_config);
+    app.add_event::<NewGenerationEvent>();
     app.add_schedule(CoreSimulationSchedule, CoreSimulationSchedule::create())
         .add_system(CoreSimulationSchedule::run);
     app.run();

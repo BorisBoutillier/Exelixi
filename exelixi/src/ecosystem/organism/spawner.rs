@@ -6,7 +6,6 @@ pub fn spawn_organism(
     body: Body,
     eye: Eye,
     brain: Brain,
-    selected: bool,
     rng: &mut MyRng,
 ) {
     let half_width = config.environment.width / 2;
@@ -14,7 +13,7 @@ pub fn spawn_organism(
     let angle = rng.0.gen_range(-PI..PI);
     let x = rng.0.gen_range(-half_width..half_width);
     let y = rng.0.gen_range(-half_height..half_height);
-    let mut command = commands.spawn((
+    commands.spawn((
         Organism {},
         Position::new(x as f32, y as f32, angle),
         Locomotion::new(config),
@@ -22,9 +21,6 @@ pub fn spawn_organism(
         eye,
         brain,
     ));
-    if selected {
-        command.insert(Selected);
-    }
 }
 pub fn spawn_starting_organisms(
     mut commands: Commands,
@@ -42,14 +38,10 @@ pub fn spawn_starting_organisms(
             .start_of_new_generation(&new_population, &config);
         simulation.new_generation();
         // Spawn the organisms
-        new_population
-            .into_iter()
-            .enumerate()
-            .for_each(|(i, individual)| {
-                let selected = i == 0;
-                let (body, eye, brain) = individual.into_components(&config);
-                simulation.statistics.population.add_entry(&eye);
-                spawn_organism(&mut commands, &config, body, eye, brain, selected, &mut rng);
-            });
+        new_population.into_iter().for_each(|individual| {
+            let (body, eye, brain) = individual.into_components(&config);
+            simulation.statistics.population.add_entry(&eye);
+            spawn_organism(&mut commands, &config, body, eye, brain, &mut rng);
+        });
     }
 }

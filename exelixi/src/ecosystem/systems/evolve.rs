@@ -1,5 +1,9 @@
 use crate::prelude::*;
 
+pub struct NewGenerationEvent {
+    generation: u32,
+}
+
 #[allow(clippy::too_many_arguments)]
 pub fn evolve(
     mut commands: Commands,
@@ -8,6 +12,7 @@ pub fn evolve(
     organisms: Query<(Entity, &Body, &Brain, &Eye)>,
     foods: Query<Entity, With<Food>>,
     mut rng: ResMut<MyRng>,
+    mut new_generation_events: EventWriter<NewGenerationEvent>,
 ) {
     simulation.steps += 1;
     if simulation.steps == config.generation_length {
@@ -43,6 +48,9 @@ pub fn evolve(
             .start_of_new_generation(&new_population, &config);
 
         simulation.new_generation();
+        new_generation_events.send(NewGenerationEvent {
+            generation: simulation.generation,
+        });
         // Remove all remaining food
         {
             let mut food_decay = 0;
@@ -53,15 +61,11 @@ pub fn evolve(
             simulation.statistics.add_food_decay(food_decay);
         }
         // Spawn new organisms
-        new_population
-            .into_iter()
-            .enumerate()
-            .for_each(|(i, individual)| {
-                let selected = i == 0;
-                let (body, eye, brain) = individual.into_components(&config);
-                simulation.statistics.population.add_entry(&eye);
-                spawn_organism(&mut commands, &config, body, eye, brain, selected, &mut rng);
-            });
+        new_population.into_iter().for_each(|individual| {
+            let (body, eye, brain) = individual.into_components(&config);
+            simulation.statistics.population.add_entry(&eye);
+            spawn_organism(&mut commands, &config, body, eye, brain, &mut rng);
+        });
     }
 }
 

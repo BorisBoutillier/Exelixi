@@ -27,6 +27,7 @@ impl Plugin for UiPlugin {
             .add_system(_debug_ui)
             .add_system(panels_ui)
             .add_system(user_selection)
+            .add_system(selection_on_new_generation)
             .add_system(selection_changed.in_base_set(CoreSet::PostUpdate));
     }
 }

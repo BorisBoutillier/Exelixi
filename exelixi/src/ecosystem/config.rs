@@ -4,14 +4,14 @@ use crate::prelude::*;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub enum ConfigValue<T> {
     Fixed(T),
     Gene { min: T, max: T },
     Neuron { min: T, max: T },
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct OrganismsConfig {
     // Fov angle of the eye in centi radians
     pub eye_fov_angle: ConfigValue<f32>,
@@ -43,7 +43,7 @@ pub struct OrganismsConfig {
     // This defines a minimum energy consumption per step
     pub body_cost: i32,
 }
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct EnvironmentConfig {
     // Width of the floor
     pub width: i32,

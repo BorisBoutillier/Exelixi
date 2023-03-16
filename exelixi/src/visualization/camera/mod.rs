@@ -33,7 +33,6 @@ fn camera_movement(
     config: Res<SimulationConfig>,
     primary_window: Query<Entity, With<PrimaryWindow>>,
     mut window_resized_events: EventReader<WindowResized>,
-    ui_state: Res<UiState>,
 ) {
     let window_entity = primary_window.get_single().expect("Missing Primary window");
     let window_resized = window_resized_events
