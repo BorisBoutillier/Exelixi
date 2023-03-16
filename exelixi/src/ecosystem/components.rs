@@ -17,9 +17,6 @@ impl Food {
 }
 
 #[derive(Component)]
-pub struct Floor {}
-
-#[derive(Component)]
 pub struct Decay {
     // Number of steps after which this entity will be despawned
     pub time: i32,

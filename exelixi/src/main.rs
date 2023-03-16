@@ -81,14 +81,9 @@ fn main() {
     } else {
         app.add_plugins(MinimalPlugins);
     }
-    app.insert_resource(MyRng(rng))
-        .add_system(spawn_starting_organisms.in_base_set(CoreSet::PreUpdate))
-        .add_system(spawn_floor.in_base_set(CoreSet::PreUpdate))
-        .add_system(exit_at_generation)
-        .insert_resource(Simulation::new(&start_config))
+    app.insert_resource(MyRng(rng));
+    app.add_plugin(ecosystem::EcosystemPlugin);
+    app.insert_resource(Simulation::new(&start_config))
         .insert_resource(start_config);
-    app.add_event::<NewGenerationEvent>();
-    app.add_schedule(CoreSimulationSchedule, CoreSimulationSchedule::create())
-        .add_system(CoreSimulationSchedule::run);
     app.run();
 }

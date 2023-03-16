@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 pub struct NewGenerationEvent {
-    generation: u32,
+    pub generation: u32,
 }
 
 #[allow(clippy::too_many_arguments)]

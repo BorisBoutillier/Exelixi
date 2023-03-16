@@ -4,7 +4,6 @@ mod components;
 mod config;
 mod control;
 mod organism;
-mod spawner;
 mod stats;
 mod systems;
 
@@ -12,7 +11,6 @@ pub use components::*;
 pub use config::*;
 pub use control::*;
 pub use organism::*;
-pub use spawner::*;
 pub use stats::*;
 pub use systems::*;
 
@@ -65,5 +63,16 @@ impl Simulation {
     pub fn new_generation(&mut self) {
         self.generation += 1;
         self.generation_start_time = Instant::now();
+    }
+}
+
+pub struct EcosystemPlugin;
+impl Plugin for EcosystemPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_system(spawn_starting_organisms.in_base_set(CoreSet::PreUpdate))
+            .add_system(exit_at_generation);
+        app.add_event::<NewGenerationEvent>();
+        app.add_schedule(CoreSimulationSchedule, CoreSimulationSchedule::create())
+            .add_system(CoreSimulationSchedule::run);
     }
 }
