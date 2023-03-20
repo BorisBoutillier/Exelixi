@@ -42,6 +42,8 @@ pub struct OrganismsConfig {
     // Cost to run the body.
     // This defines a minimum energy consumption per step
     pub body_cost: i32,
+    // Number of child one surviving organism spawn in next generation
+    pub fertility_rate: f32,
 }
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EnvironmentConfig {
@@ -59,52 +61,40 @@ pub struct EnvironmentConfig {
     pub food_energy: i32,
 }
 
-pub fn bool_true() -> bool {
-    true
-}
 //
 // Resources
 //
 #[derive(Serialize, Deserialize, Resource)]
-pub struct SimulationConfig {
+pub struct EcosystemConfig {
     pub generation_length: u32,
     // Minimum number of organisms in each generation. Randomized if 'missing'
     pub min_population: usize,
-    // Number of child one surviving organism spawn in next generation
-    pub fertility_rate: f32,
-    // Defines if the simulation must be stopped after reaching a given generation.
-    pub exit_at_generation: Option<u32>,
-    // Defines if debug information is dumped in a temporary file, each step of the simulation
-    #[serde(default = "bool_true")]
-    pub with_gui: bool,
-    #[serde(default)]
-    pub dump_debug_info: bool,
     // Configuration information regarding the environment
     pub environment: EnvironmentConfig,
     // Configuration information regarding the organisms
     pub organisms: OrganismsConfig,
 }
-impl SimulationConfig {
+impl EcosystemConfig {
     pub fn from_path(path: Option<PathBuf>) -> Self {
         match path {
             None => {
                 let config = ron::from_str(include_str!("../../../configs/default.ron"))
                     .expect("default_config.ron is not correct");
-                log::info!("SimulationConfig loaded from configs/default.ron");
+                log::info!("EcosystemConfig loaded from configs/default.ron");
                 config
             }
             Some(path) => {
                 if let Ok(ron_string) = std::fs::read_to_string(path.as_path()) {
-                    if let Ok(config) = ron::from_str::<SimulationConfig>(&ron_string) {
-                        log::info!("SimulationConfig loaded from {:?}", path.as_os_str());
+                    if let Ok(config) = ron::from_str::<EcosystemConfig>(&ron_string) {
+                        log::info!("EcosystemConfig loaded from {:?}", path.as_os_str());
                         config
                     } else {
-                        log::error!("SimulationConfig could not be loaded from {:?}, invalid content in the file.",path.as_os_str());
+                        log::error!("EcosystemConfig could not be loaded from {:?}, invalid content in the file.",path.as_os_str());
                         panic!();
                     }
                 } else {
                     log::error!(
-                        "SimulationConfig could not be loaded from {:?}, file does not exists.",
+                        "EcosystemConfig could not be loaded from {:?}, file does not exists.",
                         path.as_os_str()
                     );
                     panic!();

@@ -1,9 +1,9 @@
 #![allow(clippy::type_complexity)]
 mod ecosystem;
+mod simulation;
 mod visualization;
 
 mod prelude {
-    use rand_chacha::ChaCha8Rng;
 
     pub use std::f32::consts::{FRAC_PI_2, PI};
 
@@ -21,19 +21,14 @@ mod prelude {
     pub use lib_neural_network as nn;
 
     pub use crate::ecosystem::*;
+    pub use crate::simulation::*;
     pub use crate::visualization::*;
-
-    #[derive(Resource)]
-    pub struct MyRng(pub ChaCha8Rng);
 }
 
 use std::path::PathBuf;
 
-use bevy::window::WindowResolution;
 use clap::Parser;
 use prelude::*;
-use rand::SeedableRng;
-use rand_chacha::ChaCha8Rng;
 
 // Organism evolution simulation
 #[derive(Parser, Debug)]
@@ -45,45 +40,28 @@ struct Args {
     /// Initial seed for the simulation, randomized when not provided.
     #[arg(short, long)]
     seed: Option<u64>,
-    /// Defines if the simulation is run without GUI
-    #[arg(long = "no-gui", default_value_t = false)]
-    no_gui: bool,
+    /// Auto start the simulation without gui for the provided number of generation
+    ///
+    #[arg(long)]
+    run_for: Option<u32>,
 }
 
 fn main() {
     let args = Args::parse();
-    let mut start_config = SimulationConfig::from_path(args.config);
     // Handle command line argument overrides
-    if args.no_gui {
-        start_config.with_gui = false;
-    }
-    let rng = if let Some(seed) = args.seed {
-        ChaCha8Rng::seed_from_u64(seed)
-    } else {
-        ChaCha8Rng::from_entropy()
-    };
     let mut app = App::new();
-    if start_config.with_gui {
-        app.insert_resource(ClearColor(Color::BLACK));
-        app.add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                resolution: WindowResolution::new(1500.0, 900.0),
-                title: "Exelixi".to_string(),
-                ..Default::default()
-            }),
-            ..Default::default()
-        }))
-        .add_plugin(FrameTimeDiagnosticsPlugin::default())
-        .add_plugin(visualization::VisualizationPlugin);
-        app.add_plugin(InputManagerPlugin::<SimulationSpeedAction>::default());
-        app.add_startup_system(setup_simulation_speed_action);
-        app.add_system(simulation_speed_action_input);
+    let with_gui = args.run_for.is_none();
+    if with_gui {
+        app.add_plugin(visualization::VisualizationPlugin);
     } else {
         app.add_plugins(MinimalPlugins);
     }
-    app.insert_resource(MyRng(rng));
-    app.add_plugin(ecosystem::EcosystemPlugin);
-    app.insert_resource(Simulation::new(&start_config))
-        .insert_resource(start_config);
+    app.add_plugin(ecosystem::EcosystemPlugin {
+        seed: args.seed,
+        config_path: args.config,
+    });
+    app.add_plugin(simulation::SimulationPlugin {
+        run_for: args.run_for,
+    });
     app.run();
 }

@@ -18,19 +18,3 @@
         And show last generation statitiscs
 . Allow clicking an organism to see its state:
     . plot with evolution of the energy level.
-
--- Simulation
-. Replace Stomach Satiation, with body energy management:
-    . Give a cost to each action:
-        . process vision
-            Based on number of cells and fov_range, fov_angle.
-        . process_brain
-            Based on non-epsilon weights
-        . process_movement:
-            exponential cost of linear/angular velocity
-. Allow an output neuron to control usage of eyes.
-    . On output for each eye ?  <0.4 disable, >-.6 enable , in-between don't touch ?
-. New genes to control the fov_range/fov_angle:
-    Impacts on energy based on 'visible' area.
-. New genes to control number of eyes.
-. Add a new kind of carnivor organism, able to eat herbivors.

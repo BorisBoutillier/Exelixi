@@ -1,12 +1,15 @@
 use crate::prelude::*;
 
+#[derive(Component)]
+pub struct Organism {}
+
 pub fn spawn_organism(
     commands: &mut Commands,
-    config: &SimulationConfig,
+    config: &EcosystemConfig,
     body: Body,
     eye: Eye,
     brain: Brain,
-    rng: &mut MyRng,
+    rng: &mut EcosystemRng,
 ) {
     let half_width = config.environment.width / 2;
     let half_height = config.environment.height / 2;
@@ -17,6 +20,7 @@ pub fn spawn_organism(
         Organism {},
         Position::new(x as f32, y as f32, angle),
         Locomotion::new(config),
+        Mouth { reach: 10.0 },
         body,
         eye,
         brain,
@@ -25,8 +29,8 @@ pub fn spawn_organism(
 pub fn spawn_starting_organisms(
     mut commands: Commands,
     mut simulation: ResMut<Simulation>,
-    config: Res<SimulationConfig>,
-    mut rng: ResMut<MyRng>,
+    config: Res<EcosystemConfig>,
+    mut rng: ResMut<EcosystemRng>,
 ) {
     if config.is_changed() {
         // Create a new random population

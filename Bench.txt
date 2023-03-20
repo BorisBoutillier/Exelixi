@@ -1,4 +1,4 @@
-This file store historical performance and reproductibility analysis.
+This file store hist to check performance and determinism.
 ###### Commit 8cc8eb78b59839c56ce6cc9a0bdea5e7a7f0b6b4
 time cargo run --release -- --config configs/bench_A.ron --seed 0 --no-gui
    Gen: 009 , Sps: 215.47 , Avg: 7789.1 , Pop start: 1280, Pop end: 1280 , Uneaten food: 0

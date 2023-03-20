@@ -8,10 +8,10 @@ pub struct NewGenerationEvent {
 pub fn evolve(
     mut commands: Commands,
     mut simulation: ResMut<Simulation>,
-    config: Res<SimulationConfig>,
+    config: Res<EcosystemConfig>,
     organisms: Query<(Entity, &Body, &Brain, &Eye)>,
     foods: Query<Entity, With<Food>>,
-    mut rng: ResMut<MyRng>,
+    mut rng: ResMut<EcosystemRng>,
     mut new_generation_events: EventWriter<NewGenerationEvent>,
 ) {
     simulation.steps += 1;
@@ -35,7 +35,7 @@ pub fn evolve(
         let mut new_population = simulation.ga.evolve(
             &mut rng.0,
             &current_population,
-            config.fertility_rate,
+            config.organisms.fertility_rate,
             (config.min_population as f32 * 0.9) as usize, // If survivors and fertility are not enough keep 10% random
         );
         // If not enough survived, add random organisms
@@ -71,11 +71,10 @@ pub fn evolve(
 
 pub fn dump_debug_info(
     simulation: Res<Simulation>,
-    config: Res<SimulationConfig>,
     organisms_debug: Query<(&Position, &Locomotion, &Body), With<Organism>>,
     foods_debug: Query<&Position, With<Food>>,
 ) {
-    if config.dump_debug_info {
+    if simulation.debug {
         println!(
             "##### Generation:{} Step:{}",
             simulation.generation, simulation.steps

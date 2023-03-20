@@ -15,7 +15,7 @@ pub struct Eye {
 }
 
 impl Eye {
-    pub fn random(rng: &mut dyn RngCore, config: &SimulationConfig) -> Self {
+    pub fn random(rng: &mut dyn RngCore, config: &EcosystemConfig) -> Self {
         let (_n_sectors, n_cells) = match config.organisms.n_eye_cells {
             ConfigValue::Fixed(v) => (v, v),
             ConfigValue::Gene { min, max } => (rng.gen_range(min..=max), max),
@@ -46,7 +46,7 @@ impl Eye {
             ),
         }
     }
-    pub fn from_genes(genes: impl IntoIterator<Item = f32>, config: &SimulationConfig) -> Self {
+    pub fn from_genes(genes: impl IntoIterator<Item = f32>, config: &EcosystemConfig) -> Self {
         let mut genes = genes.into_iter();
         let fov_angle = match config.organisms.eye_fov_angle {
             ConfigValue::Fixed(v) => v,
@@ -87,7 +87,7 @@ impl Eye {
             ),
         }
     }
-    pub fn as_chromosome(&self, config: &SimulationConfig) -> ga::Chromosome {
+    pub fn as_chromosome(&self, config: &EcosystemConfig) -> ga::Chromosome {
         let mut genes = vec![];
         match config.organisms.eye_fov_angle {
             ConfigValue::Fixed(_) => (),
@@ -111,7 +111,7 @@ impl Eye {
         position: &Position,
         food_positions: &[&Position],
         organism_positions: &[&Position],
-        config: &SimulationConfig,
+        config: &EcosystemConfig,
     ) -> Vec<f32> {
         let mut sensors = vec![];
         if self.see_foods {
@@ -155,7 +155,7 @@ impl Eye {
         //println!("  -> Cells: {cells:?}");
         cells
     }
-    pub fn sense_walls(&self, position: &Position, config: &SimulationConfig) -> Vec<f32> {
+    pub fn sense_walls(&self, position: &Position, config: &EcosystemConfig) -> Vec<f32> {
         let half_width = config.environment.width as f32 / 2.0;
         let half_height = config.environment.height as f32 / 2.0;
         let angle_incr = self.fov_angle / self.n_cells as f32;

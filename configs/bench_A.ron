@@ -1,9 +1,6 @@
 (
     generation_length : 500
 ,   min_population    : 5
-,   fertility_rate    : 2
-,   exit_at_generation: Some(10)
-,   dump_debug_info: false
 ,   environment:(
         width  : 500
     ,   height : 500
@@ -26,5 +23,6 @@
     ,   linear_cost: 0.000
     ,   angular_cost: 0.000
     ,   body_cost: 6
+    ,   fertility_rate: 2
     )
 )

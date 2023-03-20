@@ -36,7 +36,7 @@ pub fn _debug_ui(
     mut contexts: EguiContexts,
     selection: Query<(&Position, &Locomotion, &Body), With<Selected>>,
     simulation: Res<Simulation>,
-    config: Res<SimulationConfig>,
+    config: Res<EcosystemConfig>,
     diagnostics: Res<Diagnostics>,
 ) {
     egui::Window::new("Debug")

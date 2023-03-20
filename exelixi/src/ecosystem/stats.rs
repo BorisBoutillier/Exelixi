@@ -17,7 +17,7 @@ pub struct PopulationStatistics {
 }
 
 impl PopulationStatistics {
-    pub fn new(config: &SimulationConfig) -> Self {
+    pub fn new(config: &EcosystemConfig) -> Self {
         let mut s = Self::default();
         if let ConfigValue::Gene { min, max } = config.organisms.eye_fov_range {
             let min = min as u32;
@@ -89,7 +89,7 @@ impl SimulationStatistics {
     pub fn start_of_new_generation(
         &mut self,
         population: &[OrganismIndividual],
-        config: &SimulationConfig,
+        config: &EcosystemConfig,
     ) {
         self.cur_generation.start_size = population.len();
         self.population = PopulationStatistics::new(config);

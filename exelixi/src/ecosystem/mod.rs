@@ -1,77 +1,41 @@
-use std::time::Instant;
-
-mod components;
 mod config;
-mod control;
+mod food;
 mod organism;
+mod position;
+mod schedule;
 mod stats;
-mod systems;
 
-pub use components::*;
+use std::path::PathBuf;
+
 pub use config::*;
-pub use control::*;
+pub use food::*;
 pub use organism::*;
+pub use position::*;
+pub use schedule::*;
 pub use stats::*;
-pub use systems::*;
 
 use crate::prelude::*;
-// Resources
+use rand::SeedableRng;
+use rand_chacha::ChaCha8Rng;
 #[derive(Resource)]
-pub struct Simulation {
-    pub control: SimulationControl,
-    pub steps: u32,
-    pub generation: u32,
-    pub ga: ga::GeneticAlgorithm<ga::RouletteWheelSelection>,
-    pub statistics: SimulationStatistics,
-    // Total active running of the simulation
-    pub generation_start_time: Instant,
-}
-impl Simulation {
-    pub fn new(config: &SimulationConfig) -> Self {
-        Self {
-            control: SimulationControl::new(config),
-            steps: 0,
-            generation: 0,
-            ga: ga::GeneticAlgorithm::new(
-                ga::RouletteWheelSelection::default(),
-                ga::UniformCrossover::default(),
-                ga::GaussianMutation::new(0.01, 0.3),
-            ),
-            statistics: SimulationStatistics::default(),
-            generation_start_time: Instant::now(),
-        }
-    }
-    // Number simulation steps per seconds for this simulation
-    pub fn sps(&self, config: &SimulationConfig) -> f32 {
-        config.generation_length as f32
-            / (Instant::now() - self.generation_start_time).as_secs_f32()
-    }
-    // Dump current simulation information in a single line string.
-    pub fn sprint_state(&self, config: &SimulationConfig) -> String {
-        format!(
-            "Gen: {:03} , Sps: {:.2} , Avg: {:.1} , Pop start: {}, Pop end: {} , Uneaten food: {}",
-            self.generation,
-            self.sps(config),
-            self.statistics.latest_avg_energy(),
-            self.statistics.latest_start_size(),
-            self.statistics.latest_end_size(),
-            self.statistics.latest_food_decay(),
-        )
-    }
+pub struct EcosystemRng(pub ChaCha8Rng);
 
-    // Triggers a new generation
-    pub fn new_generation(&mut self) {
-        self.generation += 1;
-        self.generation_start_time = Instant::now();
-    }
+pub struct EcosystemPlugin {
+    pub seed: Option<u64>,
+    pub config_path: Option<PathBuf>,
 }
-
-pub struct EcosystemPlugin;
 impl Plugin for EcosystemPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(spawn_starting_organisms.in_base_set(CoreSet::PreUpdate))
-            .add_system(exit_at_generation);
+        let rng = if let Some(seed) = self.seed {
+            ChaCha8Rng::seed_from_u64(seed)
+        } else {
+            ChaCha8Rng::from_entropy()
+        };
+        let ecosystem_config = EcosystemConfig::from_path(self.config_path.clone());
+        app.add_system(spawn_starting_organisms.in_base_set(CoreSet::PreUpdate));
         app.add_event::<NewGenerationEvent>();
+        app.insert_resource(EcosystemRng(rng));
+        app.insert_resource(ecosystem_config);
         app.add_schedule(CoreSimulationSchedule, CoreSimulationSchedule::create())
             .add_system(CoreSimulationSchedule::run);
     }

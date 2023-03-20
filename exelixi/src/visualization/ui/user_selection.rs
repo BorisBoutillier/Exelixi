@@ -10,7 +10,7 @@ pub fn user_selection(
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
     organisms: Query<(Entity, &Transform), With<Organism>>,
     selected: Query<Entity, With<Selected>>,
-    config: Res<SimulationConfig>,
+    config: Res<EcosystemConfig>,
 ) {
     // Detect mouse click
     if mouse_button_input.just_pressed(MouseButton::Left) {

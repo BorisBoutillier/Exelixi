@@ -1,15 +1,9 @@
-mod body;
-mod brain;
-mod eye;
+mod evolve;
 mod individual;
-mod locomotion;
-mod position;
+mod parts;
 mod spawner;
 
-pub use body::*;
-pub use brain::*;
-pub use eye::*;
+pub use evolve::*;
 pub use individual::*;
-pub use locomotion::*;
-pub use position::*;
+pub use parts::*;
 pub use spawner::*;

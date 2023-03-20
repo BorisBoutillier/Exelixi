@@ -30,7 +30,7 @@ fn camera_movement(
     mouse_button_input: Res<Input<MouseButton>>,
     mut mouse_wheel_events: EventReader<MouseWheel>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    config: Res<SimulationConfig>,
+    config: Res<EcosystemConfig>,
     primary_window: Query<Entity, With<PrimaryWindow>>,
     mut window_resized_events: EventReader<WindowResized>,
 ) {

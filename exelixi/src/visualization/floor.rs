@@ -5,7 +5,7 @@ pub struct Floor {}
 
 pub fn show_floor(
     mut commands: Commands,
-    config: Res<SimulationConfig>,
+    config: Res<EcosystemConfig>,
     mut floor_sprite: Query<&mut Sprite, With<Floor>>,
 ) {
     if config.is_added() {
