@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::ecosystem::*;
 
 #[derive(Component)]
 pub struct Body {

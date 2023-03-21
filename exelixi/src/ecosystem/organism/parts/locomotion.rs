@@ -1,4 +1,6 @@
-use crate::prelude::*;
+use std::f32::consts::PI;
+
+use crate::ecosystem::*;
 //
 /// Maximum angalur velocity in radians/step
 pub const V_ANGULAR_MAX: f32 = 0.1;

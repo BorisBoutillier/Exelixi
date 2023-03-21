@@ -1,8 +1,7 @@
-This file store hist to check performance and determinism.
-###### Commit 8cc8eb78b59839c56ce6cc9a0bdea5e7a7f0b6b4
-time cargo run --release -- --config configs/bench_A.ron --seed 0 --no-gui
-   Gen: 009 , Sps: 215.47 , Avg: 7789.1 , Pop start: 1280, Pop end: 1280 , Uneaten food: 0
-   user    0m3,555s
-time cargo run --release -- --config configs/bench_B.ron --seed 0 --no-gui
-   Gen: 049 , Sps: 6530.13 , Avg: 31152.4 , Pop start: 89, Pop end: 61 , Uneaten food: 655
-   user    0m30,479s
+# This file store run results to check performance and determinism.
+cargo build --release && time cargo run --release -- --config configs/bench_A.ron --seed 0 --run-for 10
+   Gen: 009 , Sps: 142.77 , Avg: 7796.9 , Pop start: 1280, Pop end: 1280 , Uneaten food: 0
+   user    0m5,274s
+cargo build --release && time cargo run --release -- --config configs/bench_B.ron --seed 0 --run-for 50
+   Gen: 049 , Sps: 3131.70 , Avg: 32327.4 , Pop start: 101, Pop end: 72 , Uneaten food: 531
+   user    0m39,324s

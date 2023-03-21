@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use crate::prelude::*;
 
 mod config;
@@ -13,7 +15,7 @@ pub struct SimulationPlugin {
 impl Plugin for SimulationPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(Simulation::new(self.run_for));
-        app.add_system(run_for);
+        app.add_system(run_ecosystem_schedule);
         if self.run_for.is_none() {
             app.add_plugin(InputManagerPlugin::<SimulationSpeedAction>::default());
             app.add_startup_system(setup_simulation_speed_action);
@@ -22,8 +24,54 @@ impl Plugin for SimulationPlugin {
     }
 }
 
-fn run_for(simulation: Res<Simulation>, mut app_exit_event: EventWriter<AppExit>) {
-    if simulation.run_for.map(|g| simulation.generation >= g) == Some(true) {
-        app_exit_event.send_default();
+const FPS: u32 = 60;
+// Maximum duration the simulation steps car run per frame
+const MAX_SIMULATION_DURATION_PER_FRAME: f32 = 1.0 / (FPS as f32);
+
+pub fn run_ecosystem_schedule(world: &mut World) {
+    let (start_generation, control, run_for) = {
+        let simulation = world.get_resource::<Simulation>().unwrap();
+        (
+            simulation.generation,
+            simulation.control,
+            simulation.run_for,
+        )
+    };
+    if let Some(n_generation) = run_for {
+        loop {
+            world.run_schedule(EcosystemSchedule);
+            let cur_generation = world.get_resource::<Simulation>().unwrap().generation;
+            // Always give back control on generation increase
+            if cur_generation >= start_generation + n_generation - 1 {
+                world
+                    .get_resource_mut::<Events<AppExit>>()
+                    .unwrap()
+                    .send_default();
+                break;
+            }
+        }
+    } else {
+        if control.state == SimulationControlState::Paused {
+            return;
+        }
+        let start_time = Instant::now();
+        let mut cur_steps = 0;
+        loop {
+            world.run_schedule(EcosystemSchedule);
+            cur_steps += 1;
+            let cur_generation = world.get_resource::<Simulation>().unwrap().generation;
+            // Always give back control on generation increase
+            if cur_generation > start_generation {
+                break;
+            }
+            // Give back control every 1/60s
+            if (Instant::now() - start_time).as_secs_f32() >= MAX_SIMULATION_DURATION_PER_FRAME {
+                break;
+            }
+
+            if control.state == SimulationControlState::Run && cur_steps >= control.speed_factor {
+                break;
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::ecosystem::*;
 
 pub struct NewGenerationEvent {
     pub generation: u32,
@@ -66,35 +66,5 @@ pub fn evolve(
             simulation.statistics.population.add_entry(&eye);
             spawn_organism(&mut commands, &config, body, eye, brain, &mut rng);
         });
-    }
-}
-
-pub fn dump_debug_info(
-    simulation: Res<Simulation>,
-    organisms_debug: Query<(&Position, &Locomotion, &Body), With<Organism>>,
-    foods_debug: Query<&Position, With<Food>>,
-) {
-    if simulation.debug {
-        println!(
-            "##### Generation:{} Step:{}",
-            simulation.generation, simulation.steps
-        );
-        let mut organisms = organisms_debug.iter().collect::<Vec<_>>();
-        organisms.sort_by(|o1, o2| (o1.0.x, o1.0.y).partial_cmp(&(o2.0.x, o2.0.y)).unwrap());
-        for (position, locomotion, body) in organisms.iter() {
-            println!(
-                "O: ({:.2},{:.2})%{:.2} V:{} ; E:{:.2}",
-                position.x,
-                position.y,
-                position.angle(),
-                locomotion.linear,
-                body.energy()
-            );
-        }
-        let mut foods = foods_debug.iter().collect::<Vec<_>>();
-        foods.sort_by(|o1, o2| (o1.x, o1.y).partial_cmp(&(o2.x, o2.y)).unwrap());
-        for position in foods.iter() {
-            println!("F: ({},{})", position.x, position.y,);
-        }
     }
 }

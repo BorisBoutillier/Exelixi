@@ -5,7 +5,10 @@ mod position;
 mod schedule;
 mod stats;
 
-use std::path::PathBuf;
+pub use bevy::log;
+pub use bevy::prelude::*;
+pub use rand::Rng;
+pub use rand::RngCore;
 
 pub use config::*;
 pub use food::*;
@@ -14,9 +17,12 @@ pub use position::*;
 pub use schedule::*;
 pub use stats::*;
 
-use crate::prelude::*;
+pub use crate::prelude::Simulation;
+
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
+use std::path::PathBuf;
+
 #[derive(Resource)]
 pub struct EcosystemRng(pub ChaCha8Rng);
 
@@ -36,7 +42,6 @@ impl Plugin for EcosystemPlugin {
         app.add_event::<NewGenerationEvent>();
         app.insert_resource(EcosystemRng(rng));
         app.insert_resource(ecosystem_config);
-        app.add_schedule(CoreSimulationSchedule, CoreSimulationSchedule::create())
-            .add_system(CoreSimulationSchedule::run);
+        app.add_schedule(EcosystemSchedule, EcosystemSchedule::new_schedule());
     }
 }

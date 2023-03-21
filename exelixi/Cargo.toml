@@ -10,7 +10,7 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 rand = "0.8"
 rand_chacha = "0.3"
-bevy = "0.10"
+bevy = { version ="0.10" , default-features= false, features = ["bevy_asset","bevy_winit","bevy_core_pipeline","bevy_render","bevy_sprite","png","x11"] }
 bevy_egui = "0.20"
 lib-neural-network = { path = "../libs/neural-network" }
 lib-genetic-algorithm = { path = "../libs/genetic-algorithm" }

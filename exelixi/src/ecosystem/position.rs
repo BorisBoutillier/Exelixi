@@ -1,6 +1,6 @@
 use std::f32::consts::PI;
 
-use crate::prelude::*;
+use crate::ecosystem::*;
 
 #[derive(Clone, Copy, Component, Debug)]
 pub struct Position {

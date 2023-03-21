@@ -1,6 +1,6 @@
 use std::{collections::HashMap, ops::Range};
 
-use crate::prelude::*;
+use crate::ecosystem::*;
 
 #[derive(Default, Debug, Clone, Copy)]
 pub struct GenerationStatistics {

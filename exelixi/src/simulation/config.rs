@@ -13,7 +13,6 @@ pub struct Simulation {
     // Total active running of the simulation
     pub generation_start_time: Instant,
     pub run_for: Option<u32>,
-    pub debug: bool,
 }
 impl Simulation {
     pub fn new(run_for: Option<u32>) -> Self {
@@ -34,7 +33,6 @@ impl Simulation {
             statistics: SimulationStatistics::default(),
             generation_start_time: Instant::now(),
             run_for,
-            debug: false,
         }
     }
     // Number simulation steps per seconds for this simulation

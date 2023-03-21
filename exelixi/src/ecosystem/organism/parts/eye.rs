@@ -1,4 +1,5 @@
-use crate::prelude::*;
+use crate::ecosystem::*;
+use lib_genetic_algorithm as ga;
 
 use std::f32::consts::PI;
 

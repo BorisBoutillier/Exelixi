@@ -1,4 +1,6 @@
-use crate::prelude::*;
+use std::f32::consts::PI;
+
+use crate::ecosystem::*;
 
 #[derive(Component)]
 pub struct Organism {}

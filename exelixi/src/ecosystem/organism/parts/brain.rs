@@ -1,4 +1,6 @@
-use crate::prelude::*;
+use crate::ecosystem::*;
+pub use lib_genetic_algorithm as ga;
+pub use lib_neural_network as nn;
 
 #[derive(Component)]
 pub struct Brain {

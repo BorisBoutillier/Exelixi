@@ -1,4 +1,5 @@
-use crate::*;
+use crate::ecosystem::*;
+use lib_genetic_algorithm as ga;
 
 pub struct OrganismIndividual {
     pub energy: f32,
