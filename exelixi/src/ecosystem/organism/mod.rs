@@ -1,9 +1,9 @@
 mod evolve;
 mod individual;
-mod parts;
+mod organs;
 mod spawner;
 
 pub use evolve::*;
 pub use individual::*;
-pub use parts::*;
+pub use organs::*;
 pub use spawner::*;

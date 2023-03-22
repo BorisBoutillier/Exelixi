@@ -14,28 +14,6 @@ impl Food {
     }
 }
 
-#[derive(Component)]
-pub struct Decay {
-    // Number of steps after which this entity will be despawned
-    pub time: i32,
-}
-
-pub fn food_decay(
-    mut commands: Commands,
-    mut query: Query<(Entity, &mut Decay), With<Food>>,
-    mut simulation: ResMut<Simulation>,
-) {
-    let mut food_decay = 0;
-    for (entity, mut decay) in query.iter_mut() {
-        decay.time -= 1;
-        if decay.time <= 0 {
-            commands.entity(entity).despawn();
-            food_decay += 1;
-        }
-    }
-    simulation.statistics.add_food_decay(food_decay);
-}
-
 pub fn food_spawning(
     mut commands: Commands,
     config: Res<EcosystemConfig>,
@@ -53,11 +31,21 @@ pub fn food_spawning(
         let half_height = config.environment.height / 2;
         let x = rng.0.gen_range(-half_width..half_width);
         let y = rng.0.gen_range(-half_height..half_height);
+        // The food energy will linearly increase from min to max in first 2/3 of its lifetime
+        //                 then linearly decreate from max to 0 in last 1/3 of its lifetime.
+        let start_energy = config.environment.food_energy;
+        let lifetime = config.environment.food_decay_time as i32;
+        let max_energy = start_energy * 2;
+        let total_energy = (max_energy - start_energy) * (lifetime * 2 / 3) / 2;
+        let body_cost = total_energy / lifetime;
         commands.spawn((
             Food::new(&config),
             Position::new(x as f32, y as f32, 0.0),
-            Decay {
-                time: config.environment.food_decay_time as i32,
+            Body::new(start_energy, max_energy, body_cost),
+            Leaf {
+                lifetime: lifetime as u32 * 2 / 3,
+                energy_production: (body_cost + (max_energy - start_energy) / (lifetime * 2 / 3))
+                    as f32,
             },
         ));
     }

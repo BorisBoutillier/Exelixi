@@ -18,3 +18,4 @@
         And show last generation statitiscs
 . Allow clicking an organism to see its state:
     . plot with evolution of the energy level.
+-- Fix incoherency in energy data types

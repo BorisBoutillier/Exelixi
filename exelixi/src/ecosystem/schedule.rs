@@ -14,7 +14,7 @@ impl EcosystemSchedule {
                 apply_system_buffers,
                 brain_processing,
                 body_energy_consumption,
-                food_decay,
+                leaf_lifecycle,
                 apply_system_buffers,
                 evolve,
                 food_spawning,

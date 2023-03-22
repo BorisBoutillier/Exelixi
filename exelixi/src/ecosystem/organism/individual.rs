@@ -39,14 +39,22 @@ impl OrganismIndividual {
     }
     pub fn into_components(self, config: &EcosystemConfig) -> (Body, Eye, Brain) {
         let mut genes = self.chromosome.into_iter();
-        let body = Body::new(config);
+        let body = Body::new(
+            config.organisms.starting_energy,
+            config.organisms.maximum_energy,
+            config.organisms.body_cost,
+        );
         let locomotion = Locomotion::new(config);
         let eye = Eye::from_genes(&mut genes, config);
         let brain = Brain::from_genes(&mut genes, &body, &eye, &locomotion);
         (body, eye, brain)
     }
     pub fn random(mut rng: &mut dyn RngCore, config: &EcosystemConfig) -> Self {
-        let body = Body::new(config);
+        let body = Body::new(
+            config.organisms.starting_energy,
+            config.organisms.maximum_energy,
+            config.organisms.body_cost,
+        );
         let locomotion = Locomotion::new(config);
         let eye = Eye::random(&mut rng, config);
         let brain = Brain::random(&mut rng, &body, &eye, &locomotion);
