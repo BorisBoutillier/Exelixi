@@ -19,3 +19,6 @@
 . Allow clicking an organism to see its state:
     . plot with evolution of the energy level.
 -- Fix incoherency in energy data types
+-- add an organism kind, wiht Plant and Herbivore.
+-- add a edible type to the Mouth component, an array of organism kinds.
+-- evolution attribute to organism, with evole and regular spawn
