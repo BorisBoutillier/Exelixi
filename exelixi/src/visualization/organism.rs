@@ -14,31 +14,34 @@ pub fn organism_transform_update(
 pub fn show_organism(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    new_foods: Query<(Entity, &Food), Added<Food>>,
     new_organisms: Query<(Entity, &Organism), Added<Organism>>,
 ) {
-    for (entity, _food) in new_foods.iter() {
-        commands.entity(entity).insert(SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(10.0, 10.0)),
-                color: Color::rgb(0.1, 0.7, 0.1),
-                ..Default::default()
-            },
-            texture: asset_server.load("food.png"),
-            ..Default::default()
-        });
-    }
-    for (entity, _organism) in new_organisms.iter() {
-        let color = Color::rgb(0.8, 0.3, 0.8);
-        commands.entity(entity).insert(SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(25.0, 25.0)),
-                color,
-                ..Default::default()
-            },
-            texture: asset_server.load("bird.png"),
-            ..Default::default()
-        });
+    for (entity, organism) in new_organisms.iter() {
+        match organism.kind {
+            OrganismKind::Plant => {
+                commands.entity(entity).insert(SpriteBundle {
+                    sprite: Sprite {
+                        custom_size: Some(Vec2::new(10.0, 10.0)),
+                        color: Color::rgb(0.1, 0.7, 0.1),
+                        ..Default::default()
+                    },
+                    texture: asset_server.load("food.png"),
+                    ..Default::default()
+                });
+            }
+            OrganismKind::Herbivore => {
+                let color = Color::rgb(0.8, 0.3, 0.8);
+                commands.entity(entity).insert(SpriteBundle {
+                    sprite: Sprite {
+                        custom_size: Some(Vec2::new(25.0, 25.0)),
+                        color,
+                        ..Default::default()
+                    },
+                    texture: asset_server.load("bird.png"),
+                    ..Default::default()
+                });
+            }
+        }
     }
 }
 

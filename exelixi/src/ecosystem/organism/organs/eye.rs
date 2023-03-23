@@ -110,19 +110,30 @@ impl Eye {
     pub fn process_vision(
         &self,
         position: &Position,
-        food_positions: &[&Position],
-        organism_positions: &[&Position],
+        positions: &[(&Position, &Organism)],
         config: &EcosystemConfig,
     ) -> Vec<f32> {
         let mut sensors = vec![];
         if self.see_foods {
-            sensors.extend(self.sense_objects(position, food_positions));
+            let food_positions = positions
+                .iter()
+                .filter(|(_, o)| o.kind == OrganismKind::Plant)
+                .map(|(p, _)| *p)
+                .collect::<Vec<_>>();
+            sensors.extend(self.sense_objects(position, &food_positions));
         }
         if self.see_walls {
             sensors.extend(self.sense_walls(position, config));
         }
         if self.see_organisms {
-            sensors.extend(self.sense_objects(position, organism_positions));
+            let organism_positions = positions
+                .iter()
+                .filter(|(p, o)| {
+                    o.kind == OrganismKind::Herbivore && p.distance_squared(position) < f32::EPSILON
+                })
+                .map(|(p, _)| *p)
+                .collect::<Vec<_>>();
+            sensors.extend(self.sense_objects(position, &organism_positions));
         }
         assert_eq!(sensors.len(), self.n_sensors());
         sensors

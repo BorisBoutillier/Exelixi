@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use crate::ecosystem::*;
 
 #[derive(Component)]
@@ -8,21 +10,31 @@ pub struct Mouth {
 
 pub fn mouth_eating(
     mut commands: Commands,
-    mut organisms: Query<(&mut Body, &Position, &Mouth), Without<Food>>,
-    mut foods: Query<(Entity, &Position, &mut Food, &Body), With<Food>>,
+    mut organisms: Query<(Entity, &Organism, &mut Body, &Position, Option<&Mouth>)>,
 ) {
-    for (mut body, position, mouth) in organisms.iter_mut() {
-        let mouth_reach_pow_2 = mouth.reach.powf(2.);
-        for (food_entity, food_position, mut food, food_body) in foods.iter_mut() {
-            if !food.eaten {
-                let dist_pow2 =
-                    (position.x - food_position.x).powi(2) + (position.y - food_position.y).powi(2);
-                if dist_pow2 <= mouth_reach_pow_2 {
-                    body.add_energy(food_body.energy());
+    let foods = organisms
+        .iter()
+        .filter_map(|(e, o, b, p, _)| {
+            if o.kind == OrganismKind::Plant {
+                Some((e, *p, b.energy()))
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>();
+    let mut eaten_foods = HashSet::new();
+    for (_, _, mut body, position, mouth) in organisms.iter_mut() {
+        if let Some(mouth) = mouth {
+            let mouth_reach_squared = mouth.reach.powf(2.);
+            for (food_entity, food_position, food_energy) in foods.iter() {
+                if !eaten_foods.contains(food_entity)
+                    && position.distance_squared(food_position) <= mouth_reach_squared
+                {
+                    body.add_energy(*food_energy);
                     // Storing the eaten state is currently necessary, because despawn will not
                     // happen when we do multiple steps per run_criteria
-                    food.eaten = true;
-                    commands.entity(food_entity).despawn();
+                    eaten_foods.insert(food_entity);
+                    commands.entity(*food_entity).despawn();
                 }
             }
         }

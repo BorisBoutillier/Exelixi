@@ -10,7 +10,6 @@ pub fn evolve(
     mut simulation: ResMut<Simulation>,
     config: Res<EcosystemConfig>,
     organisms: Query<(Entity, &Body, &Brain, &Eye)>,
-    foods: Query<Entity, With<Food>>,
     mut rng: ResMut<EcosystemRng>,
     mut new_generation_events: EventWriter<NewGenerationEvent>,
 ) {
@@ -51,15 +50,6 @@ pub fn evolve(
         new_generation_events.send(NewGenerationEvent {
             generation: simulation.generation,
         });
-        // Remove all remaining food
-        {
-            let mut food_decay = 0;
-            for entity in foods.iter() {
-                commands.entity(entity).despawn_recursive();
-                food_decay += 1;
-            }
-            simulation.statistics.add_food_decay(food_decay);
-        }
         // Spawn new organisms
         new_population.into_iter().for_each(|individual| {
             let (body, eye, brain) = individual.into_components(&config);

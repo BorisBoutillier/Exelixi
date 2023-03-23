@@ -23,4 +23,7 @@ impl Position {
         // Keep within  -PI..PI
         self.angle = (angle + PI) % (2.0 * PI) - PI;
     }
+    pub fn distance_squared(&self, other: &Position) -> f32 {
+        (self.x - other.x).powi(2) + (self.y - other.y).powi(2)
+    }
 }

@@ -43,17 +43,15 @@ impl Body {
 #[allow(clippy::too_many_arguments)]
 pub fn body_energy_consumption(
     mut commands: Commands,
-    mut bodies: Query<(Entity, &mut Body)>,
+    mut bodies: Query<(Entity, &mut Body, &Organism)>,
     q0: Query<&Brain>,
     q1: Query<&Eye>,
     q2: Query<&Locomotion>,
     q3: Query<&Leaf>,
-    // Temporary while Food is not yet a standard Organisms
-    foods: Query<&Food>,
     mut simulation: ResMut<Simulation>,
 ) {
     let mut food_decays = 0;
-    for (entity, mut body) in bodies.iter_mut() {
+    for (entity, mut body, organism) in bodies.iter_mut() {
         let mut total = body.energy_cost() as f32;
         if let Ok(organ) = q0.get(entity) {
             total += organ.energy_cost();
@@ -69,7 +67,7 @@ pub fn body_energy_consumption(
         }
         if !body.spend_energy(total as i32) {
             commands.entity(entity).despawn_recursive();
-            if foods.contains(entity) {
+            if organism.kind == OrganismKind::Plant {
                 food_decays += 1;
             }
         }

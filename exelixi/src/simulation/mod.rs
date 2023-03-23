@@ -24,9 +24,9 @@ impl Plugin for SimulationPlugin {
     }
 }
 
-const FPS: u32 = 60;
+const MIN_FPS: u32 = 10;
 // Maximum duration the simulation steps car run per frame
-const MAX_SIMULATION_DURATION_PER_FRAME: f32 = 1.0 / (FPS as f32);
+const MAX_SIMULATION_DURATION_PER_FRAME: f32 = 1.0 / (MIN_FPS as f32);
 
 pub fn run_ecosystem_schedule(world: &mut World) {
     let (start_generation, control, run_for) = {

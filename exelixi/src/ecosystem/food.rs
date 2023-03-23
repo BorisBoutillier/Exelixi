@@ -1,19 +1,5 @@
 use crate::ecosystem::*;
 
-#[derive(Component)]
-pub struct Food {
-    pub eaten: bool,
-    pub energy: i32,
-}
-impl Food {
-    pub fn new(config: &EcosystemConfig) -> Self {
-        Self {
-            eaten: false,
-            energy: config.environment.food_energy,
-        }
-    }
-}
-
 pub fn food_spawning(
     mut commands: Commands,
     config: Res<EcosystemConfig>,
@@ -39,7 +25,9 @@ pub fn food_spawning(
         let total_energy = (max_energy - start_energy) * (lifetime * 2 / 3) / 2;
         let body_cost = total_energy / lifetime;
         commands.spawn((
-            Food::new(&config),
+            Organism {
+                kind: OrganismKind::Plant,
+            },
             Position::new(x as f32, y as f32, 0.0),
             Body::new(start_energy, max_energy, body_cost),
             Leaf {

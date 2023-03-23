@@ -39,8 +39,7 @@ pub struct OrganismsConfig {
     pub linear_cost: f32,
     // Cost for will be angular_cost*angular^2
     pub angular_cost: f32,
-    // Cost to run the body.
-    // This defines a minimum energy consumption per step
+    // Fixed cost to run the body.
     pub body_cost: i32,
     // Number of child one surviving organism spawn in next generation
     pub fertility_rate: f32,

@@ -2,9 +2,6 @@ use std::f32::consts::PI;
 
 use crate::ecosystem::*;
 
-#[derive(Component)]
-pub struct Organism {}
-
 pub fn spawn_organism(
     commands: &mut Commands,
     config: &EcosystemConfig,
@@ -19,7 +16,9 @@ pub fn spawn_organism(
     let x = rng.0.gen_range(-half_width..half_width);
     let y = rng.0.gen_range(-half_height..half_height);
     commands.spawn((
-        Organism {},
+        Organism {
+            kind: OrganismKind::Herbivore,
+        },
         Position::new(x as f32, y as f32, angle),
         Locomotion::new(config),
         Mouth { reach: 10.0 },
