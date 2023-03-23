@@ -21,6 +21,10 @@ impl Body {
     pub fn energy(&self) -> i32 {
         self.cur_energy
     }
+    // Return current energy percentage in regard to maximum energy
+    pub fn energy_pct(&self) -> f32 {
+        self.cur_energy as f32 / self.max_energy as f32
+    }
     pub fn spend_energy(&mut self, energy: i32) -> bool {
         self.cur_energy -= energy;
         self.cur_energy > 0

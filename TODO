@@ -1,24 +1,28 @@
 -- Code
 . Make simulation systems and needed components as a plugin
+. Save/Load population, with config
+. Fix incoherency in energy data types
+. Replace Food with a Plant organism:
+    New to add an organism kind, wiht Plant and Herbivore.
+. Include evolution of organism in the component:
+    Plant auto-spawn
+    Herbivore use genetic evolution
+. add an edible type to the Mouth component, an array of organism kinds.
+    Use a spatial data structure to look for organism eating each-other.
+    Try to eat the closest eatable, within its 'reach'
+    When competing for one items, the closest eat it.
+    Add the reach of the Mouth as fixed energy cost, and also a gene 
 
 -- User Interaction
 . Improve user camera interaction:
     . Make panning around follow environment 'scale'
-. User edition of the simulation configuration
-    . As a modal pane ?
-. Generation statistics:
-    . avg energy per tick ?
-. Population statistics:
-    . chromosome histograms:
-        histogram on number of eyes.
-. Save/Load population
+. Have a drop down panel for Simulation, Population, Organism, openable/closable through F4/F5/F6
+  Simulation show evolution through generation data.
+    
+  Population show current population data:
+    Number alive, stats per parts
+  Organism show currently selected organism data.
+. Status bar with a progress bar of steps within the generation
+
 . Update on simulation interaction:
-    . Allow to trigger N generation advances:
-        Then run at normal speed
-        And show last generation statitiscs
-. Allow clicking an organism to see its state:
-    . plot with evolution of the energy level.
--- Fix incoherency in energy data types
--- add an organism kind, wiht Plant and Herbivore.
--- add a edible type to the Mouth component, an array of organism kinds.
--- evolution attribute to organism, with evole and regular spawn
+    Allow a 'skip N' input command where N entered by user (default 10)

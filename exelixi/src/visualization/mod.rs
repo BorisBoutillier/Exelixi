@@ -26,6 +26,7 @@ impl Plugin for VisualizationPlugin {
             .add_plugin(camera::CameraPlugin {})
             .add_system(organism::organism_transform_update)
             .add_system(floor::show_floor)
-            .add_system(organism::show_organism.in_base_set(CoreSet::PostUpdate));
+            .add_system(organism::show_organism.in_base_set(CoreSet::PostUpdate))
+            .add_system(organism::sprite_lightness_from_body);
     }
 }
