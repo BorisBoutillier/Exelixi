@@ -6,8 +6,17 @@ use crate::ecosystem::*;
 pub struct Mouth {
     // Maximum distance the mouth can catch something
     pub reach: f32,
-    // Vec of type of organism kind that are edible for this one
-    pub edible: Vec<OrganismKind>,
+    // Vec of name of organisms that are edible for this one
+    pub edible: Vec<String>,
+}
+
+impl Mouth {
+    pub fn new(config: &MouthConfig) -> Self {
+        Self {
+            reach: config.reach,
+            edible: config.edible.clone(),
+        }
+    }
 }
 
 // Each organism mouth will eat the closest reachable other organisms.
@@ -16,9 +25,12 @@ pub fn mouth_eating(
     mut organisms: Query<(Entity, &Organism, &Position, Option<&Mouth>), With<Body>>,
     mut bodies: Query<&mut Body>,
 ) {
-    let mut per_kind = HashMap::new();
+    let mut per_name = HashMap::new();
     for (e, o, p, _) in organisms.iter() {
-        per_kind.entry(o.kind).or_insert(vec![]).push((e, *p));
+        per_name
+            .entry(o.name.clone())
+            .or_insert(vec![])
+            .push((e, *p));
     }
     // Store for each eatable organisms, the list of each organism that want to eat it
     // with the distance it is at.
@@ -27,11 +39,11 @@ pub fn mouth_eating(
     for (entity, _, position, mouth) in organisms.iter_mut() {
         if let Some(mouth) = mouth {
             let mouth_reach_squared = mouth.reach.powi(2);
-            for kind in mouth.edible.iter() {
-                if !per_kind.contains_key(kind) {
+            for name in mouth.edible.iter() {
+                if !per_name.contains_key(name) {
                     continue;
                 }
-                for (other_entity, other_position) in per_kind[kind].iter() {
+                for (other_entity, other_position) in per_name[name].iter() {
                     let dist_squared = position.distance_squared(other_position);
                     if *other_entity != entity && dist_squared <= mouth_reach_squared {
                         want_to_eat

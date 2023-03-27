@@ -12,6 +12,8 @@ pub struct OrganismConfig {
     pub leaf: Option<LeafConfig>,
     // Optional locomotion organ
     pub locomotion: Option<LocomotionConfig>,
+    // Optional mouth organ
+    pub mouth: Option<MouthConfig>,
     // Mean of creating new organism
     pub reproduction: ReproductionConfig,
     pub visualization: OrganismVisualizationConfig,

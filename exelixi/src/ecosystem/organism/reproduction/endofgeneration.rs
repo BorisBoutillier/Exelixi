@@ -99,10 +99,6 @@ pub fn spawn_organism(
             name: organism_config.name.clone(),
         },
         Position::new(x as f32, y as f32, angle),
-        Mouth {
-            reach: 10.0,
-            edible: vec![OrganismKind::Plant],
-        },
         body,
         brain,
     ));
@@ -114,6 +110,9 @@ pub fn spawn_organism(
     }
     if let Some(leaf_config) = &organism_config.leaf {
         command.insert(Leaf::new(leaf_config));
+    }
+    if let Some(mouth_config) = &organism_config.mouth {
+        command.insert(Mouth::new(mouth_config));
     }
 }
 pub fn spawn_starting_organisms(

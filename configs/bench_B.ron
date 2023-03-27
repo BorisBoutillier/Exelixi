@@ -18,6 +18,10 @@
             ,   maximum_energy: 40000
             ,   body_cost: 6
         )
+        ,   mouth: Some( MouthConfig(
+            reach: 10.0,
+            edible: ["Plant"],
+        ))
         ,   locomotion: Some( LocomotionConfig(
                 linear: Neuron(min:0,max:6)
             ,   linear_cost: 0.000

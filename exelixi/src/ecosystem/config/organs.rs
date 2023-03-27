@@ -39,3 +39,10 @@ pub struct LeafConfig {
     pub energy_production: f32,
     pub lifetime: u32,
 }
+
+// Configuration for the eye organ.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct MouthConfig {
+    pub reach: f32,
+    pub edible: Vec<String>,
+}

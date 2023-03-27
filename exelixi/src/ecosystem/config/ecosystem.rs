@@ -47,6 +47,19 @@ impl EcosystemConfig {
                 .organisms_per_name
                 .insert(organism_config.name.clone(), organism_config.clone());
         }
+        config.check_coherency();
         config
+    }
+    fn check_coherency(&self) {
+        for organism in self.organisms.iter() {
+            // Each mouth.edible must reference defined organism name
+            if let Some(mouth_config) = &organism.mouth {
+                for name in mouth_config.edible.iter() {
+                    if !self.organisms_per_name.contains_key(name) {
+                        panic!("Undefined organism '{name}' referenced in a mouth.edible");
+                    }
+                }
+            }
+        }
     }
 }
