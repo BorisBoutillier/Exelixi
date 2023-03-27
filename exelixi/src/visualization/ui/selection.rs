@@ -1,21 +1,24 @@
 use crate::prelude::*;
 
+const SELECTED_HUE: f32 = 180.0;
 #[derive(Component)]
 pub struct Selected;
 
 pub fn selection_changed(
     mut deselected: RemovedComponents<Selected>,
     selected: Query<Entity, Added<Selected>>,
-    mut organisms_sprite: Query<&mut Sprite, With<Organism>>,
+    mut organisms_sprite: Query<(&mut Sprite, &Organism)>,
 ) {
     for entity in deselected.iter() {
-        if let Ok(mut sprite) = organisms_sprite.get_mut(entity) {
-            sprite.color = Color::rgb(0.8, 0.3, 0.8)
+        if let Ok((mut sprite, organism)) = organisms_sprite.get_mut(entity) {
+            let [_h, s, l, a] = sprite.color.as_hsla_f32();
+            sprite.color = Color::hsla(organism.kind.get_hue(), s, l, a);
         }
     }
     for entity in selected.iter() {
-        if let Ok(mut sprite) = organisms_sprite.get_mut(entity) {
-            sprite.color = Color::rgb(0.2, 0.9, 0.9);
+        if let Ok((mut sprite, _)) = organisms_sprite.get_mut(entity) {
+            let [_h, s, l, a] = sprite.color.as_hsla_f32();
+            sprite.color = Color::hsla(SELECTED_HUE, s, l, a);
         }
     }
 }

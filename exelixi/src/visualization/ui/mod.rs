@@ -1,11 +1,11 @@
 use crate::prelude::*;
 
 mod eye_viewer;
+mod mouth_viewer;
 mod panels;
 mod selection;
 mod user_selection;
 
-pub use eye_viewer::*;
 pub use panels::*;
 pub use selection::*;
 pub use user_selection::*;
@@ -23,7 +23,8 @@ pub struct UiPlugin;
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(UiState { stat_panel: true })
-            .add_plugin(EyeViewerPlugin)
+            .add_plugin(eye_viewer::EyeViewerPlugin)
+            .add_plugin(mouth_viewer::MouthViewerPlugin)
             .add_system(_debug_ui)
             .add_system(panels_ui)
             .add_system(user_selection)

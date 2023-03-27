@@ -6,6 +6,7 @@ pub fn organism_transform_update(
     for (mut transform, position) in query.iter_mut() {
         transform.translation.x = position.x;
         transform.translation.y = position.y;
+        transform.translation.z = 10.0;
         transform.rotation = Quat::from_axis_angle(Vec3::Z, position.angle());
     }
 }
@@ -17,31 +18,15 @@ pub fn show_organism(
     new_organisms: Query<(Entity, &Organism), Added<Organism>>,
 ) {
     for (entity, organism) in new_organisms.iter() {
-        match organism.kind {
-            OrganismKind::Plant => {
-                commands.entity(entity).insert(SpriteBundle {
-                    sprite: Sprite {
-                        custom_size: Some(Vec2::new(10.0, 10.0)),
-                        color: Color::rgb(0.1, 0.7, 0.1),
-                        ..Default::default()
-                    },
-                    texture: asset_server.load("food.png"),
-                    ..Default::default()
-                });
-            }
-            OrganismKind::Herbivore => {
-                let color = Color::rgb(0.8, 0.3, 0.8);
-                commands.entity(entity).insert(SpriteBundle {
-                    sprite: Sprite {
-                        custom_size: Some(Vec2::new(25.0, 25.0)),
-                        color,
-                        ..Default::default()
-                    },
-                    texture: asset_server.load("bird.png"),
-                    ..Default::default()
-                });
-            }
-        }
+        commands.entity(entity).insert(SpriteBundle {
+            sprite: Sprite {
+                custom_size: Some(organism.kind.get_sprite_size()),
+                color: Color::hsl(organism.kind.get_hue(), 0.8, 0.5),
+                ..Default::default()
+            },
+            texture: asset_server.load(organism.kind.get_sprite_file()),
+            ..Default::default()
+        });
     }
 }
 
@@ -51,5 +36,27 @@ pub fn sprite_lightness_from_body(mut query: Query<(&mut Sprite, &Body)>) {
         let [h, s, _l, a] = sprite.color.as_hsla_f32();
         let l = 0.1 + body.energy_pct().sqrt() * 0.7; // Keep in [0.1 .. 0.8 ]
         sprite.color = Color::hsla(h, s, l, a);
+    }
+}
+
+impl OrganismKind {
+    pub fn get_hue(&self) -> f32 {
+        match self {
+            OrganismKind::Plant => 120.0,
+            OrganismKind::Herbivore => 300.0,
+        }
+    }
+    pub fn get_sprite_file(&self) -> String {
+        match self {
+            OrganismKind::Plant => "food.png",
+            OrganismKind::Herbivore => "bird.png",
+        }
+        .into()
+    }
+    pub fn get_sprite_size(&self) -> Vec2 {
+        match self {
+            OrganismKind::Plant => Vec2::new(8.0, 8.0),
+            OrganismKind::Herbivore => Vec2::new(20.0, 20.0),
+        }
     }
 }
