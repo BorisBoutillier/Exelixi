@@ -144,13 +144,11 @@ impl Eye {
         let mut cells = vec![0.0; self.n_cells];
         //println!("SENSE for {position:?}");
         for object_position in object_positions {
-            let dx = object_position.x - position.x;
-            let dy = object_position.y - position.y;
-            let dist_pow2 = dx.powi(2) + dy.powi(2);
-            if dist_pow2 > self.fov_range.powi(2) {
+            let distance_squared = position.distance_squared(object_position);
+            if distance_squared > self.fov_range.powi(2) {
                 continue;
             }
-            let view_angle = f32::atan2(dy, dx);
+            let view_angle = position.angle_between(object_position);
             //println!("    FOOD {:?} -> {}", object_position, view_angle);
             if view_angle < -self.fov_angle / 2.0 || view_angle > self.fov_angle / 2.0 {
                 continue;
@@ -160,7 +158,7 @@ impl Eye {
             let sector = (view_angle + self.fov_angle / 2.0) / sector_angle;
             let sector = (sector as usize).min(self.n_sectors - 1);
 
-            let energy = (self.fov_range - dist_pow2.sqrt()) / self.fov_range;
+            let energy = (self.fov_range - distance_squared.sqrt()) / self.fov_range;
 
             cells[sector] += energy;
         }

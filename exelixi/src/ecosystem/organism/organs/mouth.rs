@@ -25,7 +25,7 @@ pub fn mouth_eating(
     let mut eaten_foods = HashSet::new();
     for (_, _, mut body, position, mouth) in organisms.iter_mut() {
         if let Some(mouth) = mouth {
-            let mouth_reach_squared = mouth.reach.powf(2.);
+            let mouth_reach_squared = mouth.reach.powi(2);
             for (food_entity, food_position, food_energy) in foods.iter() {
                 if !eaten_foods.contains(food_entity)
                     && position.distance_squared(food_position) <= mouth_reach_squared

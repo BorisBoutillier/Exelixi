@@ -26,4 +26,7 @@ impl Position {
     pub fn distance_squared(&self, other: &Position) -> f32 {
         (self.x - other.x).powi(2) + (self.y - other.y).powi(2)
     }
+    pub fn angle_between(&self, other: &Position) -> f32 {
+        f32::atan2(other.y - self.y, other.x - self.x)
+    }
 }
