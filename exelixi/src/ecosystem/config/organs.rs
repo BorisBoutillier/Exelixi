@@ -1,7 +1,7 @@
 use super::*;
 
 // Configuration for the eye organ.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EyeConfig {
     // Total fov angle of all eyes cells in radians
     pub fov_angle: ConfigValue<f32>,
@@ -16,7 +16,7 @@ pub struct EyeConfig {
 }
 
 // Configuration for the body
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BodyConfig {
     pub starting_energy: f32,
     pub maximum_energy: f32,
@@ -24,7 +24,7 @@ pub struct BodyConfig {
 }
 
 // Configuration for locomotion organ
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct LocomotionConfig {
     pub linear: ConfigValue<f32>,
     // Cost for will be linear_cost*linear^2
@@ -34,7 +34,7 @@ pub struct LocomotionConfig {
 }
 
 // Configuration for the eye organ.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct LeafConfig {
     pub energy_production: f32,
     pub lifetime: u32,

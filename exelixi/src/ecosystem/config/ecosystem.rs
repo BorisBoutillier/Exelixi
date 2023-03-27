@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{collections::HashMap, path::PathBuf};
 
 use crate::ecosystem::*;
 
@@ -6,16 +6,18 @@ use super::{environment::EnvironmentConfig, organism::OrganismConfig, *};
 //
 // Resources
 //
-#[derive(Serialize, Deserialize, Resource)]
+#[derive(Serialize, Deserialize, Resource, Clone)]
 pub struct EcosystemConfig {
     // Configuration information regarding the environment
     pub environment: EnvironmentConfig,
     // Configuration information regarding the organisms
     pub organisms: Vec<OrganismConfig>,
+    #[serde(skip)]
+    pub organisms_per_name: HashMap<String, OrganismConfig>,
 }
 impl EcosystemConfig {
     pub fn from_path(path: Option<PathBuf>) -> Self {
-        match path {
+        let mut config = match path {
             None => {
                 let config = ron::from_str(include_str!("../../../../configs/default.ron"))
                     .expect("default_config.ron is not correct");
@@ -39,6 +41,12 @@ impl EcosystemConfig {
                     panic!();
                 }
             }
+        };
+        for organism_config in config.organisms.iter() {
+            config
+                .organisms_per_name
+                .insert(organism_config.name.clone(), organism_config.clone());
         }
+        config
     }
 }

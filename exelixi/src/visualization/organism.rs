@@ -15,16 +15,18 @@ pub fn organism_transform_update(
 pub fn show_organism(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    config: Res<EcosystemConfig>,
     new_organisms: Query<(Entity, &Organism), Added<Organism>>,
 ) {
     for (entity, organism) in new_organisms.iter() {
+        let visualization_config = &config.organisms_per_name[&organism.name].visualization;
         commands.entity(entity).insert(SpriteBundle {
             sprite: Sprite {
-                custom_size: Some(organism.kind.get_sprite_size()),
-                color: Color::hsl(organism.kind.get_hue(), 0.8, 0.5),
+                custom_size: Some(visualization_config.sprite_size.into()),
+                color: Color::hsl(visualization_config.hue, 0.8, 0.5),
                 ..Default::default()
             },
-            texture: asset_server.load(organism.kind.get_sprite_file()),
+            texture: asset_server.load(visualization_config.sprite_file.clone()),
             ..Default::default()
         });
     }
@@ -36,27 +38,5 @@ pub fn sprite_lightness_from_body(mut query: Query<(&mut Sprite, &Body)>) {
         let [h, s, _l, a] = sprite.color.as_hsla_f32();
         let l = 0.1 + body.energy_pct().sqrt() * 0.7; // Keep in [0.1 .. 0.8 ]
         sprite.color = Color::hsla(h, s, l, a);
-    }
-}
-
-impl OrganismKind {
-    pub fn get_hue(&self) -> f32 {
-        match self {
-            OrganismKind::Plant => 120.0,
-            OrganismKind::Herbivore => 300.0,
-        }
-    }
-    pub fn get_sprite_file(&self) -> String {
-        match self {
-            OrganismKind::Plant => "food.png",
-            OrganismKind::Herbivore => "bird.png",
-        }
-        .into()
-    }
-    pub fn get_sprite_size(&self) -> Vec2 {
-        match self {
-            OrganismKind::Plant => Vec2::new(8.0, 8.0),
-            OrganismKind::Herbivore => Vec2::new(20.0, 20.0),
-        }
     }
 }

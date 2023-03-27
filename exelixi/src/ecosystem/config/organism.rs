@@ -2,10 +2,9 @@ use super::organs::{BodyConfig, EyeConfig, LocomotionConfig};
 use super::reproduction::ReproductionConfig;
 use super::*;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OrganismConfig {
     pub name: String,
-
     pub body: BodyConfig,
     // Optional eye vision organ
     pub eye: Option<EyeConfig>,
@@ -15,4 +14,5 @@ pub struct OrganismConfig {
     pub locomotion: Option<LocomotionConfig>,
     // Mean of creating new organism
     pub reproduction: ReproductionConfig,
+    pub visualization: OrganismVisualizationConfig,
 }

@@ -22,6 +22,7 @@ pub fn auto_spawning(
                 let mut command = commands.spawn((
                     Organism {
                         kind: OrganismKind::Plant,
+                        name: organism_config.name.clone(),
                     },
                     Position::new(x as f32, y as f32, 0.0),
                     Body::new(&organism_config.body),

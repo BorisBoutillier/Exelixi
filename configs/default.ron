@@ -30,6 +30,11 @@
             ,   mutation_chance: 0.01
             ,   mutation_amplitude: 0.3
         )
+        , visualization: (
+            hue:300.0,
+            sprite_file: "bird.png",
+            sprite_size: (20.0,20.0),
+        )
         )
     , (
             name : "Plant"
@@ -44,6 +49,11 @@
         ))
         ,   reproduction: AutoSpawn(
                 spawn_rate : 0.2
+        )
+        , visualization: (
+            hue: 120.0,
+            sprite_file: "food.png",
+            sprite_size: (8.0,8.0),
         )
     )
     ] 
