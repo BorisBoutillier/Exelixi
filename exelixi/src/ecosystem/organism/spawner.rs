@@ -21,7 +21,10 @@ pub fn spawn_organism(
         },
         Position::new(x as f32, y as f32, angle),
         Locomotion::new(config),
-        Mouth { reach: 10.0 },
+        Mouth {
+            reach: 10.0,
+            edible: vec![OrganismKind::Plant],
+        },
         body,
         eye,
         brain,

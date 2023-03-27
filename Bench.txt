@@ -3,5 +3,5 @@ cargo build --release && time cargo run --release -- --config configs/bench_A.ro
    Gen: 009 , Sps: 233.39 , Avg: 7790.6 , Pop start: 1280, Pop end: 1280 , Uneaten food: 0
    real    0m3,630s
 cargo build --release && time cargo run --release -- --config configs/bench_B.ron --seed 0 --run-for 50
-   Gen: 049 , Sps: 7629.90 , Avg: 30617.2 , Pop start: 78, Pop end: 53 , Uneaten food: 719
+   Gen: 049 , Sps: 5066.37 , Avg: 30106.6 , Pop start: 141, Pop end: 94 , Uneaten food: 572
    real    0m23,918s
