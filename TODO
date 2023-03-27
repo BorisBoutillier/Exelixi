@@ -1,17 +1,19 @@
 -- Code
+. Update Eye to see only edible organisms.
+. Update Eye cells to only sense closest edible organism
+. Update statistics to support organism names.
+    Report end_of generation survivors per name.
+    Report eaten per generation per name
+    Report dead as out of energy per generation per name.
+. Remove OrganismKind
+. Should at this point be able to do a config with Plant, Herbivore and Carnivore.
+
+. Fix lost determinism when changing mouth eating algorithm
 . Make simulation systems and needed components as a plugin
 . Save/Load population, with config
-. Fix incoherency in energy data types
-. Replace Food with a Plant organism:
-    New to add an organism kind, wiht Plant and Herbivore.
-. Include evolution of organism in the component:
-    Plant auto-spawn
-    Herbivore use genetic evolution
-. add an edible type to the Mouth component, an array of organism kinds.
-    Use a spatial data structure to look for organism eating each-other.
-    Try to eat the closest eatable, within its 'reach'
-    When competing for one items, the closest eat it.
-    Add the reach of the Mouth as fixed energy cost, and also a gene 
+. Use a spatial data structure to look for organism eating each-other.
+. Add the reach of the Mouth as fixed energy cost, and also a gene 
+. Add support for Eye to also see 'hue' as second sensor per cell, and see all organism.
 
 -- User Interaction
 . Improve user camera interaction:
