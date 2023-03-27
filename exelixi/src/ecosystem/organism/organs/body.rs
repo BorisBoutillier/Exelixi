@@ -2,38 +2,38 @@ use crate::ecosystem::*;
 
 #[derive(Component)]
 pub struct Body {
-    cur_energy: i32,
-    max_energy: i32,
+    cur_energy: f32,
+    max_energy: f32,
     // Body energy consumption per step
-    body_cost: i32,
+    body_cost: f32,
 }
 impl Body {
-    pub fn new(starting_energy: i32, max_energy: i32, body_cost: i32) -> Self {
+    pub fn new(config: &BodyConfig) -> Self {
         Self {
-            cur_energy: starting_energy,
-            max_energy,
-            body_cost,
+            cur_energy: config.starting_energy,
+            max_energy: config.maximum_energy,
+            body_cost: config.body_cost,
         }
     }
-    pub fn energy_cost(&self) -> i32 {
+    pub fn energy_cost(&self) -> f32 {
         self.body_cost
     }
-    pub fn energy(&self) -> i32 {
+    pub fn energy(&self) -> f32 {
         self.cur_energy
     }
     // Return current energy percentage in regard to maximum energy
     pub fn energy_pct(&self) -> f32 {
-        self.cur_energy as f32 / self.max_energy as f32
+        self.cur_energy / self.max_energy
     }
-    pub fn spend_energy(&mut self, energy: i32) -> bool {
+    pub fn spend_energy(&mut self, energy: f32) -> bool {
         self.cur_energy -= energy;
-        self.cur_energy > 0
+        self.cur_energy > 0.0
     }
-    pub fn add_energy(&mut self, energy: i32) {
+    pub fn add_energy(&mut self, energy: f32) {
         self.cur_energy = (self.cur_energy + energy).min(self.max_energy);
     }
     pub fn get_sensors(&self) -> Vec<f32> {
-        vec![self.cur_energy as f32 / self.max_energy as f32]
+        vec![self.cur_energy / self.max_energy]
     }
     pub fn n_sensors(&self) -> usize {
         1
@@ -52,7 +52,7 @@ pub fn body_energy_consumption(
 ) {
     let mut food_decays = 0;
     for (entity, mut body, organism) in bodies.iter_mut() {
-        let mut total = body.energy_cost() as f32;
+        let mut total = body.energy_cost();
         if let Ok(organ) = q0.get(entity) {
             total += organ.energy_cost();
         }
@@ -65,7 +65,7 @@ pub fn body_energy_consumption(
         if let Ok(organ) = q3.get(entity) {
             total += organ.energy_cost();
         }
-        if !body.spend_energy(total as i32) {
+        if !body.spend_energy(total) {
             commands.entity(entity).despawn_recursive();
             if organism.kind == OrganismKind::Plant {
                 food_decays += 1;

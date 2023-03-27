@@ -12,6 +12,12 @@ pub struct Leaf {
 }
 
 impl Leaf {
+    pub fn new(config: &LeafConfig) -> Self {
+        Self {
+            lifetime: config.lifetime,
+            energy_production: config.energy_production,
+        }
+    }
     pub fn energy_cost(&self) -> f32 {
         // Negative, as this is an energy production organ
         -self.energy_production

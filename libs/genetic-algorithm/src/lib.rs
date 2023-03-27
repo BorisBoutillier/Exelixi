@@ -28,7 +28,7 @@ pub trait MutationMethod: Send + Sync {
     fn mutate(&self, rng: &mut dyn RngCore, chromosome: &mut Chromosome);
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Chromosome {
     genes: Vec<f32>,
 }

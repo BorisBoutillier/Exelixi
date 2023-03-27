@@ -178,50 +178,50 @@ pub fn panels_ui(
                             plot_ui.line(plot_bottom);
                         });
                     });
-                egui::CollapsingHeader::new("Population genetic")
-                    .default_open(true)
-                    .show(ui, |ui| {
-                        if !simulation.statistics.population.fov_angle.is_empty() {
-                            let chart = egui::plot::BarChart::new(
-                                simulation
-                                    .statistics
-                                    .population
-                                    .fov_angle
-                                    .iter()
-                                    .map(|(r, c)| {
-                                        egui::plot::Bar::new((r.start as f64) / 100.0, *c as f64)
-                                            .width((r.end - r.start) as f64 / 200.0)
-                                    })
-                                    .collect(),
-                            )
-                            .color(egui::Color32::from_rgb(100, 100, 255))
-                            .name("FOV _angle");
-                            egui::plot::Plot::new("FOV angle")
-                                .height(80.0)
-                                .legend(egui::plot::Legend::default())
-                                .show(ui, |plot_ui| plot_ui.bar_chart(chart));
-                        }
-                        if !simulation.statistics.population.fov_range.is_empty() {
-                            let chart = egui::plot::BarChart::new(
-                                simulation
-                                    .statistics
-                                    .population
-                                    .fov_range
-                                    .iter()
-                                    .map(|(r, c)| {
-                                        egui::plot::Bar::new(r.start as f64, *c as f64)
-                                            .width((r.end - r.start) as f64 / 2.0)
-                                    })
-                                    .collect(),
-                            )
-                            .color(egui::Color32::from_rgb(50, 50, 255))
-                            .name("FOV range");
-                            egui::plot::Plot::new("FOV range")
-                                .height(80.0)
-                                .legend(egui::plot::Legend::default())
-                                .show(ui, |plot_ui| plot_ui.bar_chart(chart));
-                        }
-                    });
+                //egui::CollapsingHeader::new("Population genetic")
+                //    .default_open(true)
+                //    .show(ui, |ui| {
+                //        if !simulation.statistics.population.fov_angle.is_empty() {
+                //            let chart = egui::plot::BarChart::new(
+                //                simulation
+                //                    .statistics
+                //                    .population
+                //                    .fov_angle
+                //                    .iter()
+                //                    .map(|(r, c)| {
+                //                        egui::plot::Bar::new((r.start as f64) / 100.0, *c as f64)
+                //                            .width((r.end - r.start) as f64 / 200.0)
+                //                    })
+                //                    .collect(),
+                //            )
+                //            .color(egui::Color32::from_rgb(100, 100, 255))
+                //            .name("FOV _angle");
+                //            egui::plot::Plot::new("FOV angle")
+                //                .height(80.0)
+                //                .legend(egui::plot::Legend::default())
+                //                .show(ui, |plot_ui| plot_ui.bar_chart(chart));
+                //        }
+                //        if !simulation.statistics.population.fov_range.is_empty() {
+                //            let chart = egui::plot::BarChart::new(
+                //                simulation
+                //                    .statistics
+                //                    .population
+                //                    .fov_range
+                //                    .iter()
+                //                    .map(|(r, c)| {
+                //                        egui::plot::Bar::new(r.start as f64, *c as f64)
+                //                            .width((r.end - r.start) as f64 / 2.0)
+                //                    })
+                //                    .collect(),
+                //            )
+                //            .color(egui::Color32::from_rgb(50, 50, 255))
+                //            .name("FOV range");
+                //            egui::plot::Plot::new("FOV range")
+                //                .height(80.0)
+                //                .legend(egui::plot::Legend::default())
+                //                .show(ui, |plot_ui| plot_ui.bar_chart(chart));
+                //        }
+                //    });
             });
     }
 }

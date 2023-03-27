@@ -1,5 +1,3 @@
-use std::{collections::HashMap, ops::Range};
-
 use crate::ecosystem::*;
 
 #[derive(Default, Debug, Clone, Copy)]
@@ -10,52 +8,54 @@ pub struct GenerationStatistics {
     pub food_decay: usize,
 }
 #[derive(Default, Debug)]
+// FIXME
 pub struct PopulationStatistics {
-    pub count: usize,
-    pub fov_range: HashMap<Range<u32>, usize>,
-    pub fov_angle: HashMap<Range<u32>, usize>,
+    //pub count: usize,
+    //pub fov_range: HashMap<Range<u32>, usize>,
+    //pub fov_angle: HashMap<Range<u32>, usize>,
 }
 
 impl PopulationStatistics {
-    pub fn new(config: &EcosystemConfig) -> Self {
-        let mut s = Self::default();
-        if let ConfigValue::Gene { min, max } = config.organisms.eye_fov_range {
-            let min = min as u32;
-            let max = max as u32;
-            let step = (max - min) / 20;
-            for i in (min..max).step_by(step as usize) {
-                s.fov_range.insert(i..(i + step), 0);
-            }
-        }
-        if let ConfigValue::Gene { min, max } = config.organisms.eye_fov_angle {
-            let min = (min * 100.0) as u32;
-            let max = (max * 100.0) as u32;
-            let step = (max - min) / 20;
-            for i in (min..max).step_by(step as usize) {
-                s.fov_angle.insert(i..(i + step), 0);
-            }
-        }
-        s
+    pub fn new(_config: &EcosystemConfig) -> Self {
+        //let mut s = Self::default();
+        //if let ConfigValue::Gene { min, max } = config.organisms.eye_fov_range {
+        //    let min = min as u32;
+        //    let max = max as u32;
+        //    let step = (max - min) / 20;
+        //    for i in (min..max).step_by(step as usize) {
+        //        s.fov_range.insert(i..(i + step), 0);
+        //    }
+        //}
+        //if let ConfigValue::Gene { min, max } = config.organisms.eye_fov_angle {
+        //    let min = (min * 100.0) as u32;
+        //    let max = (max * 100.0) as u32;
+        //    let step = (max - min) / 20;
+        //    for i in (min..max).step_by(step as usize) {
+        //        s.fov_angle.insert(i..(i + step), 0);
+        //    }
+        //}
+        //s
+        Self {}
     }
-    pub fn add_entry(&mut self, eye: &Eye) {
-        self.count += 1;
-        if !self.fov_range.is_empty() {
-            let fov_range = eye.fov_range as u32;
-            for (range, count) in self.fov_range.iter_mut() {
-                if range.contains(&fov_range) {
-                    *count += 1;
-                }
-            }
-        }
-        if !self.fov_angle.is_empty() {
-            let fov_angle = (eye.fov_angle * 100.0) as u32;
-            for (range, count) in self.fov_angle.iter_mut() {
-                if range.contains(&fov_angle) {
-                    *count += 1;
-                }
-            }
-        }
-    }
+    //pub fn add_entry(&mut self, eye: &Eye) {
+    //    self.count += 1;
+    //    if !self.fov_range.is_empty() {
+    //        let fov_range = eye.fov_range as u32;
+    //        for (range, count) in self.fov_range.iter_mut() {
+    //            if range.contains(&fov_range) {
+    //                *count += 1;
+    //            }
+    //        }
+    //    }
+    //    if !self.fov_angle.is_empty() {
+    //        let fov_angle = (eye.fov_angle * 100.0) as u32;
+    //        for (range, count) in self.fov_angle.iter_mut() {
+    //            if range.contains(&fov_angle) {
+    //                *count += 1;
+    //            }
+    //        }
+    //    }
+    //}
 }
 
 #[derive(Default, Debug)]

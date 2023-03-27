@@ -46,7 +46,7 @@ pub fn mouth_eating(
     let mut has_eaten = HashSet::new();
     // We store the energy of each eaten organism before applying any mouth eating
     // so that eaten energy is independant of order of mouth eating.
-    let eaten_energy = HashMap::<Entity, i32>::from_iter(
+    let eaten_energy = HashMap::<Entity, f32>::from_iter(
         want_to_eat
             .keys()
             .map(|e| (*e, bodies.get(*e).unwrap().energy())),

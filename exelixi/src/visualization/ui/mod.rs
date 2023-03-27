@@ -36,7 +36,7 @@ impl Plugin for UiPlugin {
 pub fn _debug_ui(
     mut contexts: EguiContexts,
     selection: Query<(&Position, &Locomotion, &Body), With<Selected>>,
-    simulation: Res<Simulation>,
+    _simulation: Res<Simulation>,
     config: Res<EcosystemConfig>,
     diagnostics: Res<Diagnostics>,
 ) {
@@ -67,6 +67,5 @@ pub fn _debug_ui(
                 }
             }
             ui.label(format!("fps: {fps_s}"));
-            ui.label(format!("sps: {:.2}", simulation.sps(&config)));
         });
 }

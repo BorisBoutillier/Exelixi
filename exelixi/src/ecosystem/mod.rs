@@ -1,5 +1,4 @@
 mod config;
-mod food;
 mod organism;
 mod position;
 mod schedule;
@@ -11,7 +10,6 @@ pub use rand::Rng;
 pub use rand::RngCore;
 
 pub use config::*;
-pub use food::*;
 pub use organism::*;
 pub use position::*;
 pub use schedule::*;

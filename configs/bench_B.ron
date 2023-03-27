@@ -1,28 +1,50 @@
 (
-    generation_length : 5000
-,   min_population    : 50
-,   environment:(
+   environment:(
         width  : 3500
     ,   height : 3000
     ,   wall   : true
-    ,   food_spawn_rate   : 0.2
-    ,   food_decay_time   : 1000
-    ,   food_energy       : 10000
     )
-,   organisms: (
-        eye_fov_angle: Gene(min:1.5,max:4.71)
-    ,   eye_fov_range: Gene(min:70,max:400)
-    ,   eye_energy_cost: 0.000
-    ,   n_eye_cells: Fixed(9)
-    ,   see_foods:   true
-    ,   see_walls:   true
-    ,   see_organisms: false
-    ,   starting_energy: 10000
-    ,   maximum_energy: 40000
-    ,   linear_locomotion: Neuron(min:0,max:6)
-    ,   linear_cost: 0.000
-    ,   angular_cost: 0.000
-    ,   body_cost: 6
-    ,   fertility_rate: 1.5
+,   organisms: [
+        (
+            name : "Herbivore"
+        ,   eye: Some(EyeConfig (
+                fov_angle: Gene(min:1.5,max:4.71)
+            ,   fov_range: Gene(min:70,max:400)
+            ,   energy_cost: 0.000
+            ,   n_cells: Fixed(9)
+            ))
+        ,   body: (
+                starting_energy: 10000
+            ,   maximum_energy: 40000
+            ,   body_cost: 6
+        )
+        ,   locomotion: Some( LocomotionConfig(
+                linear: Neuron(min:0,max:6)
+            ,   linear_cost: 0.000
+            ,   angular_cost: 0.000
+            ))
+        ,   reproduction: EndOfGenerationEvolution(
+                generation_length : 5000
+            ,   min_population    : 50
+            ,   fertility_rate: 1.5
+            ,   mutation_chance: 0.01
+            ,   mutation_amplitude: 0.3
+        )
+        )
+    , (
+            name : "Plant"
+        ,   body: (
+                starting_energy: 10000
+            ,   maximum_energy: 40000
+            ,   body_cost: 40
+        )
+        ,   leaf: Some(LeafConfig(
+                lifetime: 500
+            ,   energy_production: 60
+        ))
+        ,   reproduction: AutoSpawn(
+                spawn_rate : 0.2
+        )
     )
+    ] 
 )

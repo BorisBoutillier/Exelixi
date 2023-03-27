@@ -17,7 +17,7 @@ impl EcosystemSchedule {
                 leaf_lifecycle,
                 apply_system_buffers,
                 evolve,
-                food_spawning,
+                auto_spawning,
                 apply_system_buffers,
             )
                 .chain(),
