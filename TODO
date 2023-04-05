@@ -1,5 +1,4 @@
 -- Code
-. Update Eye to see only edible organisms.
 . Update Eye cells to only sense closest edible organism
 . Update statistics to support organism names.
     Report end_of generation survivors per name.

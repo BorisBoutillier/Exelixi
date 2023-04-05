@@ -13,6 +13,9 @@ pub struct EyeConfig {
     // The eye fov angle is seperated in n_cells sectors.
     // Each cells accumulate information of content in its sector
     pub n_cells: ConfigValue<u8>,
+    // Name of oganism that are visible by this eye.
+    // Each eye cell will see the closest 'visible' organism
+    pub visible: Vec<String>,
 }
 
 // Configuration for the body

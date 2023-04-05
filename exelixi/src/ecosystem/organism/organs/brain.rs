@@ -64,11 +64,10 @@ impl Brain {
 pub fn brain_processing(
     mut organisms: Query<(&Body, &Position, &mut Locomotion, &Eye, &Brain)>,
     positions: Query<(&Position, &Organism)>,
-    config: Res<EcosystemConfig>,
 ) {
     let positions = positions.iter().collect::<Vec<_>>();
     organisms.for_each_mut(|(body, position, mut locomotion, eye, brain)| {
-        let mut inputs = eye.process_vision(position, &positions, &config);
+        let mut inputs = eye.process_vision(position, &positions);
         inputs.extend(body.get_sensors().iter());
         let response = brain.nn.propagate(&inputs);
         locomotion.actuates(response);

@@ -9,9 +9,7 @@ pub struct Eye {
     pub fov_angle: f32,
     pub n_sectors: usize,
     pub n_cells: usize,
-    pub see_foods: bool,
-    pub see_walls: bool,
-    pub see_organisms: bool,
+    visible: Vec<String>,
     energy_cost: f32,
 }
 
@@ -33,13 +31,11 @@ impl Eye {
             _ => panic!(),
         };
         Self {
-            see_walls: false,
-            see_foods: true,
-            see_organisms: false,
             fov_range,
             fov_angle,
             n_sectors: n_cells as usize,
             n_cells: n_cells as usize,
+            visible: config.visible.clone(),
             energy_cost: compute_energy_cost(fov_range, fov_angle, config.energy_cost),
         }
     }
@@ -70,13 +66,11 @@ impl Eye {
             _ => panic!(),
         };
         Self {
-            see_walls: false,
-            see_foods: true,
-            see_organisms: false,
             fov_range,
             fov_angle,
             n_sectors: n_cells as usize,
             n_cells: n_cells as usize,
+            visible: config.visible.clone(),
             energy_cost: compute_energy_cost(fov_range, fov_angle, config.energy_cost),
         }
     }
@@ -103,30 +97,14 @@ impl Eye {
         &self,
         position: &Position,
         positions: &[(&Position, &Organism)],
-        config: &EcosystemConfig,
     ) -> Vec<f32> {
         let mut sensors = vec![];
-        if self.see_foods {
-            let food_positions = positions
-                .iter()
-                .filter(|(_, o)| o.kind == OrganismKind::Plant)
-                .map(|(p, _)| *p)
-                .collect::<Vec<_>>();
-            sensors.extend(self.sense_objects(position, &food_positions));
-        }
-        if self.see_walls {
-            sensors.extend(self.sense_walls(position, config));
-        }
-        if self.see_organisms {
-            let organism_positions = positions
-                .iter()
-                .filter(|(p, o)| {
-                    o.kind == OrganismKind::Herbivore && p.distance_squared(position) < f32::EPSILON
-                })
-                .map(|(p, _)| *p)
-                .collect::<Vec<_>>();
-            sensors.extend(self.sense_objects(position, &organism_positions));
-        }
+        let visible_positions = positions
+            .iter()
+            .filter(|(_, o)| self.visible.contains(&o.name))
+            .map(|(p, _)| *p)
+            .collect::<Vec<_>>();
+        sensors.extend(self.sense_objects(position, &visible_positions));
         assert_eq!(sensors.len(), self.n_sensors());
         sensors
     }
@@ -157,54 +135,12 @@ impl Eye {
         //println!("  -> Cells: {cells:?}");
         cells
     }
-    pub fn sense_walls(&self, position: &Position, config: &EcosystemConfig) -> Vec<f32> {
-        let half_width = config.environment.width as f32 / 2.0;
-        let half_height = config.environment.height as f32 / 2.0;
-        let angle_incr = self.fov_angle / self.n_cells as f32;
-        // Starting from the lowest fov line we evaluate the distance of the closest wall intersect on this line.
-        // and compute an energy
-        // Doing it for each cell boundary so cells.length()+1 lines.
-        let start_angle = position.angle() - self.fov_angle / 2.0 + angle_incr / 2.0;
-        (0..self.n_cells as i32)
-            .map(|i| {
-                let angle = start_angle + (i as f32 * angle_incr);
-                let mut dist = f32::INFINITY;
-                let dist_right = (half_width - position.x) / angle.cos();
-                if dist_right > 0.0 {
-                    dist = dist.min(dist_right);
-                }
-                let dist_left = (-half_width - position.x) / angle.cos();
-                if dist_left > 0.0 {
-                    dist = dist.min(dist_left);
-                }
-                let dist_top = (half_height - position.y) / angle.sin();
-                if dist_top > 0.0 {
-                    dist = dist.min(dist_top);
-                }
-                let dist_bottom = (-half_height - position.y) / angle.sin();
-                if dist_bottom > 0.0 {
-                    dist = dist.min(dist_bottom);
-                }
-                ((self.fov_range - dist) / self.fov_range).max(0.0)
-            })
-            .collect::<Vec<_>>()
-    }
     pub fn energy_cost(&self) -> f32 {
         self.energy_cost
     }
     // Return the number of sensors associated with this eye configuration
     pub fn n_sensors(&self) -> usize {
-        let mut n_sensors = 0;
-        if self.see_foods {
-            n_sensors += self.n_cells;
-        }
-        if self.see_walls {
-            n_sensors += self.n_cells;
-        }
-        if self.see_organisms {
-            n_sensors += self.n_cells;
-        }
-        n_sensors
+        self.n_cells
     }
 }
 

@@ -12,6 +12,7 @@
             ,   fov_range: Gene(min:70,max:400)
             ,   energy_cost: 0.000
             ,   n_cells: Fixed(9)
+            ,   visible: ["Plant"]
             ))
         ,   body: (
                 starting_energy: 10000
