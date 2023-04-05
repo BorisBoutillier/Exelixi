@@ -95,7 +95,6 @@ pub fn spawn_organism(
     let y = rng.0.gen_range(-half_height..half_height);
     let mut command = commands.spawn((
         Organism {
-            kind: OrganismKind::Herbivore,
             name: organism_config.name.clone(),
         },
         Position::new(x as f32, y as f32, angle),

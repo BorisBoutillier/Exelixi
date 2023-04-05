@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::ecosystem::*;
 
 #[derive(Component)]
@@ -50,7 +52,7 @@ pub fn body_energy_consumption(
     q3: Query<&Leaf>,
     mut simulation: ResMut<Simulation>,
 ) {
-    let mut food_decays = 0;
+    let mut deaths = HashMap::new();
     for (entity, mut body, organism) in bodies.iter_mut() {
         let mut total = body.energy_cost();
         if let Ok(organ) = q0.get(entity) {
@@ -67,12 +69,10 @@ pub fn body_energy_consumption(
         }
         if !body.spend_energy(total) {
             commands.entity(entity).despawn_recursive();
-            if organism.kind == OrganismKind::Plant {
-                food_decays += 1;
-            }
+            *deaths.entry(organism.name.clone()).or_insert(0) += 1;
         }
     }
-    if food_decays > 0 {
-        simulation.statistics.add_food_decay(food_decays);
+    if !deaths.is_empty() {
+        simulation.statistics.update_deaths(deaths);
     }
 }

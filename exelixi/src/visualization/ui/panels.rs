@@ -123,7 +123,7 @@ pub fn panels_ui(
                                 .generations
                                 .iter()
                                 .enumerate()
-                                .map(|(i, s)| [i as f64, s.food_decay as f64])
+                                .map(|(i, s)| [i as f64, s.get_deaths("Plant") as f64])
                                 .collect::<Vec<_>>(),
                         )
                         .color(avg_color);

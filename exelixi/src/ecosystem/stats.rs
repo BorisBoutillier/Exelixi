@@ -1,11 +1,19 @@
+use std::collections::HashMap;
+
 use crate::ecosystem::*;
 
-#[derive(Default, Debug, Clone, Copy)]
+#[derive(Default, Debug, Clone)]
 pub struct GenerationStatistics {
     pub start_size: usize,
     pub end_size: usize,
     pub avg_energy: f32,
-    pub food_decay: usize,
+    deaths: HashMap<String, usize>,
+}
+
+impl GenerationStatistics {
+    pub fn get_deaths(&self, name: &str) -> usize {
+        *self.deaths.get(name).unwrap_or(&0)
+    }
 }
 #[derive(Default, Debug)]
 // FIXME
@@ -81,10 +89,12 @@ impl SimulationStatistics {
         self.generations.last().map_or(0.0, |s| s.avg_energy)
     }
     pub fn latest_food_decay(&self) -> usize {
-        self.generations.last().map_or(0, |s| s.food_decay)
+        self.generations.last().map_or(0, |s| s.get_deaths("Plant"))
     }
-    pub fn add_food_decay(&mut self, food_decay: usize) {
-        self.cur_generation.food_decay += food_decay;
+    pub fn update_deaths(&mut self, deaths: HashMap<String, usize>) {
+        for (name, count) in deaths.into_iter() {
+            *self.cur_generation.deaths.entry(name).or_insert(0) += count;
+        }
     }
     pub fn start_of_new_generation(
         &mut self,
@@ -95,7 +105,7 @@ impl SimulationStatistics {
         self.population = PopulationStatistics::new(config);
     }
     pub fn end_of_generation(&mut self, population: &[OrganismIndividual]) {
-        let mut cur = self.cur_generation;
+        let mut cur = self.cur_generation.clone();
         cur.end_size = population.len();
         cur.avg_energy = population.iter().map(|i| i.energy).sum::<f32>() / (cur.end_size as f32);
         self.generations.push(cur);

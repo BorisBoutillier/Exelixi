@@ -4,7 +4,6 @@
     Report end_of generation survivors per name.
     Report eaten per generation per name
     Report dead as out of energy per generation per name.
-. Remove OrganismKind
 . Should at this point be able to do a config with Plant, Herbivore and Carnivore.
 
 . Fix lost determinism when changing mouth eating algorithm

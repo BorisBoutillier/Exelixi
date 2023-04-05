@@ -1,7 +1,7 @@
 # This file store run results to check performance and determinism.
 cargo build --release && time cargo run --release -- --config configs/bench_A.ron --seed 0 --run-for 10
-   Gen: 009 , Sps: 233.39 , Avg: 7790.6 , Pop start: 1280, Pop end: 1280 , Uneaten food: 0
-   real    0m3,630s
+   Gen: 009 , Avg: 2587.5 , Pop start: 36, Pop end: 16 , Uneaten food: 15
+   real    0m0,500s
 cargo build --release && time cargo run --release -- --config configs/bench_B.ron --seed 0 --run-for 50
    Gen: 049 , Sps: 5066.37 , Avg: 30106.6 , Pop start: 141, Pop end: 94 , Uneaten food: 572
    real    0m23,918s
