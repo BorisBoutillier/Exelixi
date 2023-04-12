@@ -3,112 +3,106 @@ use std::collections::HashMap;
 use crate::ecosystem::*;
 
 #[derive(Default, Debug, Clone)]
-pub struct GenerationStatistics {
-    pub start_size: usize,
-    pub end_size: usize,
-    pub avg_energy: f32,
-    deaths: HashMap<String, usize>,
+pub struct OrganismStatistic {
+    // Current generation for this organism.
+    // Applicable only for organism with GenerationEvolution reproduction
+    pub generation: Option<u32>,
+    // Current organism population size
+    pub size: usize,
+    // Current organism energy average
+    pub energy_avg: f32,
+    // Number of dead organism by out_of_energy since last Step
+    pub out_of_energy: u32,
+    // Number of eaten organism since last Step
+    pub eaten: u32,
+}
+impl OrganismStatistic {
+    pub fn inline_sprint(&self) -> String {
+        format!(
+            "Size: {:4}, Energy: {:6.0}, Deaths:{:4}, Eaten:{:4}, Generation:{}",
+            self.size,
+            self.energy_avg,
+            self.out_of_energy,
+            self.eaten,
+            if let Some(generation) = self.generation {
+                generation.to_string()
+            } else {
+                "N/A".to_string()
+            }
+        )
+    }
 }
 
-impl GenerationStatistics {
-    pub fn get_deaths(&self, name: &str) -> usize {
-        *self.deaths.get(name).unwrap_or(&0)
-    }
-}
-#[derive(Default, Debug)]
-// FIXME
-pub struct PopulationStatistics {
-    //pub count: usize,
-    //pub fov_range: HashMap<Range<u32>, usize>,
-    //pub fov_angle: HashMap<Range<u32>, usize>,
+#[derive(Resource, Debug, Default)]
+pub struct EcosystemStatistics {
+    pub accumulation: Vec<(u32, HashMap<String, OrganismStatistic>)>,
+    pub current: HashMap<String, OrganismStatistic>,
 }
 
-impl PopulationStatistics {
-    pub fn new(_config: &EcosystemConfig) -> Self {
-        //let mut s = Self::default();
-        //if let ConfigValue::Gene { min, max } = config.organisms.eye_fov_range {
-        //    let min = min as u32;
-        //    let max = max as u32;
-        //    let step = (max - min) / 20;
-        //    for i in (min..max).step_by(step as usize) {
-        //        s.fov_range.insert(i..(i + step), 0);
-        //    }
-        //}
-        //if let ConfigValue::Gene { min, max } = config.organisms.eye_fov_angle {
-        //    let min = (min * 100.0) as u32;
-        //    let max = (max * 100.0) as u32;
-        //    let step = (max - min) / 20;
-        //    for i in (min..max).step_by(step as usize) {
-        //        s.fov_angle.insert(i..(i + step), 0);
-        //    }
-        //}
-        //s
-        Self {}
+impl EcosystemStatistics {
+    pub fn new(config: &EcosystemConfig) -> Self {
+        let mut s = Self::default();
+        s.reset_current(config);
+        s
     }
-    //pub fn add_entry(&mut self, eye: &Eye) {
-    //    self.count += 1;
-    //    if !self.fov_range.is_empty() {
-    //        let fov_range = eye.fov_range as u32;
-    //        for (range, count) in self.fov_range.iter_mut() {
-    //            if range.contains(&fov_range) {
-    //                *count += 1;
-    //            }
-    //        }
-    //    }
-    //    if !self.fov_angle.is_empty() {
-    //        let fov_angle = (eye.fov_angle * 100.0) as u32;
-    //        for (range, count) in self.fov_angle.iter_mut() {
-    //            if range.contains(&fov_angle) {
-    //                *count += 1;
-    //            }
-    //        }
-    //    }
-    //}
-}
-
-#[derive(Default, Debug)]
-pub struct SimulationStatistics {
-    pub generations: Vec<GenerationStatistics>,
-    pub cur_generation: GenerationStatistics,
-    pub population: PopulationStatistics,
-}
-
-impl SimulationStatistics {
-    pub fn latest_dead(&self) -> usize {
-        self.generations
-            .last()
-            .map_or(0, |s| (s.start_size - s.end_size))
-    }
-    pub fn latest_start_size(&self) -> usize {
-        self.generations.last().map_or(0, |s| s.start_size)
-    }
-    pub fn latest_end_size(&self) -> usize {
-        self.generations.last().map_or(0, |s| s.end_size)
-    }
-    pub fn latest_avg_energy(&self) -> f32 {
-        self.generations.last().map_or(0.0, |s| s.avg_energy)
-    }
-    pub fn latest_food_decay(&self) -> usize {
-        self.generations.last().map_or(0, |s| s.get_deaths("Plant"))
-    }
-    pub fn update_deaths(&mut self, deaths: HashMap<String, usize>) {
-        for (name, count) in deaths.into_iter() {
-            *self.cur_generation.deaths.entry(name).or_insert(0) += count;
+    pub fn reset_current(&mut self, config: &EcosystemConfig) {
+        self.current.clear();
+        for organism_config in config.organisms.iter() {
+            self.current
+                .insert(organism_config.name.clone(), OrganismStatistic::default());
         }
     }
-    pub fn start_of_new_generation(
-        &mut self,
-        population: &[OrganismIndividual],
-        config: &EcosystemConfig,
-    ) {
-        self.cur_generation.start_size = population.len();
-        self.population = PopulationStatistics::new(config);
+    pub fn update_eaten(&mut self, eaten: HashMap<String, u32>) {
+        for (name, count) in eaten.into_iter() {
+            self.current
+                .entry(name)
+                .and_modify(|stat| stat.eaten += count);
+        }
     }
-    pub fn end_of_generation(&mut self, population: &[OrganismIndividual]) {
-        let mut cur = self.cur_generation.clone();
-        cur.end_size = population.len();
-        cur.avg_energy = population.iter().map(|i| i.energy).sum::<f32>() / (cur.end_size as f32);
-        self.generations.push(cur);
-        self.cur_generation = GenerationStatistics::default();
+    pub fn update_out_of_energy(&mut self, out_of_energy: HashMap<String, u32>) {
+        for (name, count) in out_of_energy.into_iter() {
+            self.current
+                .entry(name)
+                .and_modify(|stat| stat.out_of_energy += count);
+        }
+    }
+    pub fn sprint(&self, cur_step: u32) -> String {
+        let mut s = String::new();
+        s.push_str(&format!("Steps: {:6}\n", cur_step));
+        for (name, stat) in self.current.iter() {
+            s.push_str(&format!("    {name:10} - {}\n", stat.inline_sprint()));
+        }
+        s
+    }
+}
+
+pub fn statistics_accumulation(
+    simulation: Res<Simulation>,
+    config: Res<EcosystemConfig>,
+    mut ecosystem_statistics: ResMut<EcosystemStatistics>,
+    organisms: Query<(&Organism, &Body)>,
+) {
+    if simulation.steps % config.statistics.aggregation_rate.unwrap() == 0 {
+        // Update current statistics
+        let mut size = HashMap::new();
+        let mut energy = HashMap::new();
+        for (organism, body) in organisms.iter() {
+            *size.entry(organism.name.clone()).or_insert(0) += 1;
+            *energy.entry(organism.name.clone()).or_insert(0.) += body.energy();
+        }
+        for (name, size) in size.into_iter() {
+            if let Some(stat) = ecosystem_statistics.current.get_mut(&name) {
+                stat.size = size;
+                stat.energy_avg = energy[&name] / size as f32;
+            }
+        }
+        // Print in console
+        println!("{}", ecosystem_statistics.sprint(simulation.steps));
+        // Store current statistics, and prepare new one
+        let current = ecosystem_statistics.current.clone();
+        ecosystem_statistics
+            .accumulation
+            .push((simulation.steps, current));
+        ecosystem_statistics.reset_current(&config);
     }
 }

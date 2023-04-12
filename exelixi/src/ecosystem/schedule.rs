@@ -9,6 +9,7 @@ impl EcosystemSchedule {
         let mut schedule = Schedule::new();
         schedule.add_systems(
             (
+                statistics_accumulation,
                 locomotion_movement,
                 mouth_eating,
                 apply_system_buffers,

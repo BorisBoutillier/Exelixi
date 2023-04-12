@@ -41,6 +41,43 @@
             sprite_size: (20.0,20.0),
         )
         )
+    ,
+        (
+            name : "Carnivore"
+        ,   eye: Some(EyeConfig (
+                fov_angle: Gene(min:1.5,max:4.71)
+            ,   fov_range: Gene(min:70,max:400)
+            ,   energy_cost: 0.000
+            ,   n_cells: Fixed(9)
+            ,   visible: ["Herbivore"]
+            ))
+        ,   body: (
+                starting_energy: 10000
+            ,   maximum_energy: 40000
+            ,   body_cost: 6
+        )
+        ,   mouth: Some( MouthConfig(
+            reach: 10.0,
+            edible: ["Herbivore"],
+        ))
+        ,   locomotion: Some( LocomotionConfig(
+                linear: Neuron(min:0,max:6)
+            ,   linear_cost: 0.000
+            ,   angular_cost: 0.000
+            ))
+        ,   reproduction: GenerationEvolution(
+                generation_length : 5000
+            ,   min_population    : 50
+            ,   fertility_rate: 1.5
+            ,   mutation_chance: 0.01
+            ,   mutation_amplitude: 0.3
+        )
+        , visualization: (
+            hue:225.0,
+            sprite_file: "bird.png",
+            sprite_size: (30.0,30.0),
+        )
+        )
     , (
             name : "Plant"
         ,   body: (

@@ -40,7 +40,7 @@ struct Args {
     /// Initial seed for the simulation, randomized when not provided.
     #[arg(short, long)]
     seed: Option<u64>,
-    /// Auto start the simulation without gui for the provided number of generation
+    /// Auto start the simulation without gui for the provided number of steps
     ///
     #[arg(long)]
     run_for: Option<u32>,

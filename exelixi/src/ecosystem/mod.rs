@@ -40,6 +40,7 @@ impl Plugin for EcosystemPlugin {
         app.add_event::<NewGenerationEvent>();
         app.insert_resource(EcosystemRng(rng));
         app.insert_resource(ecosystem_config);
+        app.insert_resource(GenerationEvolutions::default());
         app.add_schedule(EcosystemSchedule, EcosystemSchedule::new_schedule());
     }
 }

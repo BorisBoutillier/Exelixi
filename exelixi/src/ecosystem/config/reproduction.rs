@@ -6,7 +6,7 @@ pub enum ReproductionConfig {
         // Average number of organism that spawns per step
         spawn_rate: f64,
     },
-    EndOfGenerationEvolution {
+    GenerationEvolution {
         // Number of child one surviving organism spawn in next generation
         generation_length: u32,
         // Minimum number of organisms in each generation. Randomized if 'missing'

@@ -3,6 +3,13 @@ use std::{collections::HashMap, path::PathBuf};
 use crate::ecosystem::*;
 
 use super::{environment::EnvironmentConfig, organism::OrganismConfig, *};
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct EcosystemStatsConfig {
+    // Defines the number of steps between each data aggregation.
+    // If not provided, with be 0.1*smallest generation length.
+    pub aggregation_rate: Option<u32>,
+}
 //
 // Resources
 //
@@ -12,6 +19,8 @@ pub struct EcosystemConfig {
     pub environment: EnvironmentConfig,
     // Configuration information regarding the organisms
     pub organisms: Vec<OrganismConfig>,
+    // Configuration information regarding statistics creation
+    pub statistics: EcosystemStatsConfig,
     #[serde(skip)]
     pub organisms_per_name: HashMap<String, OrganismConfig>,
 }
@@ -26,12 +35,14 @@ impl EcosystemConfig {
             }
             Some(path) => {
                 if let Ok(ron_string) = std::fs::read_to_string(path.as_path()) {
-                    if let Ok(config) = ron::from_str::<EcosystemConfig>(&ron_string) {
-                        log::info!("EcosystemConfig loaded from {:?}", path.as_os_str());
-                        config
-                    } else {
-                        log::error!("EcosystemConfig could not be loaded from {:?}, invalid content in the file.",path.as_os_str());
-                        panic!();
+                    match ron::from_str::<EcosystemConfig>(&ron_string) {
+                        Ok(config) => {
+                            log::info!("EcosystemConfig loaded from {:?}", path.as_os_str());
+                            config
+                        }
+                        Err(err) => {
+                            panic!("EcosystemConfig could not be loaded from {:?}, invalid content in the file: {err}",path.as_os_str());
+                        }
                     }
                 } else {
                     log::error!(
@@ -47,12 +58,16 @@ impl EcosystemConfig {
                 .organisms_per_name
                 .insert(organism_config.name.clone(), organism_config.clone());
         }
-        config.check_coherency();
+        config.update();
         config
     }
-    fn check_coherency(&self) {
+    // Update configuration.
+    // Allow to set 'undefinied' values based on other configuration values.
+    // Also check for configuration incoherencies.
+    fn update(&mut self) {
+        let mut min_generation_length = u32::MAX;
         for organism in self.organisms.iter() {
-            // Each mouth.edible must reference defined organism name
+            // Check that each mouth.edible must reference defined organism name
             if let Some(mouth_config) = &organism.mouth {
                 for name in mouth_config.edible.iter() {
                     if !self.organisms_per_name.contains_key(name) {
@@ -60,6 +75,24 @@ impl EcosystemConfig {
                     }
                 }
             }
+            if let ReproductionConfig::GenerationEvolution {
+                generation_length,
+                min_population: _,
+                fertility_rate: _,
+                mutation_chance: _,
+                mutation_amplitude: _,
+            } = organism.reproduction
+            {
+                min_generation_length = min_generation_length.min(generation_length);
+            }
         }
+        if self.statistics.aggregation_rate.is_none() {
+            if min_generation_length != u32::MAX {
+                self.statistics.aggregation_rate = Some((min_generation_length / 10).max(1));
+            } else {
+                self.statistics.aggregation_rate = Some(1000);
+            }
+        }
+        println!("Aggreation: {:?}", self.statistics.aggregation_rate);
     }
 }

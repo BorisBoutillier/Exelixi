@@ -28,7 +28,7 @@
             ,   linear_cost: 0.000
             ,   angular_cost: 0.000
             ))
-        ,   reproduction: EndOfGenerationEvolution(
+        ,   reproduction: GenerationEvolution(
                 generation_length : 5000
             ,   min_population    : 50
             ,   fertility_rate: 1.5
@@ -61,5 +61,6 @@
             sprite_size: (8.0,8.0),
         )
     )
-    ] 
+    ], 
+    statistics: () 
 )

@@ -50,7 +50,7 @@ pub fn body_energy_consumption(
     q1: Query<&Eye>,
     q2: Query<&Locomotion>,
     q3: Query<&Leaf>,
-    mut simulation: ResMut<Simulation>,
+    mut ecosystem_statistics: ResMut<EcosystemStatistics>,
 ) {
     let mut deaths = HashMap::new();
     for (entity, mut body, organism) in bodies.iter_mut() {
@@ -73,6 +73,6 @@ pub fn body_energy_consumption(
         }
     }
     if !deaths.is_empty() {
-        simulation.statistics.update_deaths(deaths);
+        ecosystem_statistics.update_out_of_energy(deaths);
     }
 }

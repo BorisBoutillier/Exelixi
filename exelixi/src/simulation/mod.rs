@@ -29,20 +29,16 @@ const MIN_FPS: u32 = 10;
 const MAX_SIMULATION_DURATION_PER_FRAME: f32 = 1.0 / (MIN_FPS as f32);
 
 pub fn run_ecosystem_schedule(world: &mut World) {
-    let (start_generation, control, run_for) = {
+    let (start_steps, control, run_for) = {
         let simulation = world.get_resource::<Simulation>().unwrap();
-        (
-            simulation.generation,
-            simulation.control,
-            simulation.run_for,
-        )
+        (simulation.steps, simulation.control, simulation.run_for)
     };
-    if let Some(n_generation) = run_for {
+    if let Some(n_steps) = run_for {
         loop {
             world.run_schedule(EcosystemSchedule);
-            let cur_generation = world.get_resource::<Simulation>().unwrap().generation;
+            let cur_steps = world.get_resource::<Simulation>().unwrap().steps;
             // Always give back control on generation increase
-            if cur_generation >= start_generation + n_generation - 1 {
+            if cur_steps >= start_steps + n_steps {
                 world
                     .get_resource_mut::<Events<AppExit>>()
                     .unwrap()
@@ -59,11 +55,13 @@ pub fn run_ecosystem_schedule(world: &mut World) {
         loop {
             world.run_schedule(EcosystemSchedule);
             cur_steps += 1;
-            let cur_generation = world.get_resource::<Simulation>().unwrap().generation;
-            // Always give back control on generation increase
-            if cur_generation > start_generation {
-                break;
+            if let Some(mut events) = world.get_resource_mut::<Events<NewGenerationEvent>>() {
+                if !events.is_empty() {
+                    events.update();
+                    break;
+                }
             }
+
             // Give back control every 1/60s
             if (Instant::now() - start_time).as_secs_f32() >= MAX_SIMULATION_DURATION_PER_FRAME {
                 break;

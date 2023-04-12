@@ -4,6 +4,7 @@ use crate::prelude::*;
 pub fn panels_ui(
     mut contexts: EguiContexts,
     simulation: Res<Simulation>,
+    ecosystem_statistics: Res<EcosystemStatistics>,
     mut ui_state: ResMut<UiState>,
     mut action_state: ResMut<ActionState<SimulationSpeedAction>>,
 ) {
@@ -22,7 +23,7 @@ pub fn panels_ui(
             spacing.button_padding = egui::Vec2::new(2.0, 2.0);
             ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
                 ui.add_space(30.0);
-                ui.heading(format!("Generation: {:4}", simulation.generation));
+                ui.heading(format!("Steps: {:6}", simulation.steps));
                 ui.add_space(ui.available_width() - half_width - 30.0 * 3.0);
                 let (text, hover_text) =
                     if simulation.control.state == SimulationControlState::Paused {
@@ -80,6 +81,7 @@ pub fn panels_ui(
     //
     // Left side panel for Statistics
     //
+    let name = ecosystem_statistics.current.keys().next().unwrap();
     if ui_state.stat_panel {
         egui::SidePanel::left("left_panel")
             .frame(
@@ -96,55 +98,28 @@ pub fn panels_ui(
                     .show(ui, |ui| {
                         let size_color = egui::Color32::from_rgb(100, 100, 255);
                         let dead_color = egui::Color32::from_rgb(230, 25, 25);
-                        let avg_color = egui::Color32::from_rgb(25, 180, 25);
                         let population_size_line = egui::plot::Line::new(
-                            simulation
-                                .statistics
-                                .generations
+                            ecosystem_statistics
+                                .accumulation
                                 .iter()
-                                .enumerate()
-                                .map(|(i, s)| [i as f64, s.start_size as f64])
+                                .map(|(step, stat)| [*step as f64, stat[name].size as f64])
                                 .collect::<Vec<_>>(),
                         )
                         .color(size_color);
                         let population_dead_line = egui::plot::Line::new(
-                            simulation
-                                .statistics
-                                .generations
+                            ecosystem_statistics
+                                .accumulation
                                 .iter()
-                                .enumerate()
-                                .map(|(i, s)| [i as f64, (s.start_size - s.end_size) as f64])
+                                .map(|(step, stat)| [*step as f64, stat[name].out_of_energy as f64])
                                 .collect::<Vec<_>>(),
                         )
                         .color(dead_color);
-                        let plot_bottom = egui::plot::Line::new(
-                            simulation
-                                .statistics
-                                .generations
-                                .iter()
-                                .enumerate()
-                                .map(|(i, s)| [i as f64, s.get_deaths("Plant") as f64])
-                                .collect::<Vec<_>>(),
-                        )
-                        .color(avg_color);
                         ui.horizontal(|ui| {
-                            ui.label(
-                                egui::RichText::new(format!(
-                                    "Population: {:4}",
-                                    simulation.statistics.latest_start_size()
-                                ))
-                                .color(size_color),
-                            )
-                            .on_hover_text("Population at the start");
+                            ui.label(egui::RichText::new(name).color(size_color))
+                                .on_hover_text("Population at the start");
                             ui.add_space(8.0);
-                            ui.label(
-                                egui::RichText::new(format!(
-                                    "Deaths: {:4}",
-                                    simulation.statistics.latest_dead()
-                                ))
-                                .color(dead_color),
-                            )
-                            .on_hover_text("Deaths at end");
+                            ui.label(egui::RichText::new("Deaths: UNK").color(dead_color))
+                                .on_hover_text("Deaths at end");
                         });
                         let plot = egui::plot::Plot::new("population_plot")
                             .height(80.0)
@@ -158,25 +133,17 @@ pub fn panels_ui(
                             plot_ui.line(population_dead_line);
                             plot_ui.line(population_size_line);
                         });
-                        ui.label(
-                            egui::RichText::new(format!(
-                                "Uneaten food: {:5}",
-                                simulation.statistics.latest_food_decay()
-                            ))
-                            .color(avg_color),
-                        )
-                        .on_hover_text("Number food that have decayed or have been eaten at end");
-                        let plot = egui::plot::Plot::new("Food decay plot")
-                            .height(80.0)
-                            .show_x(false)
-                            .show_y(true)
-                            .center_x_axis(false)
-                            .center_y_axis(false)
-                            .allow_zoom(false)
-                            .allow_drag(false);
-                        plot.show(ui, |plot_ui| {
-                            plot_ui.line(plot_bottom);
-                        });
+                        //let plot = egui::plot::Plot::new("Food decay plot")
+                        //    .height(80.0)
+                        //    .show_x(false)
+                        //    .show_y(true)
+                        //    .center_x_axis(false)
+                        //    .center_y_axis(false)
+                        //    .allow_zoom(false)
+                        //    .allow_drag(false);
+                        //plot.show(ui, |plot_ui| {
+                        //    plot_ui.line(plot_bottom);
+                        //});
                     });
                 //egui::CollapsingHeader::new("Population genetic")
                 //    .default_open(true)

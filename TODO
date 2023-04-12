@@ -1,17 +1,22 @@
 -- Code
-. Update Eye cells to only sense closest edible organism
+. Move steps in Simulation
+   Move generation per Config
+   Stats updated each 'generation' for evolving,
+   On each generation update, update stats for Autospawning
+   Show generation number per Evolving organism.
+   Update bench C to have different generation length for Carnivore/Herbivore
+. Move statistics out of Simulation
 . Update statistics to support organism names.
     Report end_of generation survivors per name.
-    Report eaten per generation per name
-    Report dead as out of energy per generation per name.
-. Should at this point be able to do a config with Plant, Herbivore and Carnivore.
+    Report death (out of energy or eatn) per generation per name.
+. Update Eye cells to only sense closest edible organism
 
 . Fix lost determinism when changing mouth eating algorithm
-. Make simulation systems and needed components as a plugin
 . Save/Load population, with config
-. Use a spatial data structure to look for organism eating each-other.
 . Add the reach of the Mouth as fixed energy cost, and also a gene 
+. Use a spatial data structure to look for organism eating each-other.
 . Add support for Eye to also see 'hue' as second sensor per cell, and see all organism.
+. Make simulation systems and needed components as a plugin
 
 -- User Interaction
 . Improve user camera interaction:

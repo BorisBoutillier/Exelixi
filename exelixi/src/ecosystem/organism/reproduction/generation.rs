@@ -1,6 +1,8 @@
 use crate::ecosystem::{organism::reproduction::individual::OrganismIndividual, *};
 
+#[derive(Debug)]
 pub struct NewGenerationEvent {
+    pub name: String,
     pub generation: u32,
 }
 
@@ -12,65 +14,50 @@ pub fn evolve(
     organisms: Query<(Entity, &Body, &Brain, Option<&Eye>)>,
     mut rng: ResMut<EcosystemRng>,
     mut new_generation_events: EventWriter<NewGenerationEvent>,
+    mut generation_evolutions: ResMut<GenerationEvolutions>,
 ) {
     simulation.steps += 1;
-    for organism_config in config.organisms.iter() {
-        if let ReproductionConfig::EndOfGenerationEvolution {
-            generation_length,
-            min_population,
-            fertility_rate,
-            mutation_chance: _,
-            mutation_amplitude: _,
-        } = organism_config.reproduction
-        {
-            if simulation.steps == generation_length {
-                simulation.steps = 0;
+    for (name, state) in generation_evolutions.0.iter_mut() {
+        if simulation.steps % state.generation_length == 0 {
+            let current_population = organisms
+                .iter()
+                .map(|(entity, body, brain, eye)| {
+                    commands.entity(entity).despawn_recursive();
+                    OrganismIndividual::from_components(&state.config, body, &eye, brain)
+                })
+                .collect::<Vec<_>>();
+            state.current_generation += 1;
 
-                let current_population = organisms
-                    .iter()
-                    .map(|(entity, body, brain, eye)| {
-                        commands.entity(entity).despawn_recursive();
-                        OrganismIndividual::from_components(organism_config, body, &eye, brain)
-                    })
-                    .collect::<Vec<_>>();
-                simulation.statistics.end_of_generation(&current_population);
-                println!("{}", simulation.sprint_state(&config));
-
-                let mut new_population = simulation.ga.evolve(
-                    &mut rng.0,
-                    &current_population,
-                    fertility_rate,
-                    (min_population as f32 * 0.9) as usize, // If survivors and fertility are not enough keep 10% random
-                );
-                // If not enough survived, add random organisms
-                let missing_population = min_population as i32 - new_population.len() as i32;
-                for _ in 0..missing_population {
-                    new_population.push(OrganismIndividual::random(&mut rng.0, organism_config));
-                }
-                simulation
-                    .statistics
-                    .start_of_new_generation(&new_population, &config);
-
-                simulation.new_generation();
-                new_generation_events.send(NewGenerationEvent {
-                    generation: simulation.generation,
-                });
-                // Spawn new organisms
-                new_population.into_iter().for_each(|individual| {
-                    let (body, eye, locomotion, brain) =
-                        individual.into_components(organism_config);
-                    spawn_organism(
-                        &mut commands,
-                        &config,
-                        organism_config,
-                        body,
-                        eye,
-                        locomotion,
-                        brain,
-                        &mut rng,
-                    );
-                });
+            let mut new_population = state.genetic_algorithm.evolve(
+                &mut rng.0,
+                &current_population,
+                state.fertility_rate,
+                (state.minimum_population as f32 * 0.9) as usize, // If survivors and fertility are not enough keep 10% random
+            );
+            // If not enough survived, add random organisms
+            let missing_population = state.minimum_population as i32 - new_population.len() as i32;
+            for _ in 0..missing_population {
+                new_population.push(OrganismIndividual::random(&mut rng.0, &state.config));
             }
+
+            new_generation_events.send(NewGenerationEvent {
+                name: name.clone(),
+                generation: state.current_generation,
+            });
+            // Spawn new organisms
+            new_population.into_iter().for_each(|individual| {
+                let (body, eye, locomotion, brain) = individual.into_components(&state.config);
+                spawn_organism(
+                    &mut commands,
+                    &config,
+                    &state.config,
+                    body,
+                    eye,
+                    locomotion,
+                    brain,
+                    &mut rng,
+                );
+            });
         }
     }
 }
@@ -116,13 +103,15 @@ pub fn spawn_organism(
 }
 pub fn spawn_starting_organisms(
     mut commands: Commands,
-    mut simulation: ResMut<Simulation>,
     config: Res<EcosystemConfig>,
     mut rng: ResMut<EcosystemRng>,
+    mut generation_evolutions: ResMut<GenerationEvolutions>,
 ) {
     if config.is_changed() {
+        commands.insert_resource(EcosystemStatistics::new(&config));
+        generation_evolutions.0.clear();
         for organism_config in config.organisms.iter() {
-            if let ReproductionConfig::EndOfGenerationEvolution {
+            if let ReproductionConfig::GenerationEvolution {
                 generation_length: _,
                 min_population,
                 fertility_rate: _,
@@ -130,19 +119,18 @@ pub fn spawn_starting_organisms(
                 mutation_amplitude: _,
             } = organism_config.reproduction
             {
+                generation_evolutions.0.insert(
+                    organism_config.name.clone(),
+                    GenerationEvolution::new(organism_config),
+                );
                 // Create a new random population
                 let new_population = (0..min_population)
                     .map(|_| OrganismIndividual::random(&mut rng.0, organism_config))
                     .collect::<Vec<_>>();
-                simulation
-                    .statistics
-                    .start_of_new_generation(&new_population, &config);
-                simulation.new_generation();
                 // Spawn the organisms
                 new_population.into_iter().for_each(|individual| {
                     let (body, eye, locomotion, brain) =
                         individual.into_components(organism_config);
-                    //simulation.statistics.population.add_entry(&eye);
                     spawn_organism(
                         &mut commands,
                         &config,
