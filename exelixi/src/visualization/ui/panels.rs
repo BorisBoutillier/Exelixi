@@ -1,17 +1,18 @@
+use bevy_egui::egui::{Color32, FontId, Id, Pos2, RichText};
+
 use crate::prelude::*;
 
 // All panels must be declared in the same system as the order of panel creation is important
-pub fn panels_ui(
+pub fn ui_status_bar(
     mut contexts: EguiContexts,
     simulation: Res<Simulation>,
-    ecosystem_statistics: Res<EcosystemStatistics>,
-    mut ui_state: ResMut<UiState>,
     mut action_state: ResMut<ActionState<SimulationSpeedAction>>,
+    diagnostics: Res<Diagnostics>,
 ) {
     //
     // Bottom status bar
     //
-    // Always present and first to span the whole bottom
+    // Always present and span the whole bottom
 
     egui::TopBottomPanel::bottom("status_bar")
         .frame(egui::Frame::default().fill(egui::Color32::from_rgb(30, 30, 30)))
@@ -67,128 +68,70 @@ pub fn panels_ui(
                 {
                     action_state.press(SimulationSpeedAction::Fastest);
                 }
-                if ui
-                    .add(egui::Button::new(
-                        egui::RichText::new("S").color(egui::Color32::from_rgb(211, 211, 211)),
-                    ))
-                    .on_hover_text("Stat panel")
-                    .clicked()
-                {
-                    ui_state.stat_panel = !ui_state.stat_panel;
+                ui.add_space(ui.available_width() - 60.0);
+                let mut fps_s = "N/A".to_string();
+                if let Some(fps) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {
+                    if let Some(average) = fps.average() {
+                        fps_s = format!("{average:.1}");
+                    }
                 }
+                ui.label(RichText::new(format!("fps: {fps_s}")).font(FontId::proportional(10.0)));
             });
         });
-    //
-    // Left side panel for Statistics
-    //
-    let name = ecosystem_statistics.current.keys().next().unwrap();
-    if ui_state.stat_panel {
-        egui::SidePanel::left("left_panel")
-            .frame(
-                egui::Frame::default()
-                    .fill(egui::Color32::from_rgb(30, 30, 30))
-                    .inner_margin(egui::Vec2::new(10.0, 10.0)),
-            )
-            .resizable(false)
-            .min_width(UI_LEFT_PANEL_WIDTH)
-            .max_width(UI_LEFT_PANEL_WIDTH)
-            .show(contexts.ctx_mut(), |ui| {
-                egui::CollapsingHeader::new("Simulation")
-                    .default_open(true)
-                    .show(ui, |ui| {
-                        let size_color = egui::Color32::from_rgb(100, 100, 255);
-                        let dead_color = egui::Color32::from_rgb(230, 25, 25);
-                        let population_size_line = egui::plot::Line::new(
-                            ecosystem_statistics
-                                .accumulation
-                                .iter()
-                                .map(|(step, stat)| [*step as f64, stat[name].size as f64])
-                                .collect::<Vec<_>>(),
-                        )
-                        .color(size_color);
-                        let population_dead_line = egui::plot::Line::new(
-                            ecosystem_statistics
-                                .accumulation
-                                .iter()
-                                .map(|(step, stat)| [*step as f64, stat[name].out_of_energy as f64])
-                                .collect::<Vec<_>>(),
-                        )
-                        .color(dead_color);
-                        ui.horizontal(|ui| {
-                            ui.label(egui::RichText::new(name).color(size_color))
-                                .on_hover_text("Population at the start");
-                            ui.add_space(8.0);
-                            ui.label(egui::RichText::new("Deaths: UNK").color(dead_color))
-                                .on_hover_text("Deaths at end");
-                        });
-                        let plot = egui::plot::Plot::new("population_plot")
-                            .height(80.0)
-                            .show_x(false)
-                            .show_y(true)
-                            .center_x_axis(false)
-                            .center_y_axis(false)
-                            .allow_zoom(false)
-                            .allow_drag(false);
-                        plot.show(ui, |plot_ui| {
-                            plot_ui.line(population_dead_line);
-                            plot_ui.line(population_size_line);
-                        });
-                        //let plot = egui::plot::Plot::new("Food decay plot")
-                        //    .height(80.0)
-                        //    .show_x(false)
-                        //    .show_y(true)
-                        //    .center_x_axis(false)
-                        //    .center_y_axis(false)
-                        //    .allow_zoom(false)
-                        //    .allow_drag(false);
-                        //plot.show(ui, |plot_ui| {
-                        //    plot_ui.line(plot_bottom);
-                        //});
-                    });
-                //egui::CollapsingHeader::new("Population genetic")
-                //    .default_open(true)
-                //    .show(ui, |ui| {
-                //        if !simulation.statistics.population.fov_angle.is_empty() {
-                //            let chart = egui::plot::BarChart::new(
-                //                simulation
-                //                    .statistics
-                //                    .population
-                //                    .fov_angle
-                //                    .iter()
-                //                    .map(|(r, c)| {
-                //                        egui::plot::Bar::new((r.start as f64) / 100.0, *c as f64)
-                //                            .width((r.end - r.start) as f64 / 200.0)
-                //                    })
-                //                    .collect(),
-                //            )
-                //            .color(egui::Color32::from_rgb(100, 100, 255))
-                //            .name("FOV _angle");
-                //            egui::plot::Plot::new("FOV angle")
-                //                .height(80.0)
-                //                .legend(egui::plot::Legend::default())
-                //                .show(ui, |plot_ui| plot_ui.bar_chart(chart));
-                //        }
-                //        if !simulation.statistics.population.fov_range.is_empty() {
-                //            let chart = egui::plot::BarChart::new(
-                //                simulation
-                //                    .statistics
-                //                    .population
-                //                    .fov_range
-                //                    .iter()
-                //                    .map(|(r, c)| {
-                //                        egui::plot::Bar::new(r.start as f64, *c as f64)
-                //                            .width((r.end - r.start) as f64 / 2.0)
-                //                    })
-                //                    .collect(),
-                //            )
-                //            .color(egui::Color32::from_rgb(50, 50, 255))
-                //            .name("FOV range");
-                //            egui::plot::Plot::new("FOV range")
-                //                .height(80.0)
-                //                .legend(egui::plot::Legend::default())
-                //                .show(ui, |plot_ui| plot_ui.bar_chart(chart));
-                //        }
-                //    });
-            });
-    }
+}
+pub fn ui_simulation(
+    mut contexts: EguiContexts,
+    ecosystem_config: ResMut<EcosystemConfig>,
+    ecosystem_statistics: Res<EcosystemStatistics>,
+    mut ui_state: ResMut<UiState>,
+) {
+    egui::popup::show_tooltip_at(
+        contexts.ctx_mut(),
+        Id::new("Simulation"),
+        Some(Pos2 { x: 10.0, y: 10.0 }),
+        |ui| {
+            ui.set_width(400.0);
+            if ui.label("[1] Simulation").clicked() {
+                ui_state.ui_simulation_open = !ui_state.ui_simulation_open;
+            }
+            if ui_state.ui_simulation_open {
+                let mut plot_lines = vec![];
+                for (name, stats) in ecosystem_statistics.organisms.iter() {
+                    if let Some(stat) = stats.last_stored() {
+                        let hue = ecosystem_config.organisms_per_name[name].visualization.hue;
+                        let [r, g, b, _] = Color::hsl(hue, 1.0, 0.7).as_rgba_f32();
+                        let color = Color32::from_rgb(
+                            (r * 256.0) as u8,
+                            (g * 256.0) as u8,
+                            (b * 256.0) as u8,
+                        );
+                        ui.label(RichText::new(format!("{name} {}", stat.size)).color(color));
+                        plot_lines.push(
+                            egui::plot::Line::new(
+                                stats
+                                    .accumulation
+                                    .iter()
+                                    .map(|(step, stat)| [*step as f64, stat.size as f64])
+                                    .collect::<Vec<_>>(),
+                            )
+                            .color(color),
+                        );
+                    }
+                }
+                let plot = egui::plot::Plot::new("Population")
+                    .height(80.0)
+                    .show_x(false)
+                    .show_y(true)
+                    .center_x_axis(false)
+                    .center_y_axis(false)
+                    .allow_zoom(false)
+                    .allow_drag(false);
+                plot.show(ui, |plot_ui| {
+                    for plot_line in plot_lines {
+                        plot_ui.line(plot_line);
+                    }
+                });
+            }
+        },
+    );
 }

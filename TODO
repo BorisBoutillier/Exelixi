@@ -1,14 +1,7 @@
 -- Code
-. Move steps in Simulation
-   Move generation per Config
-   Stats updated each 'generation' for evolving,
-   On each generation update, update stats for Autospawning
-   Show generation number per Evolving organism.
-   Update bench C to have different generation length for Carnivore/Herbivore
-. Move statistics out of Simulation
-. Update statistics to support organism names.
-    Report end_of generation survivors per name.
-    Report death (out of energy or eatn) per generation per name.
+. Statistics:
+  . Compute generation number in stats.
+  . Update bench C to have different generation length for Carnivore/Herbivore
 . Update Eye cells to only sense closest edible organism
 
 . Fix lost determinism when changing mouth eating algorithm
