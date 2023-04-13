@@ -96,30 +96,35 @@ impl Eye {
     pub fn process_vision(
         &self,
         position: &Position,
-        positions: &[(&Position, &Organism)],
+        positions: &[(&Position, &Organism, &Body)],
     ) -> Vec<f32> {
         let mut sensors = vec![];
         let visible_positions = positions
             .iter()
-            .filter(|(_, o)| self.visible.contains(&o.name))
-            .map(|(p, _)| *p)
+            .filter(|(_, o, _)| self.visible.contains(&o.name))
+            .map(|(p, _, b)| (*p, b.energy_pct()))
             .collect::<Vec<_>>();
         sensors.extend(self.sense_objects(position, &visible_positions));
         assert_eq!(sensors.len(), self.n_sensors());
         sensors
     }
-    // process the sensors value for each eye cell associated to the given
-    // transforms
-    pub fn sense_objects(&self, position: &Position, object_positions: &[&Position]) -> Vec<f32> {
-        let mut cells = vec![0.0; self.n_cells];
+    // process the sensors value for each eye cell associated to the given transforms
+    // Each eye sector only seen the closest organism.
+    // The sensor value for each sector is (1-distance_pct)*energy_pct of the closest organism that this sector can see.
+    // Meaning the closer and the more energy this organism has, the higher the value, range [0..1]
+    pub fn sense_objects(
+        &self,
+        position: &Position,
+        organism_positions: &[(&Position, f32)],
+    ) -> Vec<f32> {
+        let mut closest_per_cell = vec![None; self.n_cells];
         //println!("SENSE for {position:?}");
-        for object_position in object_positions {
-            let distance_squared = position.distance_squared(object_position);
+        for (organism_position, organism_energy_pct) in organism_positions {
+            let distance_squared = position.distance_squared(organism_position);
             if distance_squared > self.fov_range.powi(2) {
                 continue;
             }
-            let view_angle = position.angle_between(object_position);
-            //println!("    FOOD {:?} -> {}", object_position, view_angle);
+            let view_angle = position.angle_between(organism_position);
             if view_angle < -self.fov_angle / 2.0 || view_angle > self.fov_angle / 2.0 {
                 continue;
             }
@@ -128,12 +133,24 @@ impl Eye {
             let sector = (view_angle + self.fov_angle / 2.0) / sector_angle;
             let sector = (sector as usize).min(self.n_sectors - 1);
 
-            let energy = (self.fov_range - distance_squared.sqrt()) / self.fov_range;
-
-            cells[sector] += energy;
+            let distance_pct = (self.fov_range - distance_squared.sqrt()) / self.fov_range;
+            if let Some((other_distance_pct, _)) = closest_per_cell[sector] {
+                if distance_pct < other_distance_pct {
+                    closest_per_cell[sector] = Some((distance_pct, organism_energy_pct));
+                }
+            } else {
+                closest_per_cell[sector] = Some((distance_pct, organism_energy_pct));
+            }
         }
         //println!("  -> Cells: {cells:?}");
-        cells
+        closest_per_cell
+            .iter()
+            .map(|closest| {
+                closest
+                    .map(|(distance_pct, energy_pct)| (1.0 - distance_pct) * energy_pct)
+                    .unwrap_or(0.0)
+            })
+            .collect::<Vec<_>>()
     }
     pub fn energy_cost(&self) -> f32 {
         self.energy_cost

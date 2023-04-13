@@ -15,6 +15,5 @@ pub fn setup_ui_action(mut commands: Commands) {
 pub fn ui_action_input(action_state: Res<ActionState<UiAction>>, mut ui_state: ResMut<UiState>) {
     if action_state.just_pressed(UiAction::OpenCloseSimulationPanel) {
         ui_state.ui_simulation_open = !ui_state.ui_simulation_open;
-        println!("NEW State {:?}", ui_state);
     }
 }

@@ -1,26 +1,23 @@
+-- Bugs
+. Mouse simulation interactions no more working.
+. Fix lost determinism when changing mouth eating algorithm
+
 -- Code
 . Statistics:
-  . Compute generation number in stats.
+  . Compute generation number in stats, show them in Simulation pane
   . Update bench C to have different generation length for Carnivore/Herbivore
-. Update Eye cells to only sense closest edible organism
+. UI:
+  . Add a 'Selection' panel, that show data from currently selected organism:
+    A collaspable header per Component.
 
-. Fix lost determinism when changing mouth eating algorithm
 . Save/Load population, with config
 . Add the reach of the Mouth as fixed energy cost, and also a gene 
 . Use a spatial data structure to look for organism eating each-other.
-. Add support for Eye to also see 'hue' as second sensor per cell, and see all organism.
-. Make simulation systems and needed components as a plugin
+. Add support for Eye to have two sensors per cell 'distance' and 'energy' of closest
+. Add support for Eye to have three sensors per eye 'distance', 'energy', 'hue'
 
 -- User Interaction
 . Improve user camera interaction:
     . Make panning around follow environment 'scale'
-. Have a drop down panel for Simulation, Population, Organism, openable/closable through F4/F5/F6
-  Simulation show evolution through generation data.
-    
-  Population show current population data:
-    Number alive, stats per parts
-  Organism show currently selected organism data.
-. Status bar with a progress bar of steps within the generation
-
 . Update on simulation interaction:
     Allow a 'skip N' input command where N entered by user (default 10)

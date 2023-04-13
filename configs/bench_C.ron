@@ -9,7 +9,7 @@
             name : "Herbivore"
         ,   eye: Some(EyeConfig (
                 fov_angle: Gene(min:1.5,max:4.71)
-            ,   fov_range: Gene(min:70,max:400)
+            ,   fov_range: Gene(min:70,max:250)
             ,   energy_cost: 0.000
             ,   n_cells: Fixed(9)
             ,   visible: ["Plant"]
@@ -17,20 +17,20 @@
         ,   body: (
                 starting_energy: 10000
             ,   maximum_energy: 40000
-            ,   body_cost: 6
+            ,   body_cost: 4
         )
         ,   mouth: Some( MouthConfig(
             reach: 10.0,
             edible: ["Plant"],
         ))
         ,   locomotion: Some( LocomotionConfig(
-                linear: Neuron(min:0,max:6)
-            ,   linear_cost: 0.000
+                linear: Neuron(min:0,max:4)
+            ,   linear_cost: 0.1
             ,   angular_cost: 0.000
             ))
         ,   reproduction: GenerationEvolution(
                 generation_length : 5000
-            ,   min_population    : 50
+            ,   min_population    : 20
             ,   fertility_rate: 1.5
             ,   mutation_chance: 0.01
             ,   mutation_amplitude: 0.3
@@ -48,7 +48,7 @@
                 fov_angle: Gene(min:1.5,max:4.71)
             ,   fov_range: Gene(min:70,max:400)
             ,   energy_cost: 0.000
-            ,   n_cells: Fixed(9)
+            ,   n_cells: Fixed(18)
             ,   visible: ["Herbivore"]
             ))
         ,   body: (
@@ -57,17 +57,17 @@
             ,   body_cost: 6
         )
         ,   mouth: Some( MouthConfig(
-            reach: 10.0,
+            reach: 20.0,
             edible: ["Herbivore"],
         ))
         ,   locomotion: Some( LocomotionConfig(
-                linear: Neuron(min:0,max:6)
-            ,   linear_cost: 0.000
+                linear: Neuron(min:0,max:16)
+            ,   linear_cost: 0.1
             ,   angular_cost: 0.000
             ))
         ,   reproduction: GenerationEvolution(
                 generation_length : 5000
-            ,   min_population    : 50
+            ,   min_population    : 2
             ,   fertility_rate: 1.5
             ,   mutation_chance: 0.01
             ,   mutation_amplitude: 0.3
@@ -90,7 +90,7 @@
             ,   energy_production: 60
         ))
         ,   reproduction: AutoSpawn(
-                spawn_rate : 0.2
+                spawn_rate : 0.8
         )
         , visualization: (
             hue: 120.0,

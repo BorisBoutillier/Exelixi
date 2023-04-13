@@ -1,3 +1,5 @@
+use ga::Individual;
+
 use crate::ecosystem::{organism::reproduction::individual::OrganismIndividual, *};
 
 #[derive(Debug)]
@@ -11,7 +13,7 @@ pub fn evolve(
     mut commands: Commands,
     mut simulation: ResMut<Simulation>,
     config: Res<EcosystemConfig>,
-    organisms: Query<(Entity, &Body, &Brain, Option<&Eye>)>,
+    organisms: Query<(Entity, &Organism, &Body, &Brain, Option<&Eye>)>,
     mut rng: ResMut<EcosystemRng>,
     mut new_generation_events: EventWriter<NewGenerationEvent>,
     mut generation_evolutions: ResMut<GenerationEvolutions>,
@@ -21,7 +23,8 @@ pub fn evolve(
         if simulation.steps % state.generation_length == 0 {
             let current_population = organisms
                 .iter()
-                .map(|(entity, body, brain, eye)| {
+                .filter(|(_, organism, _, _, _)| &organism.name == name)
+                .map(|(entity, _, body, brain, eye)| {
                     commands.entity(entity).despawn_recursive();
                     OrganismIndividual::from_components(&state.config, body, &eye, brain)
                 })

@@ -71,7 +71,7 @@ pub fn mouth_eating(
                 .unwrap()
                 .add_energy(eaten_energy[&eaten_entity]);
             has_eaten.insert(e);
-            commands.entity(eaten_entity).despawn();
+            commands.entity(eaten_entity).despawn_recursive();
         }
     }
 }

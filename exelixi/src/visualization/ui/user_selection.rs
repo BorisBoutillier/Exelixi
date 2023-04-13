@@ -2,6 +2,7 @@ use bevy::window::PrimaryWindow;
 
 use crate::prelude::*;
 
+#[allow(clippy::too_many_arguments)]
 pub fn user_selection(
     mut commands: Commands,
     mouse_button_input: Res<Input<MouseButton>>,
@@ -11,9 +12,12 @@ pub fn user_selection(
     organisms: Query<(Entity, &Transform), With<Organism>>,
     selected: Query<Entity, With<Selected>>,
     config: Res<EcosystemConfig>,
+    simulation: Res<Simulation>,
 ) {
     // Detect mouse click
-    if mouse_button_input.just_pressed(MouseButton::Left) {
+    if simulation.control.state != SimulationControlState::Fastest
+        && mouse_button_input.just_pressed(MouseButton::Left)
+    {
         let window = primary_window.get_single().expect("Missing primary window");
         let (camera, camera_global_transform) = cameras.single();
         if let Some(pos) = window.cursor_position() {

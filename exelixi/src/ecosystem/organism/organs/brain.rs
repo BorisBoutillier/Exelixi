@@ -37,7 +37,7 @@ impl Brain {
         body: &Body,
         eye: &Option<&Eye>,
         locomotion: &Option<&Locomotion>,
-    ) -> [nn::LayerTopology; 3] {
+    ) -> [nn::LayerTopology; 5] {
         let mut n_sensors = body.n_sensors();
         if let Some(eye) = eye {
             n_sensors += eye.n_sensors();
@@ -48,6 +48,12 @@ impl Brain {
         }
         [
             nn::LayerTopology { neurons: n_sensors },
+            nn::LayerTopology {
+                neurons: 2 * n_sensors,
+            },
+            nn::LayerTopology {
+                neurons: 4 * n_sensors,
+            },
             nn::LayerTopology {
                 neurons: 2 * n_sensors,
             },
@@ -63,7 +69,7 @@ impl Brain {
 
 pub fn brain_processing(
     mut organisms: Query<(&Body, &Position, &mut Locomotion, &Eye, &Brain)>,
-    positions: Query<(&Position, &Organism)>,
+    positions: Query<(&Position, &Organism, &Body)>,
 ) {
     let positions = positions.iter().collect::<Vec<_>>();
     organisms.for_each_mut(|(body, position, mut locomotion, eye, brain)| {
