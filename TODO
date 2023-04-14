@@ -1,14 +1,7 @@
 -- Bugs
-. Mouse simulation interactions no more working.
 . Fix lost determinism when changing mouth eating algorithm
 
--- Code
-. UI:
-  . Add a 'Selection' panel, that show data from currently selected organism:
-    A collaspable header per Component.
-  . Add a configuration panel that show current configuration.
-    Allow to edit/save and reset current simulation configuration
-
+-- Ecosystem
 . Save/Load population, with config
 . Add the reach of the Mouth as fixed energy cost, and also a gene 
 . Use a spatial data structure to look for organism eating each-other.
@@ -16,6 +9,10 @@
 . Add support for Eye to have three sensors per eye 'distance', 'energy', 'hue'
 
 -- User Interaction
+. Add a 'Selection' panel, that show data from currently selected organism:
+  A collaspable header per Component.
+. Add a configuration panel that show current configuration.
+  Allow to edit/save and reset current simulation configuration
 . Improve user camera interaction:
     . Make panning around follow environment 'scale'
 . Update on simulation interaction:
