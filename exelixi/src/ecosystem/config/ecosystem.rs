@@ -1,5 +1,7 @@
 use std::{collections::HashMap, path::PathBuf};
 
+use bevy_egui::egui::Color32;
+
 use crate::ecosystem::*;
 
 use super::{environment::EnvironmentConfig, organism::OrganismConfig, *};
@@ -94,5 +96,10 @@ impl EcosystemConfig {
             }
         }
         println!("Aggreation: {:?}", self.statistics.aggregation_rate);
+    }
+    pub fn get_egui_color(&self, organism_name: &str, saturation: f32, lightness: f32) -> Color32 {
+        let hue = self.organisms_per_name[organism_name].visualization.hue;
+        let [r, g, b, _] = Color::hsl(hue, saturation, lightness).as_rgba_f32();
+        Color32::from_rgb((r * 256.0) as u8, (g * 256.0) as u8, (b * 256.0) as u8)
     }
 }

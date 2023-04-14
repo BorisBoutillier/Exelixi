@@ -13,7 +13,9 @@ use std::collections::HashMap;
 use crate::prelude::{OrganismConfig, ReproductionConfig};
 
 #[derive(Resource, Default)]
-pub struct GenerationEvolutions(HashMap<String, GenerationEvolution>);
+pub struct GenerationEvolutions {
+    pub per_name: HashMap<String, GenerationEvolution>,
+}
 
 pub struct GenerationEvolution {
     pub config: OrganismConfig,

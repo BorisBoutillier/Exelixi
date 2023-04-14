@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::prelude::*;
 
 mod control;
@@ -16,7 +18,9 @@ pub const UI_STATUS_BAR_HEIGHT: f32 = 40.0;
 
 #[derive(Resource, Default, Debug)]
 pub struct UiState {
-    pub ui_simulation_open: bool,
+    pub simulation_open: bool,
+    pub simulation_population_checked: HashMap<String, bool>,
+    pub simulation_energy_checked: HashMap<String, bool>,
 }
 //
 pub struct UiPlugin;

@@ -37,7 +37,7 @@ impl Brain {
         body: &Body,
         eye: &Option<&Eye>,
         locomotion: &Option<&Locomotion>,
-    ) -> [nn::LayerTopology; 5] {
+    ) -> [nn::LayerTopology; 3] {
         let mut n_sensors = body.n_sensors();
         if let Some(eye) = eye {
             n_sensors += eye.n_sensors();
@@ -48,12 +48,6 @@ impl Brain {
         }
         [
             nn::LayerTopology { neurons: n_sensors },
-            nn::LayerTopology {
-                neurons: 2 * n_sensors,
-            },
-            nn::LayerTopology {
-                neurons: 4 * n_sensors,
-            },
             nn::LayerTopology {
                 neurons: 2 * n_sensors,
             },

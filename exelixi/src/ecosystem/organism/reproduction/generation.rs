@@ -1,5 +1,3 @@
-use ga::Individual;
-
 use crate::ecosystem::{organism::reproduction::individual::OrganismIndividual, *};
 
 #[derive(Debug)]
@@ -19,7 +17,7 @@ pub fn evolve(
     mut generation_evolutions: ResMut<GenerationEvolutions>,
 ) {
     simulation.steps += 1;
-    for (name, state) in generation_evolutions.0.iter_mut() {
+    for (name, state) in generation_evolutions.per_name.iter_mut() {
         if simulation.steps % state.generation_length == 0 {
             let current_population = organisms
                 .iter()
@@ -112,7 +110,7 @@ pub fn spawn_starting_organisms(
 ) {
     if config.is_changed() {
         commands.insert_resource(EcosystemStatistics::new(&config));
-        generation_evolutions.0.clear();
+        generation_evolutions.per_name.clear();
         for organism_config in config.organisms.iter() {
             if let ReproductionConfig::GenerationEvolution {
                 generation_length: _,
@@ -122,7 +120,7 @@ pub fn spawn_starting_organisms(
                 mutation_amplitude: _,
             } = organism_config.reproduction
             {
-                generation_evolutions.0.insert(
+                generation_evolutions.per_name.insert(
                     organism_config.name.clone(),
                     GenerationEvolution::new(organism_config),
                 );

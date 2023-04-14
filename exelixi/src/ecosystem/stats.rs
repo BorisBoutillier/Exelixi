@@ -48,6 +48,9 @@ impl OrganismStatistics {
         self.current.size = size;
         self.current.energy_avg = energy_avg;
     }
+    pub fn set_generation(&mut self, generation: u32) {
+        self.current.generation = Some(generation);
+    }
     pub fn add_eaten(&mut self, count: u32) {
         self.current.eaten += count;
     }
@@ -108,6 +111,7 @@ pub fn statistics_accumulation(
     config: Res<EcosystemConfig>,
     mut ecosystem_statistics: ResMut<EcosystemStatistics>,
     organisms: Query<(&Organism, &Body)>,
+    generation_evolutions: Res<GenerationEvolutions>,
 ) {
     if simulation.steps % config.statistics.aggregation_rate.unwrap() == 0 {
         // Update current statistics
@@ -120,6 +124,11 @@ pub fn statistics_accumulation(
         for (name, size) in size.into_iter() {
             if let Some(stat) = ecosystem_statistics.organisms.get_mut(&name) {
                 stat.set_current(size, energy[&name] / size as f32);
+            }
+        }
+        for (name, generation_evolution) in generation_evolutions.per_name.iter() {
+            if let Some(stat) = ecosystem_statistics.organisms.get_mut(name) {
+                stat.set_generation(generation_evolution.current_generation);
             }
         }
         // Print in console

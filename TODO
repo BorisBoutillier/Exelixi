@@ -1,14 +1,14 @@
 -- Bugs
 . Mouse simulation interactions no more working.
 . Fix lost determinism when changing mouth eating algorithm
+. Fix energy_avg stat, seems off.
 
 -- Code
-. Statistics:
-  . Compute generation number in stats, show them in Simulation pane
-  . Update bench C to have different generation length for Carnivore/Herbivore
 . UI:
   . Add a 'Selection' panel, that show data from currently selected organism:
     A collaspable header per Component.
+  . Add a configuration panel that show current configuration.
+    Allow to edit/save and reset current simulation configuration
 
 . Save/Load population, with config
 . Add the reach of the Mouth as fixed energy cost, and also a gene 
