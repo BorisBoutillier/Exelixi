@@ -1,7 +1,6 @@
 -- Bugs
 . Mouse simulation interactions no more working.
 . Fix lost determinism when changing mouth eating algorithm
-. Fix energy_avg stat, seems off.
 
 -- Code
 . UI:

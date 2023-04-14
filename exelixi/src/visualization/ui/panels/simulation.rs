@@ -79,7 +79,7 @@ pub fn ui_simulation(
                                     .or_insert(true);
                                 ui.checkbox(
                                     checked,
-                                    RichText::new(format!("{name} {}", stat.out_of_energy))
+                                    RichText::new(format!("{name} {:.0}", stat.energy_avg))
                                         .color(color),
                                 );
                                 if *checked {
@@ -89,7 +89,7 @@ pub fn ui_simulation(
                                                 .accumulation
                                                 .iter()
                                                 .map(|(step, stat)| {
-                                                    [*step as f64, stat.out_of_energy as f64]
+                                                    [*step as f64, stat.energy_avg as f64]
                                                 })
                                                 .collect::<Vec<_>>(),
                                         )
