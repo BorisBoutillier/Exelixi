@@ -1,19 +1,48 @@
 -- Bugs
-. Fix lost determinism when changing mouth eating algorithm
+- Fix lost determinism when changing mouth eating algorithm
 
--- Ecosystem
-. Save/Load population, with config
-. Add the reach of the Mouth as fixed energy cost, and also a gene 
-. Use a spatial data structure to look for organism eating each-other.
-. Add support for Eye to have two sensors per cell 'distance' and 'energy' of closest
-. Add support for Eye to have three sensors per eye 'distance', 'energy', 'hue'
+--- Ecosystem
 
+- ECS:
+  - Save/Load population, with config to file. Should include 'git' checksum
+
+- Config:
+  - Move config file to yaml or json.
+
+- Mouth:
+  - Add the reach of the Mouth as fixed energy cost, and also a gene 
+  - Use a spatial data structure to look for organism eating each-other.
+
+- Eye:
+  - Add support for two sensors per cell 'distance' and 'energy' of closest
+  - Add support for Eye to have three sensors per eye 'distance', 'energy', 'hue'
+  - Add hue of the wall as black
+
+- Brain:
+  - Add hidden layer topology in config:
+    - ex: [2S,3S,2A] = 3 hidden layers, 2*n_sensors, 3*n_sensors, 2*n_actuactors.
+  - Can we use existing neuron crates ? [dfdx]
+  - Can we do reinforcement learning during 'life', evolving copy current state.
+  - Support edge with 0 value between neurons.
+    Cannot change during reinforcement learning.
+    Mutation can go from 0 -> non-zero or reverse.
+    Base cost of brain on number of non-0 edges.
+  
+- Reproduction:
+  - All reproduction through Birth.
+    - Contacts with co-organisms store their genetics.
+    - Give birth when reaching max-energy, create child from self and stored genetics with half 'start' energy, that self loses.
+
+- Statistics:
+  - Performance aggregation of stats to max length, through merges. (1/3 kept 2/3 merged 2 by twos -> 2/3)
+
+  
 -- User Interaction
-. Add a 'Selection' panel, that show data from currently selected organism:
-  A collaspable header per Component.
-. Add a configuration panel that show current configuration.
+[!] Add a 'Selection' panel, that show data from currently selected organism:
+  - A collaspable header per Component.
+- Add a configuration panel that show current configuration.
   Allow to edit/save and reset current simulation configuration
-. Improve user camera interaction:
+- Improve user camera interaction:
     . Make panning around follow environment 'scale'
-. Update on simulation interaction:
+- Update on simulation interaction:
     Allow a 'skip N' input command where N entered by user (default 10)
