@@ -28,13 +28,20 @@ pub fn evolve(
                 })
                 .collect::<Vec<_>>();
             state.current_generation += 1;
+            let total_energy = organisms
+                .iter()
+                .filter(|(_, organism, _, _, _)| &organism.name == name)
+                .map(|(_, _, b, _, _)| b.energy())
+                .sum::<f32>();
 
             let mut new_population = state.genetic_algorithm.evolve(
                 &mut rng.0,
                 &current_population,
                 state.fertility_rate,
-                (state.minimum_population as f32 * 0.9) as usize, // If survivors and fertility are not enough keep 10% random
+                (state.minimum_population as f32 * 0.9) as usize,
             );
+            let n_evolve = new_population.len();
+            let evolve_energy = total_energy / n_evolve as f32;
             // If not enough survived, add random organisms
             let missing_population = state.minimum_population as i32 - new_population.len() as i32;
             for _ in 0..missing_population {
@@ -46,19 +53,26 @@ pub fn evolve(
                 generation: state.current_generation,
             });
             // Spawn new organisms
-            new_population.into_iter().for_each(|individual| {
-                let (body, eye, locomotion, brain) = individual.into_components(&state.config);
-                spawn_organism(
-                    &mut commands,
-                    &config,
-                    &state.config,
-                    body,
-                    eye,
-                    locomotion,
-                    brain,
-                    &mut rng,
-                );
-            });
+            new_population
+                .into_iter()
+                .enumerate()
+                .for_each(|(i, individual)| {
+                    let (mut body, eye, locomotion, brain) =
+                        individual.into_components(&state.config);
+                    if i < n_evolve {
+                        body.set_energy(evolve_energy);
+                    }
+                    spawn_organism(
+                        &mut commands,
+                        &config,
+                        &state.config,
+                        body,
+                        eye,
+                        locomotion,
+                        brain,
+                        &mut rng,
+                    );
+                });
         }
     }
 }

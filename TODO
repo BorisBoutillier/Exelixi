@@ -27,8 +27,7 @@
     Base cost of brain on number of non-0 edges.
   
 - Reproduction:
-  - GenerationEvolution should keep total energy when creating new population, if more than min_population.
-  - All reproduction through Birth.
+  - Add reproduction through Birth.
     - Contacts with co-organisms store their genetics.
     - Give birth when reaching max-energy, create child from self and stored genetics with half 'start' energy, that self loses.
 
