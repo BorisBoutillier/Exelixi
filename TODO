@@ -14,8 +14,6 @@
   - Use a spatial data structure to look for organism eating each-other.
 
 - Eye:
-  - Add support for two sensors per cell 'distance' and 'energy' of closest
-  - Add support for Eye to have three sensors per eye 'distance', 'energy', 'hue'
   - Add hue of the wall as black
 
 - Brain:
@@ -29,6 +27,7 @@
     Base cost of brain on number of non-0 edges.
   
 - Reproduction:
+  - GenerationEvolution should keep total energy when creating new population, if more than min_population.
   - All reproduction through Birth.
     - Contacts with co-organisms store their genetics.
     - Give birth when reaching max-energy, create child from self and stored genetics with half 'start' energy, that self loses.

@@ -19,11 +19,11 @@ pub fn show_organism(
     new_organisms: Query<(Entity, &Organism), Added<Organism>>,
 ) {
     for (entity, organism) in new_organisms.iter() {
-        let visualization_config = &config.organisms_per_name[&organism.name].visualization;
+        let visualization_config = &config.organisms_per_name[organism.name()].visualization;
         commands.entity(entity).insert(SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(visualization_config.sprite_size.into()),
-                color: Color::hsl(visualization_config.hue, 0.8, 0.5),
+                color: Color::hsl(organism.hue(), 0.8, 0.5),
                 ..Default::default()
             },
             texture: asset_server.load(visualization_config.sprite_file.clone()),

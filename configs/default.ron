@@ -13,6 +13,7 @@
             ,   energy_cost: 0.000
             ,   n_cells: Fixed(9)
             ,   visible: ["Plant"]
+            ,   cell_sensors: DistanceEnergy
             ))
         ,   body: (
                 starting_energy: 10000

@@ -6,15 +6,13 @@ pub struct Selected;
 
 pub fn selection_changed(
     mut deselected: RemovedComponents<Selected>,
-    config: Res<EcosystemConfig>,
     selected: Query<Entity, Added<Selected>>,
     mut organisms_sprite: Query<(&mut Sprite, &Organism)>,
 ) {
     for entity in deselected.iter() {
         if let Ok((mut sprite, organism)) = organisms_sprite.get_mut(entity) {
-            let visualization_config = &config.organisms_per_name[&organism.name].visualization;
             let [_h, s, l, a] = sprite.color.as_hsla_f32();
-            sprite.color = Color::hsla(visualization_config.hue, s, l, a);
+            sprite.color = Color::hsla(organism.hue(), s, l, a);
         }
     }
     for entity in selected.iter() {

@@ -12,7 +12,8 @@
             ,   fov_range: Gene(min:70,max:250)
             ,   energy_cost: 0.000
             ,   n_cells: Fixed(9)
-            ,   visible: ["Plant"]
+            ,   visible: ["Plant","Carnivore"]
+            ,   cell_sensors: DistanceEnergyHue,
             ))
         ,   body: (
                 starting_energy: 10000
@@ -50,6 +51,7 @@
             ,   energy_cost: 0.000
             ,   n_cells: Fixed(18)
             ,   visible: ["Herbivore"]
+            ,   cell_sensors: DistanceEnergy,
             ))
         ,   body: (
                 starting_energy: 10000

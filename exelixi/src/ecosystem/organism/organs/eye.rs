@@ -11,6 +11,7 @@ pub struct Eye {
     pub n_cells: usize,
     visible: Vec<String>,
     energy_cost: f32,
+    cell_sensors: CellSensors,
 }
 
 impl Eye {
@@ -37,6 +38,7 @@ impl Eye {
             n_cells: n_cells as usize,
             visible: config.visible.clone(),
             energy_cost: compute_energy_cost(fov_range, fov_angle, config.energy_cost),
+            cell_sensors: config.cell_sensors,
         }
     }
     pub fn from_genes(genes: impl IntoIterator<Item = f32>, config: &EyeConfig) -> Self {
@@ -72,6 +74,7 @@ impl Eye {
             n_cells: n_cells as usize,
             visible: config.visible.clone(),
             energy_cost: compute_energy_cost(fov_range, fov_angle, config.energy_cost),
+            cell_sensors: config.cell_sensors,
         }
     }
     pub fn as_chromosome(&self, config: &EyeConfig) -> ga::Chromosome {
@@ -102,7 +105,7 @@ impl Eye {
         let visible_positions = positions
             .iter()
             .filter(|(_, o, _)| self.visible.contains(&o.name))
-            .map(|(p, _, b)| (*p, b.energy_pct()))
+            .map(|(p, o, b)| (*p, b.energy_pct(), o.hue()))
             .collect::<Vec<_>>();
         sensors.extend(self.sense_objects(position, &visible_positions));
         assert_eq!(sensors.len(), self.n_sensors());
@@ -115,11 +118,11 @@ impl Eye {
     pub fn sense_objects(
         &self,
         position: &Position,
-        organism_positions: &[(&Position, f32)],
+        organims: &[(&Position, f32, f32)],
     ) -> Vec<f32> {
         let mut closest_per_cell = vec![None; self.n_cells];
         //println!("SENSE for {position:?}");
-        for (organism_position, organism_energy_pct) in organism_positions {
+        for &(organism_position, organism_energy_pct, organism_hue) in organims {
             let distance_squared = position.distance_squared(organism_position);
             if distance_squared > self.fov_range.powi(2) {
                 continue;
@@ -134,21 +137,24 @@ impl Eye {
             let sector = (sector as usize).min(self.n_sectors - 1);
 
             let distance_pct = (self.fov_range - distance_squared.sqrt()) / self.fov_range;
-            if let Some((other_distance_pct, _)) = closest_per_cell[sector] {
+            if let Some((other_distance_pct, _, _)) = closest_per_cell[sector] {
                 if distance_pct < other_distance_pct {
-                    closest_per_cell[sector] = Some((distance_pct, organism_energy_pct));
+                    closest_per_cell[sector] =
+                        Some((distance_pct, organism_energy_pct, organism_hue));
                 }
             } else {
-                closest_per_cell[sector] = Some((distance_pct, organism_energy_pct));
+                closest_per_cell[sector] = Some((distance_pct, organism_energy_pct, organism_hue));
             }
         }
         //println!("  -> Cells: {cells:?}");
         closest_per_cell
             .iter()
-            .map(|closest| {
+            .flat_map(|closest| {
                 closest
-                    .map(|(distance_pct, energy_pct)| (1.0 - distance_pct) * energy_pct)
-                    .unwrap_or(0.0)
+                    .map(|(distance_pct, energy_pct, hue)| {
+                        self.cell_sensors.sensors(distance_pct, energy_pct, hue)
+                    })
+                    .unwrap_or(vec![0.0; self.cell_sensors.n_sensors()])
             })
             .collect::<Vec<_>>()
     }
@@ -157,7 +163,7 @@ impl Eye {
     }
     // Return the number of sensors associated with this eye configuration
     pub fn n_sensors(&self) -> usize {
-        self.n_cells
+        self.n_cells * self.cell_sensors.n_sensors()
     }
 }
 

@@ -20,9 +20,7 @@ pub fn auto_spawning(
                 let x = rng.0.gen_range(-half_width..half_width);
                 let y = rng.0.gen_range(-half_height..half_height);
                 let mut command = commands.spawn((
-                    Organism {
-                        name: organism_config.name.clone(),
-                    },
+                    Organism::new(organism_config),
                     Position::new(x as f32, y as f32, 0.0),
                     Body::new(&organism_config.body),
                 ));

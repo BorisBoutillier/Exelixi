@@ -118,8 +118,8 @@ pub fn statistics_accumulation(
         let mut size = HashMap::new();
         let mut energy = HashMap::new();
         for (organism, body) in organisms.iter() {
-            *size.entry(organism.name.clone()).or_insert(0) += 1;
-            *energy.entry(organism.name.clone()).or_insert(0.) += body.energy();
+            *size.entry(organism.name().to_string()).or_insert(0) += 1;
+            *energy.entry(organism.name().to_string()).or_insert(0.) += body.energy();
         }
         for (name, size) in size.into_iter() {
             if let Some(stat) = ecosystem_statistics.organisms.get_mut(&name) {
