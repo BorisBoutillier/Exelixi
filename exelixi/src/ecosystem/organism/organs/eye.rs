@@ -9,7 +9,7 @@ pub struct Eye {
     pub fov_angle: f32,
     pub n_sectors: usize,
     pub n_cells: usize,
-    visible: Vec<String>,
+    visible: Vec<SpeciesId>,
     energy_cost: f32,
     cell_sensors: CellSensors,
 }
@@ -36,7 +36,7 @@ impl Eye {
             fov_angle,
             n_sectors: n_cells as usize,
             n_cells: n_cells as usize,
-            visible: config.visible.clone(),
+            visible: config.visible_species.clone(),
             energy_cost: compute_energy_cost(fov_range, fov_angle, config.energy_cost),
             cell_sensors: config.cell_sensors,
         }
@@ -72,7 +72,7 @@ impl Eye {
             fov_angle,
             n_sectors: n_cells as usize,
             n_cells: n_cells as usize,
-            visible: config.visible.clone(),
+            visible: config.visible_species.clone(),
             energy_cost: compute_energy_cost(fov_range, fov_angle, config.energy_cost),
             cell_sensors: config.cell_sensors,
         }
@@ -104,8 +104,8 @@ impl Eye {
     ) -> Vec<f32> {
         let mut sensors = vec![];
         let mut visible = vec![];
-        for name in self.visible.iter() {
-            for entry in kdtree.per_name[name].within_radius(
+        for species in self.visible.iter() {
+            for entry in kdtree.per_species[species].within_radius(
                 &KdTreeEntry::new(position, Entity::PLACEHOLDER),
                 self.fov_range,
             ) {

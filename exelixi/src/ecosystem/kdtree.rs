@@ -32,7 +32,7 @@ impl KdPoint for KdTreeEntry {
 
 #[derive(Resource, Default)]
 pub struct OrganismKdTree {
-    pub per_name: HashMap<String, KdTree<KdTreeEntry>>,
+    pub per_species: HashMap<SpeciesId, KdTree<KdTreeEntry>>,
 }
 
 pub fn build_organism_kdtree(
@@ -40,18 +40,20 @@ pub fn build_organism_kdtree(
     organisms: Query<(Entity, &Organism, &Position)>,
     ecosystem_config: Res<EcosystemConfig>,
 ) {
-    let mut per_name = HashMap::new();
+    let mut per_species = ecosystem_config
+        .species
+        .keys()
+        .map(|k| (*k, vec![]))
+        .collect::<HashMap<_, _>>();
     for (entity, organism, position) in organisms.iter() {
-        per_name
-            .entry(organism.name().to_string())
-            .or_insert(vec![])
-            .push(KdTreeEntry::new(position, entity));
+        per_species
+            .entry(organism.species())
+            .and_modify(|v| v.push(KdTreeEntry::new(position, entity)));
     }
-    organism_kdtree.per_name.clear();
-    for name in ecosystem_config.organisms_per_name.keys() {
-        let entries = per_name.remove(name).unwrap_or(vec![]);
+    organism_kdtree.per_species.clear();
+    for (id, entries) in per_species {
         organism_kdtree
-            .per_name
-            .insert(name.to_string(), KdTree::build_by_ordered_float(entries));
+            .per_species
+            .insert(id, KdTree::build_by_ordered_float(entries));
     }
 }

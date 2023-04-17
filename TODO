@@ -5,10 +5,7 @@
 
 - ECS:
   - Save/Load population, with config to file. Should include 'git' checksum
-  - Optimize KdTree to not rebuild 'static' organism.
-
-- Organism:
-  - Remove use of name strings in all ECS, convert to a Kind and keep Kind to Name conversion in a Resource.
+  - Optimize KdTree to for quasi 'static' species ( only appear and die, do not move)
 
 - Config:
   - Move config file to yaml or json.

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::*;
 
 #[derive(Default, Serialize, Deserialize, Debug, Clone, Copy)]
@@ -43,6 +45,17 @@ pub struct EyeConfig {
     // Name of oganism that are visible by this eye.
     // Each eye cell will see the closest 'visible' organism
     pub visible: Vec<String>,
+    #[serde(skip)]
+    pub visible_species: Vec<SpeciesId>,
+}
+impl EyeConfig {
+    pub fn update(&mut self, species_name_to_id: &HashMap<String, SpeciesId>) {
+        self.visible_species = self
+            .visible
+            .iter()
+            .map(|name| species_name_to_id[name])
+            .collect();
+    }
 }
 
 // Configuration for the body
@@ -75,4 +88,15 @@ pub struct LeafConfig {
 pub struct MouthConfig {
     pub reach: f32,
     pub edible: Vec<String>,
+    #[serde(skip)]
+    pub edible_species: Vec<SpeciesId>,
+}
+impl MouthConfig {
+    pub fn update(&mut self, species_name_to_id: &HashMap<String, SpeciesId>) {
+        self.edible_species = self
+            .edible
+            .iter()
+            .map(|name| species_name_to_id[name])
+            .collect();
+    }
 }

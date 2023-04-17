@@ -72,7 +72,7 @@ pub fn body_energy_consumption(
         }
         if !body.spend_energy(total) {
             commands.entity(entity).despawn_recursive();
-            *deaths.entry(organism.name.clone()).or_insert(0) += 1;
+            *deaths.entry(organism.species()).or_insert(0) += 1;
         }
     }
     if !deaths.is_empty() {

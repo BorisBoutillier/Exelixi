@@ -10,15 +10,15 @@ use bevy::prelude::Resource;
 use lib_genetic_algorithm as ga;
 use std::collections::HashMap;
 
-use crate::prelude::{OrganismConfig, ReproductionConfig};
+use crate::ecosystem::*;
 
 #[derive(Resource, Default)]
 pub struct GenerationEvolutions {
-    pub per_name: HashMap<String, GenerationEvolution>,
+    pub per_species: HashMap<SpeciesId, GenerationEvolution>,
 }
 
 pub struct GenerationEvolution {
-    pub config: OrganismConfig,
+    pub config: SpeciesConfig,
     // genetic algorithm
     pub genetic_algorithm: ga::GeneticAlgorithm<ga::RouletteWheelSelection>,
     //
@@ -29,7 +29,7 @@ pub struct GenerationEvolution {
     pub current_generation: u32,
 }
 impl GenerationEvolution {
-    pub fn new(config: &OrganismConfig) -> Self {
+    pub fn new(config: &SpeciesConfig) -> Self {
         if let ReproductionConfig::GenerationEvolution {
             generation_length,
             min_population,

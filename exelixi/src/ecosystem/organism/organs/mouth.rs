@@ -7,14 +7,14 @@ pub struct Mouth {
     // Maximum distance the mouth can catch something
     pub reach: f32,
     // Vec of name of organisms that are edible for this one
-    pub edible: Vec<String>,
+    pub edible: Vec<SpeciesId>,
 }
 
 impl Mouth {
     pub fn new(config: &MouthConfig) -> Self {
         Self {
             reach: config.reach,
-            edible: config.edible.clone(),
+            edible: config.edible_species.clone(),
         }
     }
 }
@@ -31,8 +31,8 @@ pub fn mouth_eating(
     // Only the closest will be able to eat it.
     let mut want_to_eat = HashMap::new();
     for (entity, position, mouth) in eaters.iter_mut() {
-        for name in mouth.edible.iter() {
-            for other in kdtree.per_name[name]
+        for species in mouth.edible.iter() {
+            for other in kdtree.per_species[species]
                 .within_radius(&KdTreeEntry::new(position, entity), mouth.reach)
             {
                 if other.entity != entity {

@@ -19,7 +19,7 @@ pub fn show_organism(
     new_organisms: Query<(Entity, &Organism), Added<Organism>>,
 ) {
     for (entity, organism) in new_organisms.iter() {
-        let visualization_config = &config.organisms_per_name[organism.name()].visualization;
+        let visualization_config = &config.species[&organism.species()].visualization;
         commands.entity(entity).insert(SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(visualization_config.sprite_size.into()),

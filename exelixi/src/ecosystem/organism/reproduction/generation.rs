@@ -2,7 +2,7 @@ use crate::ecosystem::{organism::reproduction::individual::OrganismIndividual, *
 
 #[derive(Debug)]
 pub struct NewGenerationEvent {
-    pub name: String,
+    pub species: SpeciesId,
     pub generation: u32,
 }
 
@@ -17,11 +17,11 @@ pub fn evolve(
     mut generation_evolutions: ResMut<GenerationEvolutions>,
 ) {
     simulation.steps += 1;
-    for (name, state) in generation_evolutions.per_name.iter_mut() {
+    for (species, state) in generation_evolutions.per_species.iter_mut() {
         if simulation.steps % state.generation_length == 0 {
             let current_population = organisms
                 .iter()
-                .filter(|(_, organism, _, _, _)| &organism.name == name)
+                .filter(|(_, organism, _, _, _)| &organism.species() == species)
                 .map(|(entity, _, body, brain, eye)| {
                     commands.entity(entity).despawn_recursive();
                     OrganismIndividual::from_components(&state.config, body, &eye, brain)
@@ -30,7 +30,7 @@ pub fn evolve(
             state.current_generation += 1;
             let total_energy = organisms
                 .iter()
-                .filter(|(_, organism, _, _, _)| &organism.name == name)
+                .filter(|(_, organism, _, _, _)| &organism.species() == species)
                 .map(|(_, _, b, _, _)| b.energy())
                 .sum::<f32>();
 
@@ -49,7 +49,7 @@ pub fn evolve(
             }
 
             new_generation_events.send(NewGenerationEvent {
-                name: name.clone(),
+                species: *species,
                 generation: state.current_generation,
             });
             // Spawn new organisms
@@ -83,7 +83,7 @@ use std::f32::consts::PI;
 pub fn spawn_organism(
     commands: &mut Commands,
     config: &EcosystemConfig,
-    organism_config: &OrganismConfig,
+    organism_config: &SpeciesConfig,
     body: Body,
     eye: Option<Eye>,
     locomotion: Option<Locomotion>,
@@ -122,8 +122,8 @@ pub fn spawn_starting_organisms(
 ) {
     if config.is_changed() {
         commands.insert_resource(EcosystemStatistics::new(&config));
-        generation_evolutions.per_name.clear();
-        for organism_config in config.organisms.iter() {
+        generation_evolutions.per_species.clear();
+        for (species_id, organism_config) in config.species.iter() {
             if let ReproductionConfig::GenerationEvolution {
                 generation_length: _,
                 min_population,
@@ -132,10 +132,9 @@ pub fn spawn_starting_organisms(
                 mutation_amplitude: _,
             } = organism_config.reproduction
             {
-                generation_evolutions.per_name.insert(
-                    organism_config.name.clone(),
-                    GenerationEvolution::new(organism_config),
-                );
+                generation_evolutions
+                    .per_species
+                    .insert(*species_id, GenerationEvolution::new(organism_config));
                 // Create a new random population
                 let new_population = (0..min_population)
                     .map(|_| OrganismIndividual::random(&mut rng.0, organism_config))

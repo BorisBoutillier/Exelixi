@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use crate::ecosystem::*;
 
 #[derive(Default, Debug, Clone)]
-pub struct OrganismStatistic {
+pub struct SpeciesStatistic {
     // Current generation for this organism.
     // Applicable only for organism with GenerationEvolution reproduction
     pub generation: Option<u32>,
@@ -16,7 +16,7 @@ pub struct OrganismStatistic {
     // Number of eaten organism since last Step
     pub eaten: u32,
 }
-impl OrganismStatistic {
+impl SpeciesStatistic {
     pub fn inline_sprint(&self) -> String {
         format!(
             "Size: {:4}, Energy: {:6.0}, Deaths:{:4}, Eaten:{:4}, Generation:{}",
@@ -33,14 +33,16 @@ impl OrganismStatistic {
     }
 }
 #[derive(Debug)]
-pub struct OrganismStatistics {
-    pub current: OrganismStatistic,
-    pub accumulation: Vec<(u32, OrganismStatistic)>,
+pub struct SpeciesStatistics {
+    pub name: String,
+    pub current: SpeciesStatistic,
+    pub accumulation: Vec<(u32, SpeciesStatistic)>,
 }
-impl OrganismStatistics {
-    pub fn new() -> Self {
+impl SpeciesStatistics {
+    pub fn new(name: String) -> Self {
         Self {
-            current: OrganismStatistic::default(),
+            name,
+            current: SpeciesStatistic::default(),
             accumulation: vec![],
         }
     }
@@ -58,38 +60,41 @@ impl OrganismStatistics {
         self.current.out_of_energy += count;
     }
     pub fn inline_sprint(&self) -> String {
-        self.current.inline_sprint()
+        format!("{:19} - {}", self.name, self.current.inline_sprint())
     }
     pub fn store_at_step(&mut self, step: u32) {
         self.accumulation.push((step, self.current.clone()));
-        self.current = OrganismStatistic::default();
+        self.current = SpeciesStatistic::default();
     }
-    pub fn last_stored(&self) -> Option<&OrganismStatistic> {
+    pub fn last_stored(&self) -> Option<&SpeciesStatistic> {
         self.accumulation.last().map(|(_, stat)| stat)
     }
 }
 
 #[derive(Resource, Debug, Default)]
 pub struct EcosystemStatistics {
-    pub organisms: BTreeMap<String, OrganismStatistics>,
+    pub organisms: BTreeMap<SpeciesId, SpeciesStatistics>,
 }
 
 impl EcosystemStatistics {
     pub fn new(config: &EcosystemConfig) -> Self {
         let mut organisms = BTreeMap::new();
-        for organism_config in config.organisms.iter() {
-            organisms.insert(organism_config.name.clone(), OrganismStatistics::new());
+        for (species_id, species_config) in config.species.iter() {
+            organisms.insert(
+                *species_id,
+                SpeciesStatistics::new(species_config.name.clone()),
+            );
         }
         Self { organisms }
     }
-    pub fn update_eaten(&mut self, eaten: HashMap<String, u32>) {
-        for (name, count) in eaten.into_iter() {
-            if let Some(stat) = self.organisms.get_mut(&name) {
+    pub fn update_eaten(&mut self, eaten: HashMap<SpeciesId, u32>) {
+        for (species_id, count) in eaten {
+            if let Some(stat) = self.organisms.get_mut(&species_id) {
                 stat.add_eaten(count)
             }
         }
     }
-    pub fn update_out_of_energy(&mut self, out_of_energy: HashMap<String, u32>) {
+    pub fn update_out_of_energy(&mut self, out_of_energy: HashMap<SpeciesId, u32>) {
         for (name, count) in out_of_energy.into_iter() {
             if let Some(stat) = self.organisms.get_mut(&name) {
                 stat.add_out_of_energy(count)
@@ -99,8 +104,8 @@ impl EcosystemStatistics {
     pub fn sprint(&self, cur_step: u32) -> String {
         let mut s = String::new();
         s.push_str(&format!("Steps: {:6}\n", cur_step));
-        for (name, stat) in self.organisms.iter() {
-            s.push_str(&format!("    {name:10} - {}\n", stat.inline_sprint()));
+        for stat in self.organisms.values() {
+            s.push_str(&format!("    {}\n", stat.inline_sprint()));
         }
         s
     }
@@ -113,21 +118,21 @@ pub fn statistics_accumulation(
     organisms: Query<(&Organism, &Body)>,
     generation_evolutions: Res<GenerationEvolutions>,
 ) {
-    if simulation.steps % config.statistics.aggregation_rate.unwrap() == 0 {
+    if simulation.steps % config.statistics_aggregation_rate == 0 {
         // Update current statistics
         let mut size = HashMap::new();
         let mut energy = HashMap::new();
         for (organism, body) in organisms.iter() {
-            *size.entry(organism.name().to_string()).or_insert(0) += 1;
-            *energy.entry(organism.name().to_string()).or_insert(0.) += body.energy();
+            *size.entry(organism.species()).or_insert(0) += 1;
+            *energy.entry(organism.species()).or_insert(0.) += body.energy();
         }
         for (name, size) in size.into_iter() {
             if let Some(stat) = ecosystem_statistics.organisms.get_mut(&name) {
                 stat.set_current(size, energy[&name] / size as f32);
             }
         }
-        for (name, generation_evolution) in generation_evolutions.per_name.iter() {
-            if let Some(stat) = ecosystem_statistics.organisms.get_mut(name) {
+        for (species, generation_evolution) in generation_evolutions.per_species.iter() {
+            if let Some(stat) = ecosystem_statistics.organisms.get_mut(species) {
                 stat.set_generation(generation_evolution.current_generation);
             }
         }

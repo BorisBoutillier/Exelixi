@@ -28,16 +28,17 @@ pub fn ui_simulation(
                     .default_open(true)
                     .show(ui, |ui| {
                         let mut plot_lines = vec![];
-                        for (name, stats) in ecosystem_statistics.organisms.iter() {
+                        for (species, stats) in ecosystem_statistics.organisms.iter() {
                             if let Some(stat) = stats.last_stored() {
-                                let color = ecosystem_config.get_egui_color(name, 1.0, 0.7);
+                                let color = ecosystem_config.get_egui_color(species, 1.0, 0.7);
                                 let checked = ui_state
                                     .simulation_energy_checked
-                                    .entry(name.clone())
+                                    .entry(*species)
                                     .or_insert(true);
                                 ui.checkbox(
                                     checked,
-                                    RichText::new(format!("{name} {}", stat.size)).color(color),
+                                    RichText::new(format!("{} {}", stats.name, stat.size))
+                                        .color(color),
                                 );
                                 if *checked {
                                     plot_lines.push(
@@ -70,16 +71,16 @@ pub fn ui_simulation(
                     .default_open(true)
                     .show(ui, |ui| {
                         let mut plot_lines = vec![];
-                        for (name, stats) in ecosystem_statistics.organisms.iter() {
+                        for (species, stats) in ecosystem_statistics.organisms.iter() {
                             if let Some(stat) = stats.last_stored() {
-                                let color = ecosystem_config.get_egui_color(name, 1.0, 0.7);
+                                let color = ecosystem_config.get_egui_color(species, 1.0, 0.7);
                                 let checked = ui_state
                                     .simulation_population_checked
-                                    .entry(name.clone())
+                                    .entry(*species)
                                     .or_insert(true);
                                 ui.checkbox(
                                     checked,
-                                    RichText::new(format!("{name} {:.0}", stat.energy_avg))
+                                    RichText::new(format!("{} {:.0}", stats.name, stat.energy_avg))
                                         .color(color),
                                 );
                                 if *checked {
@@ -112,15 +113,17 @@ pub fn ui_simulation(
                 CollapsingHeader::new("Generation")
                     .default_open(true)
                     .show(ui, |ui| {
-                        for (name, stats) in ecosystem_statistics.organisms.iter() {
+                        for (species, stats) in ecosystem_statistics.organisms.iter() {
                             if let Some(stat) = stats.last_stored() {
-                                let color = ecosystem_config.get_egui_color(name, 1.0, 0.7);
+                                let color = ecosystem_config.get_egui_color(species, 1.0, 0.7);
                                 let value = if let Some(generation) = stat.generation {
                                     generation.to_string()
                                 } else {
                                     "n/a".to_string()
                                 };
-                                ui.label(RichText::new(format!("{name} {}", value)).color(color));
+                                ui.label(
+                                    RichText::new(format!("{} {}", stats.name, value)).color(color),
+                                );
                             }
                         }
                     });

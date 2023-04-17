@@ -23,7 +23,7 @@ impl ga::Individual for OrganismIndividual {
 }
 impl OrganismIndividual {
     pub fn from_components(
-        config: &OrganismConfig,
+        config: &SpeciesConfig,
         body: &Body,
         eye: &Option<&Eye>,
         brain: &Brain,
@@ -43,7 +43,7 @@ impl OrganismIndividual {
     }
     pub fn into_components(
         self,
-        config: &OrganismConfig,
+        config: &SpeciesConfig,
     ) -> (Body, Option<Eye>, Option<Locomotion>, Brain) {
         let mut genes = self.chromosome.into_iter();
         let body = Body::new(&config.body);
@@ -55,7 +55,7 @@ impl OrganismIndividual {
         let brain = Brain::from_genes(&mut genes, &body, &eye.as_ref(), &locomotion.as_ref());
         (body, eye, locomotion, brain)
     }
-    pub fn random(mut rng: &mut dyn RngCore, config: &OrganismConfig) -> Self {
+    pub fn random(mut rng: &mut dyn RngCore, config: &SpeciesConfig) -> Self {
         let body = Body::new(&config.body);
         let locomotion = config.locomotion.as_ref().map(Locomotion::new);
         let eye = config.eye.as_ref().map(|cfg| Eye::random(&mut rng, cfg));

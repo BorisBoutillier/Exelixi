@@ -5,7 +5,7 @@ pub fn auto_spawning(
     config: Res<EcosystemConfig>,
     mut rng: ResMut<EcosystemRng>,
 ) {
-    for organism_config in config.organisms.iter() {
+    for organism_config in config.species.values() {
         if let ReproductionConfig::AutoSpawn { spawn_rate } = organism_config.reproduction {
             let n_to_spawn = spawn_rate as u32
                 + if rng.0.gen_bool(spawn_rate % 1.0) {

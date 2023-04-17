@@ -19,8 +19,8 @@ pub const UI_STATUS_BAR_HEIGHT: f32 = 40.0;
 #[derive(Resource, Default, Debug)]
 pub struct UiState {
     pub simulation_open: bool,
-    pub simulation_population_checked: HashMap<String, bool>,
-    pub simulation_energy_checked: HashMap<String, bool>,
+    pub simulation_population_checked: HashMap<SpeciesId, bool>,
+    pub simulation_energy_checked: HashMap<SpeciesId, bool>,
 }
 //
 pub struct UiPlugin;

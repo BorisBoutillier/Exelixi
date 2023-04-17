@@ -4,7 +4,7 @@
     ,   height : 3000
     ,   wall   : true
     )
-,   organisms: [
+,   species: [
         (
             name : "Herbivore"
         ,   eye: Some(EyeConfig (
