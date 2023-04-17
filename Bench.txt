@@ -1,3 +1,6 @@
 # This file store run results to check performance and determinism.
 cargo build --release && time cargo run --release -- --config configs/bench_A.ron --seed 0 --run-for 50000
 cargo build --release && time cargo run --release -- --config configs/bench_B.ron --seed 0 --run-for 250000
+
+cargo build --release && time cargo run --release -- --config configs/bench_D.ron  --run-for=100
+-> 1m6

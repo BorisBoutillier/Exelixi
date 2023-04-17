@@ -1,4 +1,5 @@
 mod config;
+mod kdtree;
 mod organism;
 mod position;
 mod schedule;
@@ -10,6 +11,7 @@ pub use rand::Rng;
 pub use rand::RngCore;
 
 pub use config::*;
+pub use kdtree::*;
 pub use organism::*;
 pub use position::*;
 pub use schedule::*;
@@ -41,6 +43,7 @@ impl Plugin for EcosystemPlugin {
         app.insert_resource(EcosystemRng(rng));
         app.insert_resource(ecosystem_config);
         app.insert_resource(GenerationEvolutions::default());
+        app.insert_resource(OrganismKdTree::default());
         app.add_schedule(EcosystemSchedule, EcosystemSchedule::new_schedule());
     }
 }

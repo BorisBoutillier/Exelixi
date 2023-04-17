@@ -19,3 +19,5 @@ serde = { version = "1", features = ["derive"] }
 dirs = "4.0"
 clap = { version = "4.1.4", features = ["derive"] }
 leafwing-input-manager = "0.9.0"
+kd-tree = "0.5.1"
+typenum = "1.16.0"

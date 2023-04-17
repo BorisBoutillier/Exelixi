@@ -99,15 +99,23 @@ impl Eye {
     pub fn process_vision(
         &self,
         position: &Position,
-        positions: &[(&Position, &Organism, &Body)],
+        kdtree: &OrganismKdTree,
+        organims: &Query<(&Organism, &Body)>,
     ) -> Vec<f32> {
         let mut sensors = vec![];
-        let visible_positions = positions
-            .iter()
-            .filter(|(_, o, _)| self.visible.contains(&o.name))
-            .map(|(p, o, b)| (*p, b.energy_pct(), o.hue()))
-            .collect::<Vec<_>>();
-        sensors.extend(self.sense_objects(position, &visible_positions));
+        let mut visible = vec![];
+        for name in self.visible.iter() {
+            for entry in kdtree.per_name[name].within_radius(
+                &KdTreeEntry::new(position, Entity::PLACEHOLDER),
+                self.fov_range,
+            ) {
+                // Organism in the KdTree can have been eaten within this step
+                if let Ok((organism, body)) = organims.get(entry.entity) {
+                    visible.push((&entry.position, body.energy_pct(), organism.hue()))
+                }
+            }
+        }
+        sensors.extend(self.sense_objects(position, &visible));
         assert_eq!(sensors.len(), self.n_sensors());
         sensors
     }

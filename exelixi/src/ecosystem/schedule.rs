@@ -11,6 +11,7 @@ impl EcosystemSchedule {
             (
                 statistics_accumulation,
                 locomotion_movement,
+                build_organism_kdtree,
                 mouth_eating,
                 apply_system_buffers,
                 brain_processing,

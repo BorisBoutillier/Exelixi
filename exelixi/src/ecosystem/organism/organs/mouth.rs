@@ -22,35 +22,24 @@ impl Mouth {
 // Each organism mouth will eat the closest reachable other organisms.
 pub fn mouth_eating(
     mut commands: Commands,
-    mut organisms: Query<(Entity, &Organism, &Position, Option<&Mouth>), With<Body>>,
+    mut eaters: Query<(Entity, &Position, &Mouth)>,
+    kdtree: Res<OrganismKdTree>,
     mut bodies: Query<&mut Body>,
 ) {
-    let mut per_name = HashMap::new();
-    for (e, o, p, _) in organisms.iter() {
-        per_name
-            .entry(o.name.clone())
-            .or_insert(vec![])
-            .push((e, *p));
-    }
     // Store for each eatable organisms, the list of each organism that want to eat it
     // with the distance it is at.
     // Only the closest will be able to eat it.
     let mut want_to_eat = HashMap::new();
-    for (entity, _, position, mouth) in organisms.iter_mut() {
-        if let Some(mouth) = mouth {
-            let mouth_reach_squared = mouth.reach.powi(2);
-            for name in mouth.edible.iter() {
-                if !per_name.contains_key(name) {
-                    continue;
-                }
-                for (other_entity, other_position) in per_name[name].iter() {
-                    let dist_squared = position.distance_squared(other_position);
-                    if *other_entity != entity && dist_squared <= mouth_reach_squared {
-                        want_to_eat
-                            .entry(*other_entity)
-                            .or_insert(vec![])
-                            .push((dist_squared, entity));
-                    }
+    for (entity, position, mouth) in eaters.iter_mut() {
+        for name in mouth.edible.iter() {
+            for other in kdtree.per_name[name]
+                .within_radius(&KdTreeEntry::new(position, entity), mouth.reach)
+            {
+                if other.entity != entity {
+                    want_to_eat
+                        .entry(other.entity)
+                        .or_insert(vec![])
+                        .push((position.distance_squared(&other.position), entity));
                 }
             }
         }

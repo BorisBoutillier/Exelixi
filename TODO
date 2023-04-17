@@ -5,13 +5,16 @@
 
 - ECS:
   - Save/Load population, with config to file. Should include 'git' checksum
+  - Optimize KdTree to not rebuild 'static' organism.
+
+- Organism:
+  - Remove use of name strings in all ECS, convert to a Kind and keep Kind to Name conversion in a Resource.
 
 - Config:
   - Move config file to yaml or json.
 
 - Mouth:
   - Add the reach of the Mouth as fixed energy cost, and also a gene 
-  - Use a spatial data structure to look for organism eating each-other.
 
 - Eye:
   - Add hue of the wall as black
@@ -36,6 +39,7 @@
 
   
 -- User Interaction
+- Add energy total per organism kind. Probably more useful than energy avg.
 [!] Add a 'Selection' panel, that show data from currently selected organism:
   - A collaspable header per Component.
 - Add a configuration panel that show current configuration.
