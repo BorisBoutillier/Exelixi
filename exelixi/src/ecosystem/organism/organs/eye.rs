@@ -11,7 +11,8 @@ pub struct Eye {
     pub n_cells: usize,
     visible: Vec<SpeciesId>,
     energy_cost: f32,
-    cell_sensors: CellSensors,
+    pub cell_sensors: CellSensors,
+    sensors: Vec<f32>,
 }
 
 impl Eye {
@@ -39,6 +40,7 @@ impl Eye {
             visible: config.visible_species.clone(),
             energy_cost: compute_energy_cost(fov_range, fov_angle, config.energy_cost),
             cell_sensors: config.cell_sensors,
+            sensors: vec![0.0; n_cells as usize * config.cell_sensors.n_sensors()],
         }
     }
     pub fn from_genes(genes: impl IntoIterator<Item = f32>, config: &EyeConfig) -> Self {
@@ -75,6 +77,7 @@ impl Eye {
             visible: config.visible_species.clone(),
             energy_cost: compute_energy_cost(fov_range, fov_angle, config.energy_cost),
             cell_sensors: config.cell_sensors,
+            sensors: vec![0.0; n_cells as usize * config.cell_sensors.n_sensors()],
         }
     }
     pub fn as_chromosome(&self, config: &EyeConfig) -> ga::Chromosome {
@@ -97,12 +100,12 @@ impl Eye {
         genes.into_iter().collect()
     }
     pub fn process_vision(
-        &self,
+        &mut self,
         position: &Position,
         kdtree: &OrganismKdTree,
         organims: &Query<(&Organism, &Body)>,
-    ) -> Vec<f32> {
-        let mut sensors = vec![];
+    ) {
+        self.sensors = vec![];
         let mut visible = vec![];
         for species in self.visible.iter() {
             for entry in kdtree.per_species[species].within_radius(
@@ -115,9 +118,8 @@ impl Eye {
                 }
             }
         }
-        sensors.extend(self.sense_objects(position, &visible));
-        assert_eq!(sensors.len(), self.n_sensors());
-        sensors
+        self.sensors.extend(self.sense_objects(position, &visible));
+        assert_eq!(self.sensors.len(), self.n_sensors());
     }
     // process the sensors value for each eye cell associated to the given transforms
     // Each eye sector only seen the closest organism.
@@ -172,6 +174,10 @@ impl Eye {
     // Return the number of sensors associated with this eye configuration
     pub fn n_sensors(&self) -> usize {
         self.n_cells * self.cell_sensors.n_sensors()
+    }
+
+    pub fn get_sensors(&self) -> &[f32] {
+        &self.sensors
     }
 }
 

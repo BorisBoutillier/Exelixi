@@ -21,6 +21,7 @@ pub struct UiState {
     pub simulation_open: bool,
     pub simulation_population_checked: HashMap<SpeciesId, bool>,
     pub simulation_energy_checked: HashMap<SpeciesId, bool>,
+    pub selection_open: bool,
 }
 //
 pub struct UiPlugin;
@@ -31,6 +32,7 @@ impl Plugin for UiPlugin {
             .add_plugin(mouth_viewer::MouthViewerPlugin)
             .add_system(ui_status_bar)
             .add_system(ui_simulation)
+            .add_system(ui_selection)
             .add_system(user_selection)
             .add_system(selection_on_new_generation)
             .add_system(selection_changed.in_base_set(CoreSet::PostUpdate));

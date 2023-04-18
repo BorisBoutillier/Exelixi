@@ -1,19 +1,14 @@
 use super::*;
 use crate::prelude::*;
 
-use bevy_egui::egui::{CollapsingHeader, Color32, RichText};
+use bevy_egui::egui::{CollapsingHeader, RichText};
 
-const HONEY: Color32 = Color32::from_rgb(0xEC, 0x97, 0x06);
 pub fn ui_simulation(
     mut contexts: EguiContexts,
     ecosystem_config: ResMut<EcosystemConfig>,
     ecosystem_statistics: Res<EcosystemStatistics>,
     mut ui_state: ResMut<UiState>,
 ) {
-    // egui::popup::show_tooltip_at(
-    //     contexts.ctx_mut(),
-    //     Id::new("Simulation"),
-    //     Some(Pos2 { x: 10.0, y: 10.0 }),
     egui::containers::Window::new("Simulation")
         .fixed_pos((10.0, 10.0))
         .resizable(false)
