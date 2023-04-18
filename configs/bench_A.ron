@@ -30,8 +30,8 @@
             ))
         ,   reproduction: GenerationEvolution(
                 generation_length : 500
-            ,   min_population    : 5
-            ,   fertility_rate: 2
+            ,   min_population    : 1
+            ,   fertility_rate: 1
             ,   mutation_chance: 0.01
             ,   mutation_amplitude: 0.3
         )

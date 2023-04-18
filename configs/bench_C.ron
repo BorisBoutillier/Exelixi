@@ -10,7 +10,7 @@
         ,   eye: Some(EyeConfig (
                 fov_angle: Gene(min:1.5,max:4.71)
             ,   fov_range: Gene(min:70,max:250)
-            ,   energy_cost: 0.000
+            ,   energy_cost: 0.1
             ,   n_cells: Fixed(9)
             ,   visible: ["Plant","Carnivore"]
             ,   cell_sensors: DistanceEnergyHue,
@@ -48,23 +48,23 @@
         ,   eye: Some(EyeConfig (
                 fov_angle: Gene(min:1.5,max:4.71)
             ,   fov_range: Gene(min:70,max:450)
-            ,   energy_cost: 0.000
-            ,   n_cells: Fixed(18)
+            ,   energy_cost: 0.1
+            ,   n_cells: Fixed(9)
             ,   visible: ["Herbivore"]
             ,   cell_sensors: DistanceEnergy,
             ))
         ,   body: (
                 starting_energy: 10000
             ,   maximum_energy: 40000
-            ,   body_cost: 4
+            ,   body_cost: 8
         )
         ,   mouth: Some( MouthConfig(
-            reach: 20.0,
+            reach: 15.0,
             edible: ["Herbivore"],
         ))
         ,   locomotion: Some( LocomotionConfig(
                 linear: Neuron(min:0,max:10)
-            ,   linear_cost: 0.01
+            ,   linear_cost: 0.1
             ,   angular_cost: 0.000
             ))
         ,   reproduction: GenerationEvolution(

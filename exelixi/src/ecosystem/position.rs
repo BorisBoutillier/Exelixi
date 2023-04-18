@@ -21,7 +21,13 @@ impl Position {
     }
     pub fn set_angle(&mut self, angle: f32) {
         // Keep within  -PI..PI
-        self.angle = (angle + PI) % (2.0 * PI) - PI;
+        self.angle = (angle + PI).rem_euclid(2.0 * PI) - PI;
+        assert!(
+            (-PI..PI).contains(&self.angle),
+            "Angle not kept with -PI..PI : {} -> {}",
+            angle,
+            self.angle
+        );
     }
     pub fn distance_squared(&self, other: &Position) -> f32 {
         (self.x - other.x).powi(2) + (self.y - other.y).powi(2)

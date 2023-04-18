@@ -6,7 +6,7 @@ use bevy_egui::egui::{Align2, CollapsingHeader};
 pub fn ui_selection(
     mut contexts: EguiContexts,
     mut ui_state: ResMut<UiState>,
-    selection: Query<(Entity, &Organism, &Body, Option<&Eye>), With<Selected>>,
+    selection: Query<(Entity, &Organism, &Position, &Body, Option<&Eye>), With<Selected>>,
     ecosystem_config: ResMut<EcosystemConfig>,
 ) {
     egui::containers::Window::new("Selection")
@@ -18,7 +18,7 @@ pub fn ui_selection(
                 ui_state.selection_open = !ui_state.selection_open;
             }
             if ui_state.selection_open {
-                if let Ok((entity, organism, body, eye)) = selection.get_single() {
+                if let Ok((entity, organism, position, body, eye)) = selection.get_single() {
                     let species_color =
                         ecosystem_config.get_egui_color(&organism.species(), 1.0, 0.7);
                     let species_name = ecosystem_config.get_species_name(&organism.species());
@@ -30,6 +30,12 @@ pub fn ui_selection(
                                 .color(species_color),
                         );
                     });
+                    CollapsingHeader::new("Position")
+                        .default_open(false)
+                        .show(ui, |ui| {
+                            ui.label(format!("coords: {:.0} , {:.0}", position.x, position.y));
+                            ui.label(format!("angle: {:3.0}°", position.angle().to_degrees()));
+                        });
                     CollapsingHeader::new("Body")
                         .default_open(true)
                         .show(ui, |ui| {
@@ -43,8 +49,9 @@ pub fn ui_selection(
                             .default_open(true)
                             .show(ui, |ui| {
                                 ui.label(format!(
-                                    "Fov: {:.0} x {:.1} rad",
-                                    eye.fov_range, eye.fov_angle
+                                    "Fov: {:.0} x {:.0}°",
+                                    eye.fov_range,
+                                    eye.fov_angle.to_degrees()
                                 ));
                                 CollapsingHeader::new("Sensors:").default_open(false).show(
                                     ui,

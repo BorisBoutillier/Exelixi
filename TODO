@@ -1,6 +1,6 @@
 -- Bugs
-- Eye sensor viewing seem to show strange sector calculation
 - Fix lost determinism when changing mouth eating algorithm
+- Clicking in GUI ( like opening headers) event should not propagate to game
 
 --- Ecosystem
 

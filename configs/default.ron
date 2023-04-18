@@ -18,7 +18,7 @@
         ,   body: (
                 starting_energy: 10000
             ,   maximum_energy: 40000
-            ,   body_cost: 6
+            ,   body_cost: 10
         )
         ,   mouth: Some( MouthConfig(
             reach: 10.0,
@@ -26,8 +26,8 @@
         ))
         ,   locomotion: Some( LocomotionConfig(
                 linear: Neuron(min:0,max:6)
-            ,   linear_cost: 0.000
-            ,   angular_cost: 0.000
+            ,   linear_cost: 0.1
+            ,   angular_cost: 0.1
             ))
         ,   reproduction: GenerationEvolution(
                 generation_length : 5000

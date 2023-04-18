@@ -134,10 +134,13 @@ impl Eye {
         //println!("SENSE for {position:?}");
         for &(organism_position, organism_energy_pct, organism_hue) in organims {
             let distance_squared = position.distance_squared(organism_position);
-            if distance_squared > self.fov_range.powi(2) {
-                continue;
-            }
-            let view_angle = position.angle_between(organism_position);
+            assert!(
+                distance_squared <= self.fov_range.powi(2),
+                "Positions should already have been filtered by distance"
+            );
+            let view_angle = (position.angle() - position.angle_between(organism_position) + PI)
+                .rem_euclid(2. * PI)
+                - PI;
             if view_angle < -self.fov_angle / 2.0 || view_angle > self.fov_angle / 2.0 {
                 continue;
             }
