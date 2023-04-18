@@ -63,13 +63,13 @@
             edible: ["Herbivore"],
         ))
         ,   locomotion: Some( LocomotionConfig(
-                linear: Neuron(min:0,max:10)
+                linear: Neuron(min:0,max:6)
             ,   linear_cost: 0.1
             ,   angular_cost: 0.000
             ))
         ,   reproduction: GenerationEvolution(
                 generation_length : 7000
-            ,   min_population    : 2
+            ,   min_population    : 1
             ,   fertility_rate: 1.5
             ,   mutation_chance: 0.1
             ,   mutation_amplitude: 0.3
@@ -83,7 +83,7 @@
     , (
             name : "Plant"
         ,   body: (
-                starting_energy: 10000
+                starting_energy: 1000
             ,   maximum_energy: 40000
             ,   body_cost: 40
         )
@@ -92,7 +92,7 @@
             ,   energy_production: 60
         ))
         ,   reproduction: AutoSpawn(
-                spawn_rate : 0.8
+                spawn_rate : 0.7
         )
         , visualization: (
             hue: 120.0,

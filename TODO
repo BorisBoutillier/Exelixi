@@ -3,10 +3,14 @@
 - Clicking in GUI ( like opening headers) event should not propagate to game
 
 --- Ecosystem
-
 - ECS:
   - Save/Load population, with config to file. Should include 'git' checksum
   - Optimize KdTree to for quasi 'static' species ( only appear and die, do not move)
+  - Converts standard component behaviour as traits :
+      - Sensor
+      - Actuator
+      - EnergyConsummer
+  - should kdtree include multiple time same entity for torus worlds ( without wall)
 
 - Config:
   - Move config file to yaml or json.
@@ -29,6 +33,11 @@
     Base cost of brain on number of non-0 edges.
   
 - Reproduction:
+  - AutoSpawn:
+    add a min_spawn_distance_from_eater:
+      Defines that a spawn must be from any potential eaters.
+  - GenerationEvolution:
+    add a spawn distance from existing population for new generation ?
   - Add reproduction through Birth.
     - Contacts with co-organisms store their genetics.
     - Give birth when reaching max-energy, create child from self and stored genetics with half 'start' energy, that self loses.
