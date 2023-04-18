@@ -67,7 +67,7 @@ pub fn ui_simulation(
                             });
                         }
                     });
-                CollapsingHeader::new("Energy avg")
+                CollapsingHeader::new("Energy total")
                     .default_open(true)
                     .show(ui, |ui| {
                         let mut plot_lines = vec![];
@@ -80,8 +80,11 @@ pub fn ui_simulation(
                                     .or_insert(true);
                                 ui.checkbox(
                                     checked,
-                                    RichText::new(format!("{} {:.0}", stats.name, stat.energy_avg))
-                                        .color(color),
+                                    RichText::new(format!(
+                                        "{} {:.0}",
+                                        stats.name, stat.energy_total
+                                    ))
+                                    .color(color),
                                 );
                                 if *checked {
                                     plot_lines.push(
@@ -90,7 +93,7 @@ pub fn ui_simulation(
                                                 .accumulation
                                                 .iter()
                                                 .map(|(step, stat)| {
-                                                    [*step as f64, stat.energy_avg as f64]
+                                                    [*step as f64, stat.energy_total as f64]
                                                 })
                                                 .collect::<Vec<_>>(),
                                         )
@@ -102,7 +105,7 @@ pub fn ui_simulation(
                         if plot_lines.is_empty() {
                             ui.label(RichText::new("No data yet").color(HONEY));
                         } else {
-                            let plot = egui::plot::Plot::new("Energy avg").height(80.0);
+                            let plot = egui::plot::Plot::new("Energy total").height(80.0);
                             plot.show(ui, |plot_ui| {
                                 for plot_line in plot_lines {
                                     plot_ui.line(plot_line);

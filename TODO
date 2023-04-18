@@ -36,7 +36,6 @@
 
   
 -- User Interaction
-- Add energy total per organism kind. Probably more useful than energy avg.
 [!] Add a 'Selection' panel, that show data from currently selected organism:
   - A collaspable header per Component.
 - Add a configuration panel that show current configuration.

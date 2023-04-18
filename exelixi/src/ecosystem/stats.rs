@@ -9,8 +9,8 @@ pub struct SpeciesStatistic {
     pub generation: Option<u32>,
     // Current organism population size
     pub size: u32,
-    // Current organism energy average
-    pub energy_avg: f32,
+    // Total energy of all organism in this species.
+    pub energy_total: f32,
     // Number of dead organism by out_of_energy since last Step
     pub out_of_energy: u32,
     // Number of eaten organism since last Step
@@ -21,7 +21,7 @@ impl SpeciesStatistic {
         format!(
             "Size: {:4}, Energy: {:6.0}, Deaths:{:4}, Eaten:{:4}, Generation:{}",
             self.size,
-            self.energy_avg,
+            self.energy_total,
             self.out_of_energy,
             self.eaten,
             if let Some(generation) = self.generation {
@@ -46,9 +46,9 @@ impl SpeciesStatistics {
             accumulation: vec![],
         }
     }
-    pub fn set_current(&mut self, size: u32, energy_avg: f32) {
+    pub fn set_current(&mut self, size: u32, energy_total: f32) {
         self.current.size = size;
-        self.current.energy_avg = energy_avg;
+        self.current.energy_total = energy_total;
     }
     pub fn set_generation(&mut self, generation: u32) {
         self.current.generation = Some(generation);
@@ -128,7 +128,7 @@ pub fn statistics_accumulation(
         }
         for (name, size) in size.into_iter() {
             if let Some(stat) = ecosystem_statistics.organisms.get_mut(&name) {
-                stat.set_current(size, energy[&name] / size as f32);
+                stat.set_current(size, energy[&name]);
             }
         }
         for (species, generation_evolution) in generation_evolutions.per_species.iter() {
