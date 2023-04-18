@@ -9,7 +9,7 @@
             name : "Herbivore"
         ,   eye: Some(EyeConfig (
                 fov_angle: Fixed(3.14)
-            ,   fov_range: Fixed(250)
+            ,   fov_range: Fixed(100)
             ,   energy_cost: 0.000
             ,   n_cells: Fixed(9)
             ,   visible: ["Plant"]
@@ -38,7 +38,7 @@
         , visualization: (
             hue:300.0,
             sprite_file: "bird.png",
-            sprite_size: (20.0,20.0),
+            sprite_size: (10.0,10.0),
         )
         )
     , (
@@ -59,7 +59,7 @@
         , visualization: (
             hue: 120.0,
             sprite_file: "food.png",
-            sprite_size: (8.0,8.0),
+            sprite_size: (4.0,4.0),
         )
     )
     ],
