@@ -34,7 +34,6 @@ impl Plugin for UiPlugin {
             .add_system(ui_simulation)
             .add_system(ui_selection)
             .add_system(user_selection)
-            .add_system(selection_on_new_generation)
             .add_system(selection_changed.in_base_set(CoreSet::PostUpdate));
         app.add_plugin(InputManagerPlugin::<UiAction>::default())
             .add_startup_system(setup_ui_action)

@@ -22,15 +22,3 @@ pub fn selection_changed(
         }
     }
 }
-
-pub fn selection_on_new_generation(
-    mut commands: Commands,
-    mut new_generation_event: EventReader<NewGenerationEvent>,
-    organisms: Query<Entity, With<Organism>>,
-) {
-    for _event in new_generation_event.iter() {
-        if let Some(one_entity) = organisms.iter().next() {
-            commands.entity(one_entity).insert(Selected {});
-        }
-    }
-}
