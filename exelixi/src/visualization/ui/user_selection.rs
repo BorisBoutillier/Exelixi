@@ -9,7 +9,7 @@ pub fn user_selection(
     primary_window: Query<&Window, With<PrimaryWindow>>,
     // query to get camera transform
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
-    organisms: Query<(Entity, &Transform), With<Organism>>,
+    kdtree: Res<OrganismKdTree>,
     selected: Query<Entity, With<Selected>>,
     config: Res<EcosystemConfig>,
     simulation: Res<Simulation>,
@@ -36,18 +36,27 @@ pub fn user_selection(
                     && (-0.5..0.5).contains(&(world_pos.y / config.environment.height as f32))
                 {
                     // Find closest organism
-                    let mut organism_dists = organisms
+                    let position = Position::new(world_pos.x, world_pos.y, 0.0);
+                    let mut nearest = kdtree
+                        .per_species
                         .iter()
-                        .map(|(e, t)| (e, (t.translation.truncate() - world_pos).length()))
+                        .filter_map(|(_, tree)| {
+                            tree.nearest(&KdTreeEntry::new(&position, Entity::PLACEHOLDER))
+                        })
                         .collect::<Vec<_>>();
-                    organism_dists.sort_by(|(_, d1), (_, d2)| d1.partial_cmp(d2).unwrap());
-                    if let Some((closest_entity, _)) = organism_dists.first() {
+                    nearest.sort_by(|v1, v2| {
+                        v1.squared_distance
+                            .partial_cmp(&v2.squared_distance)
+                            .unwrap()
+                    });
+                    if let Some(v) = nearest.first() {
+                        let nearest_entity = v.item.entity;
                         // Deselect currently selected organisms
                         for selected_entity in selected.iter() {
                             commands.entity(selected_entity).remove::<Selected>();
                         }
                         // Select the closet organism
-                        commands.entity(*closest_entity).insert(Selected);
+                        commands.entity(nearest_entity).insert(Selected);
                     }
                 }
             }
