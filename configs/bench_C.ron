@@ -92,7 +92,8 @@
             ,   energy_production: 60
         ))
         ,   reproduction: AutoSpawn(
-                spawn_rate : 0.7
+                spawn_rate : 0.7,
+                minimum_distance_from_eater: 100,
         )
         , visualization: (
             hue: 120.0,

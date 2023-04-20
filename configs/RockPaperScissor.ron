@@ -125,7 +125,7 @@
             ,   energy_production: 6
         ))
         ,   reproduction: AutoSpawn(
-                spawn_rate : 1
+                spawn_rate : 0.1
         )
         , visualization: (
             hue: 120.0,
