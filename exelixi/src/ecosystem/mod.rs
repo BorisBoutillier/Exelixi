@@ -24,7 +24,10 @@ use rand_chacha::ChaCha8Rng;
 use std::path::PathBuf;
 
 #[derive(Resource)]
-pub struct EcosystemRng(pub ChaCha8Rng);
+pub struct Ecosystem {
+    pub rng: ChaCha8Rng,
+    pub steps: u32,
+}
 
 pub struct EcosystemPlugin {
     pub seed: Option<u64>,
@@ -40,7 +43,7 @@ impl Plugin for EcosystemPlugin {
         let ecosystem_config = EcosystemConfig::from_path(self.config_path.clone());
         app.add_system(spawn_starting_organisms.in_base_set(CoreSet::PreUpdate));
         app.add_event::<NewGenerationEvent>();
-        app.insert_resource(EcosystemRng(rng));
+        app.insert_resource(Ecosystem { rng, steps: 0 });
         app.insert_resource(ecosystem_config);
         app.insert_resource(GenerationEvolutions::default());
         app.insert_resource(OrganismKdTree::default());

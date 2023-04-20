@@ -5,6 +5,7 @@ use bevy_egui::egui::{FontId, RichText};
 pub fn ui_status_bar(
     mut contexts: EguiContexts,
     simulation: Res<Simulation>,
+    ecosystem: Res<Ecosystem>,
     mut action_state: ResMut<ActionState<SimulationSpeedAction>>,
     diagnostics: Res<Diagnostics>,
 ) {
@@ -18,7 +19,7 @@ pub fn ui_status_bar(
             spacing.button_padding = egui::Vec2::new(2.0, 2.0);
             ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
                 ui.add_space(30.0);
-                ui.heading(format!("Steps: {:6}", simulation.steps));
+                ui.heading(format!("Steps: {:6}", ecosystem.steps));
                 ui.add_space(ui.available_width() - half_width - 30.0 * 3.0);
                 let (text, hover_text) =
                     if simulation.control.state == SimulationControlState::Paused {

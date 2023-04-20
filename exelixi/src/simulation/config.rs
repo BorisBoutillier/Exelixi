@@ -4,7 +4,6 @@ use crate::prelude::*;
 #[derive(Resource)]
 pub struct Simulation {
     pub control: SimulationControl,
-    pub steps: u32,
     // Total active running of the simulation
     pub run_for: Option<u32>,
 }
@@ -17,7 +16,6 @@ impl Simulation {
         };
         Self {
             control: SimulationControl::new(start_state),
-            steps: 0,
             run_for,
         }
     }

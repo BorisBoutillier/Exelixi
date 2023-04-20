@@ -3,7 +3,7 @@ use crate::ecosystem::*;
 pub fn auto_spawning(
     mut commands: Commands,
     ecosystem_config: Res<EcosystemConfig>,
-    mut rng: ResMut<EcosystemRng>,
+    mut ecosystem: ResMut<Ecosystem>,
     kdtree: Res<OrganismKdTree>,
 ) {
     let half_width = ecosystem_config.environment.width / 2;
@@ -15,7 +15,7 @@ pub fn auto_spawning(
         } = config.reproduction
         {
             let n_to_spawn = spawn_rate as u32
-                + if rng.0.gen_bool(spawn_rate % 1.0) {
+                + if ecosystem.rng.gen_bool(spawn_rate % 1.0) {
                     1
                 } else {
                     0
@@ -39,8 +39,8 @@ pub fn auto_spawning(
                 // If we can't find one, don't spawn.
                 for _ in 0..100 {
                     let rng_pos = Position::new(
-                        rng.0.gen_range(-half_width..half_width) as f32,
-                        rng.0.gen_range(-half_height..half_height) as f32,
+                        ecosystem.rng.gen_range(-half_width..half_width) as f32,
+                        ecosystem.rng.gen_range(-half_height..half_height) as f32,
                         0.0,
                     );
                     for species_kdtree in can_eat_me

@@ -112,13 +112,13 @@ impl EcosystemStatistics {
 }
 
 pub fn statistics_accumulation(
-    simulation: Res<Simulation>,
+    ecosystem: Res<Ecosystem>,
     config: Res<EcosystemConfig>,
     mut ecosystem_statistics: ResMut<EcosystemStatistics>,
     organisms: Query<(&Organism, &Body)>,
     generation_evolutions: Res<GenerationEvolutions>,
 ) {
-    if simulation.steps % config.statistics_aggregation_rate == 0 {
+    if ecosystem.steps % config.statistics_aggregation_rate == 0 {
         // Update current statistics
         let mut size = HashMap::new();
         let mut energy = HashMap::new();
@@ -137,10 +137,10 @@ pub fn statistics_accumulation(
             }
         }
         // Print in console
-        println!("{}", ecosystem_statistics.sprint(simulation.steps));
+        println!("{}", ecosystem_statistics.sprint(ecosystem.steps));
         // Store current statistics, and prepare new one
         for stat in ecosystem_statistics.organisms.values_mut() {
-            stat.store_at_step(simulation.steps);
+            stat.store_at_step(ecosystem.steps);
         }
     }
 }

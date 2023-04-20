@@ -9,16 +9,15 @@ pub struct NewGenerationEvent {
 #[allow(clippy::too_many_arguments)]
 pub fn evolve(
     mut commands: Commands,
-    mut simulation: ResMut<Simulation>,
     config: Res<EcosystemConfig>,
     organisms: Query<(Entity, &Organism, &Position, &Body, &Brain, Option<&Eye>)>,
-    mut rng: ResMut<EcosystemRng>,
+    mut ecosystem: ResMut<Ecosystem>,
     mut new_generation_events: EventWriter<NewGenerationEvent>,
     mut generation_evolutions: ResMut<GenerationEvolutions>,
 ) {
-    simulation.steps += 1;
+    ecosystem.steps += 1;
     for (species, state) in generation_evolutions.per_species.iter_mut() {
-        if simulation.steps % state.generation_length == 0 {
+        if ecosystem.steps % state.generation_length == 0 {
             let current_population = organisms
                 .iter()
                 .filter(|(_, organism, _, _, _, _)| &organism.species() == species)
@@ -35,7 +34,7 @@ pub fn evolve(
                 .sum::<f32>();
 
             let mut new_population = state.genetic_algorithm.evolve(
-                &mut rng.0,
+                &mut ecosystem.rng,
                 &current_population,
                 state.fertility_rate,
                 (state.minimum_population as f32 * 0.9) as usize,
@@ -45,7 +44,10 @@ pub fn evolve(
             // If not enough survived, add random organisms
             let missing_population = state.minimum_population as i32 - new_population.len() as i32;
             for _ in 0..missing_population {
-                new_population.push(OrganismIndividual::random(&mut rng.0, &state.config));
+                new_population.push(OrganismIndividual::random(
+                    &mut ecosystem.rng,
+                    &state.config,
+                ));
             }
 
             new_generation_events.send(NewGenerationEvent {
@@ -69,11 +71,11 @@ pub fn evolve(
                     if i < n_evolve {
                         body.set_energy(evolve_energy);
                     }
-                    let angle = rng.0.gen_range(-PI..PI);
+                    let angle = ecosystem.rng.gen_range(-PI..PI);
                     let (x, y) = match (current_positions.is_empty(), state.child_spawn_distance) {
                         (false, Some(distance)) => {
-                            let dx = rng.0.gen_range(-distance..distance);
-                            let dy = rng.0.gen_range(-distance..distance);
+                            let dx = ecosystem.rng.gen_range(-distance..distance);
+                            let dy = ecosystem.rng.gen_range(-distance..distance);
                             (
                                 (current_positions[i % current_positions.len()].x + dx)
                                     .clamp(-half_width, half_width),
@@ -82,8 +84,8 @@ pub fn evolve(
                             )
                         }
                         _ => (
-                            rng.0.gen_range(-half_width..half_width),
-                            rng.0.gen_range(-half_height..half_height),
+                            ecosystem.rng.gen_range(-half_width..half_width),
+                            ecosystem.rng.gen_range(-half_height..half_height),
                         ),
                     };
                     let position = Position::new(x, y, angle);
@@ -130,7 +132,7 @@ pub fn spawn_organism(
 pub fn spawn_starting_organisms(
     mut commands: Commands,
     config: Res<EcosystemConfig>,
-    mut rng: ResMut<EcosystemRng>,
+    mut ecosystem: ResMut<Ecosystem>,
     mut generation_evolutions: ResMut<GenerationEvolutions>,
 ) {
     if config.is_changed() {
@@ -151,7 +153,7 @@ pub fn spawn_starting_organisms(
                     .insert(*species_id, GenerationEvolution::new(organism_config));
                 // Create a new random population
                 let new_population = (0..min_population)
-                    .map(|_| OrganismIndividual::random(&mut rng.0, organism_config))
+                    .map(|_| OrganismIndividual::random(&mut ecosystem.rng, organism_config))
                     .collect::<Vec<_>>();
                 // Spawn the organisms
                 new_population.into_iter().for_each(|individual| {
@@ -159,9 +161,9 @@ pub fn spawn_starting_organisms(
                         individual.into_components(organism_config);
                     let half_width = config.environment.width / 2;
                     let half_height = config.environment.height / 2;
-                    let angle = rng.0.gen_range(-PI..PI);
-                    let x = rng.0.gen_range(-half_width..half_width);
-                    let y = rng.0.gen_range(-half_height..half_height);
+                    let angle = ecosystem.rng.gen_range(-PI..PI);
+                    let x = ecosystem.rng.gen_range(-half_width..half_width);
+                    let y = ecosystem.rng.gen_range(-half_height..half_height);
                     let position = Position::new(x as f32, y as f32, angle);
                     spawn_organism(
                         &mut commands,
