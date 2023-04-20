@@ -1,0 +1,137 @@
+(
+   environment:(
+        width  : 2000
+    ,   height : 2000
+    ,   wall   : true
+    )
+,   species: [
+        (
+            name : "Rock"
+        ,   eye: Some(EyeConfig (
+                fov_angle: Gene(min:1.5,max:4.71)
+            ,   fov_range: Gene(min:70,max:250)
+            ,   energy_cost: 1.0
+            ,   n_cells: Fixed(9)
+            ,   visible: ["Rock","Paper","Scissor","Plant"]
+            ,   cell_sensors: DistanceEnergyHue,
+            ))
+        ,   body: (
+                starting_energy: 10000
+            ,   maximum_energy: 30000
+            ,   body_cost: 1
+        )
+        ,   mouth: Some( MouthConfig(
+            reach: 10.0,
+            edible: ["Scissor","Plant"],
+        ))
+        ,   locomotion: Some( LocomotionConfig(
+                linear: Neuron(min:0,max:5)
+            ,   linear_cost: 0.1
+            ,   angular_cost: 0.000
+            ))
+        ,   reproduction: GenerationEvolution(
+                generation_length : 5000
+            ,   min_population    : 20
+            ,   fertility_rate: 2
+            ,   mutation_chance: 0.1
+            ,   mutation_amplitude: 0.2
+        )
+        , visualization: (
+            hue:210.0,
+            sprite_file: "bird.png",
+            sprite_size: (20.0,20.0),
+        )
+    ),  (
+            name : "Paper"
+        ,   eye: Some(EyeConfig (
+                fov_angle: Gene(min:1.5,max:4.71)
+            ,   fov_range: Gene(min:70,max:250)
+            ,   energy_cost: 1.0
+            ,   n_cells: Fixed(9)
+            ,   visible: ["Rock","Paper","Scissor","Plant"]
+            ,   cell_sensors: DistanceEnergyHue,
+            ))
+        ,   body: (
+                starting_energy: 10000
+            ,   maximum_energy: 30000
+            ,   body_cost: 2
+        )
+        ,   mouth: Some( MouthConfig(
+            reach: 10.0,
+            edible: ["Rock","Plant"],
+        ))
+        ,   locomotion: Some( LocomotionConfig(
+                linear: Neuron(min:0,max:5)
+            ,   linear_cost: 0.1
+            ,   angular_cost: 0.000
+            ))
+        ,   reproduction: GenerationEvolution(
+                generation_length : 5000
+            ,   min_population    : 20
+            ,   fertility_rate: 2
+            ,   mutation_chance: 0.1
+            ,   mutation_amplitude: 0.2
+        )
+        , visualization: (
+            hue:30.0,
+            sprite_file: "bird.png",
+            sprite_size: (20.0,20.0),
+        )
+    ),  (
+            name : "Scissor"
+        ,   eye: Some(EyeConfig (
+                fov_angle: Gene(min:1.5,max:4.71)
+            ,   fov_range: Gene(min:70,max:250)
+            ,   energy_cost: 1.0
+            ,   n_cells: Fixed(9)
+            ,   visible: ["Rock","Paper","Scissor","Plant"]
+            ,   cell_sensors: DistanceEnergyHue,
+            ))
+        ,   body: (
+                starting_energy: 10000
+            ,   maximum_energy: 30000
+            ,   body_cost: 2
+        )
+        ,   mouth: Some( MouthConfig(
+            reach: 10.0,
+            edible: ["Paper","Plant"],
+        ))
+        ,   locomotion: Some( LocomotionConfig(
+                linear: Neuron(min:0,max:5)
+            ,   linear_cost: 0.1
+            ,   angular_cost: 0.000
+            ))
+        ,   reproduction: GenerationEvolution(
+                generation_length : 5000
+            ,   min_population    : 20
+            ,   fertility_rate: 2
+            ,   mutation_chance: 0.1
+            ,   mutation_amplitude: 0.2
+        )
+        , visualization: (
+            hue:300.0,
+            sprite_file: "bird.png",
+            sprite_size: (20.0,20.0),
+        )
+    ) , (
+            name : "Plant"
+        ,   body: (
+                starting_energy: 1000
+            ,   maximum_energy: 4000
+            ,   body_cost: 4
+        )
+        ,   leaf: Some(LeafConfig(
+                lifetime: 500
+            ,   energy_production: 6
+        ))
+        ,   reproduction: AutoSpawn(
+                spawn_rate : 1
+        )
+        , visualization: (
+            hue: 120.0,
+            sprite_file: "food.png",
+            sprite_size: (8.0,8.0),
+        )
+)], 
+    statistics: () 
+)
