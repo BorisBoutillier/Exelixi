@@ -18,5 +18,9 @@ pub enum ReproductionConfig {
         fertility_rate: f32,
         mutation_chance: f32,
         mutation_amplitude: f32,
+        // Maximum distance child are spawning from survivors position
+        // When None, child spawn randomly in the environment.
+        #[serde(default)]
+        child_spawn_distance: Option<f32>,
     },
 }

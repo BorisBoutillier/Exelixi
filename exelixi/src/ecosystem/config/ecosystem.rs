@@ -79,6 +79,7 @@ impl EcosystemConfig {
                 fertility_rate: _,
                 mutation_chance: _,
                 mutation_amplitude: _,
+                child_spawn_distance: _,
             } = species.reproduction
             {
                 min_generation_length = min_generation_length.min(generation_length);

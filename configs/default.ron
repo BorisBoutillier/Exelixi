@@ -35,6 +35,7 @@
             ,   fertility_rate: 1.5
             ,   mutation_chance: 0.01
             ,   mutation_amplitude: 0.3
+            ,   child_spawn_distance: Some(20.0)
         )
         , visualization: (
             hue:300.0,

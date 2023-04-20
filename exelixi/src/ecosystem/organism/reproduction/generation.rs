@@ -11,7 +11,7 @@ pub fn evolve(
     mut commands: Commands,
     mut simulation: ResMut<Simulation>,
     config: Res<EcosystemConfig>,
-    organisms: Query<(Entity, &Organism, &Body, &Brain, Option<&Eye>)>,
+    organisms: Query<(Entity, &Organism, &Position, &Body, &Brain, Option<&Eye>)>,
     mut rng: ResMut<EcosystemRng>,
     mut new_generation_events: EventWriter<NewGenerationEvent>,
     mut generation_evolutions: ResMut<GenerationEvolutions>,
@@ -21,8 +21,8 @@ pub fn evolve(
         if simulation.steps % state.generation_length == 0 {
             let current_population = organisms
                 .iter()
-                .filter(|(_, organism, _, _, _)| &organism.species() == species)
-                .map(|(entity, _, body, brain, eye)| {
+                .filter(|(_, organism, _, _, _, _)| &organism.species() == species)
+                .map(|(entity, _, _, body, brain, eye)| {
                     commands.entity(entity).despawn_recursive();
                     OrganismIndividual::from_components(&state.config, body, &eye, brain)
                 })
@@ -30,8 +30,8 @@ pub fn evolve(
             state.current_generation += 1;
             let total_energy = organisms
                 .iter()
-                .filter(|(_, organism, _, _, _)| &organism.species() == species)
-                .map(|(_, _, b, _, _)| b.energy())
+                .filter(|(_, organism, _, _, _, _)| &organism.species() == species)
+                .map(|(_, _, _, b, _, _)| b.energy())
                 .sum::<f32>();
 
             let mut new_population = state.genetic_algorithm.evolve(
@@ -53,6 +53,13 @@ pub fn evolve(
                 generation: state.current_generation,
             });
             // Spawn new organisms
+            let current_positions = organisms
+                .iter()
+                .filter(|(_, organism, _, _, _, _)| &organism.species() == species)
+                .map(|(_, _, p, _, _, _)| p)
+                .collect::<Vec<_>>();
+            let half_width = config.environment.width as f32 / 2.0;
+            let half_height = config.environment.height as f32 / 2.0;
             new_population
                 .into_iter()
                 .enumerate()
@@ -62,15 +69,32 @@ pub fn evolve(
                     if i < n_evolve {
                         body.set_energy(evolve_energy);
                     }
+                    let angle = rng.0.gen_range(-PI..PI);
+                    let (x, y) = match (current_positions.is_empty(), state.child_spawn_distance) {
+                        (false, Some(distance)) => {
+                            let dx = rng.0.gen_range(-distance..distance);
+                            let dy = rng.0.gen_range(-distance..distance);
+                            (
+                                (current_positions[i % current_positions.len()].x + dx)
+                                    .clamp(-half_width, half_width),
+                                (current_positions[i % current_positions.len()].y + dy)
+                                    .clamp(-half_height, half_height),
+                            )
+                        }
+                        _ => (
+                            rng.0.gen_range(-half_width..half_width),
+                            rng.0.gen_range(-half_height..half_height),
+                        ),
+                    };
+                    let position = Position::new(x, y, angle);
                     spawn_organism(
                         &mut commands,
-                        &config,
                         &state.config,
                         body,
                         eye,
                         locomotion,
                         brain,
-                        &mut rng,
+                        position,
                     );
                 });
         }
@@ -82,25 +106,14 @@ use std::f32::consts::PI;
 #[allow(clippy::too_many_arguments)]
 pub fn spawn_organism(
     commands: &mut Commands,
-    config: &EcosystemConfig,
     organism_config: &SpeciesConfig,
     body: Body,
     eye: Option<Eye>,
     locomotion: Option<Locomotion>,
     brain: Brain,
-    rng: &mut EcosystemRng,
+    position: Position,
 ) {
-    let half_width = config.environment.width / 2;
-    let half_height = config.environment.height / 2;
-    let angle = rng.0.gen_range(-PI..PI);
-    let x = rng.0.gen_range(-half_width..half_width);
-    let y = rng.0.gen_range(-half_height..half_height);
-    let mut command = commands.spawn((
-        Organism::new(organism_config),
-        Position::new(x as f32, y as f32, angle),
-        body,
-        brain,
-    ));
+    let mut command = commands.spawn((Organism::new(organism_config), position, body, brain));
     if let Some(locomotion) = locomotion {
         command.insert(locomotion);
     }
@@ -130,6 +143,7 @@ pub fn spawn_starting_organisms(
                 fertility_rate: _,
                 mutation_chance: _,
                 mutation_amplitude: _,
+                child_spawn_distance: _,
             } = organism_config.reproduction
             {
                 generation_evolutions
@@ -143,15 +157,20 @@ pub fn spawn_starting_organisms(
                 new_population.into_iter().for_each(|individual| {
                     let (body, eye, locomotion, brain) =
                         individual.into_components(organism_config);
+                    let half_width = config.environment.width / 2;
+                    let half_height = config.environment.height / 2;
+                    let angle = rng.0.gen_range(-PI..PI);
+                    let x = rng.0.gen_range(-half_width..half_width);
+                    let y = rng.0.gen_range(-half_height..half_height);
+                    let position = Position::new(x as f32, y as f32, angle);
                     spawn_organism(
                         &mut commands,
-                        &config,
                         organism_config,
                         body,
                         eye,
                         locomotion,
                         brain,
-                        &mut rng,
+                        position,
                     );
                 });
             }

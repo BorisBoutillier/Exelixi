@@ -25,6 +25,7 @@ pub struct GenerationEvolution {
     pub generation_length: u32,
     pub minimum_population: usize,
     pub fertility_rate: f32,
+    pub child_spawn_distance: Option<f32>,
     // Current generation for this organism
     pub current_generation: u32,
 }
@@ -36,6 +37,7 @@ impl GenerationEvolution {
             fertility_rate,
             mutation_chance,
             mutation_amplitude,
+            child_spawn_distance,
         } = config.reproduction
         {
             Self {
@@ -48,6 +50,7 @@ impl GenerationEvolution {
                 ),
                 minimum_population: min_population,
                 fertility_rate,
+                child_spawn_distance,
                 current_generation: 0,
             }
         } else {
