@@ -34,7 +34,7 @@ impl SpeciesConfig {
 }
 
 // Identifier for each different species in the simulation
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct SpeciesId(u8);
 
 const UNDEFINED_SPECIES_ID: u8 = u8::MAX;

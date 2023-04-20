@@ -6,7 +6,6 @@ pub use autospawn::*;
 pub use generation::*;
 pub use individual::*;
 
-use bevy::prelude::Resource;
 use lib_genetic_algorithm as ga;
 use std::collections::HashMap;
 

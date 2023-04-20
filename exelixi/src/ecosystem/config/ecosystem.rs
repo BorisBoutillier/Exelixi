@@ -12,7 +12,7 @@ pub struct EcosystemStatsConfig {
     // If not provided, with be 0.1*smallest generation length.
     pub aggregation_rate: Option<u32>,
 }
-#[derive(Serialize, Deserialize, Resource, Clone)]
+#[derive(Serialize, Deserialize)]
 pub struct UserEcosystemConfig {
     // Configuration information regarding the environment
     pub environment: EnvironmentConfig,
@@ -24,7 +24,7 @@ pub struct UserEcosystemConfig {
 //
 // Resources
 //
-#[derive(Resource, Clone)]
+#[derive(Resource, Clone, Serialize, Deserialize)]
 pub struct EcosystemConfig {
     pub environment: EnvironmentConfig,
     pub statistics_aggregation_rate: u32,
