@@ -3,7 +3,6 @@ use crate::ecosystem::{organism::reproduction::individual::OrganismIndividual, *
 #[derive(Debug)]
 pub struct NewGenerationEvent {
     pub species: SpeciesId,
-    pub generation: u32,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -11,11 +10,10 @@ pub fn evolve(
     mut commands: Commands,
     config: Res<EcosystemConfig>,
     organisms: Query<(Entity, &Organism, &Position, &Body, &Brain, Option<&Eye>)>,
-    mut ecosystem: ResMut<Ecosystem>,
+    mut ecosystem: ResMut<EcosystemRuntime>,
     mut new_generation_events: EventWriter<NewGenerationEvent>,
     mut generation_evolutions: ResMut<GenerationEvolutions>,
 ) {
-    ecosystem.steps += 1;
     for (species, state) in generation_evolutions.per_species.iter_mut() {
         if ecosystem.steps % state.generation_length == 0 {
             let current_population = organisms
@@ -26,7 +24,7 @@ pub fn evolve(
                     OrganismIndividual::from_components(&state.config, body, &eye, brain)
                 })
                 .collect::<Vec<_>>();
-            state.current_generation += 1;
+            ecosystem.increate_generation(species);
             let total_energy = organisms
                 .iter()
                 .filter(|(_, organism, _, _, _, _)| &organism.species() == species)
@@ -50,10 +48,7 @@ pub fn evolve(
                 ));
             }
 
-            new_generation_events.send(NewGenerationEvent {
-                species: *species,
-                generation: state.current_generation,
-            });
+            new_generation_events.send(NewGenerationEvent { species: *species });
             // Spawn new organisms
             let current_positions = organisms
                 .iter()
@@ -101,6 +96,8 @@ pub fn evolve(
                 });
         }
     }
+    // Increase steps at the end so that we can have a first evolution at step = 0
+    ecosystem.steps += 1;
 }
 
 use std::f32::consts::PI;
@@ -127,55 +124,5 @@ pub fn spawn_organism(
     }
     if let Some(mouth_config) = &organism_config.mouth {
         command.insert(Mouth::new(mouth_config));
-    }
-}
-pub fn spawn_starting_organisms(
-    mut commands: Commands,
-    config: Res<EcosystemConfig>,
-    mut ecosystem: ResMut<Ecosystem>,
-    mut generation_evolutions: ResMut<GenerationEvolutions>,
-) {
-    if config.is_changed() {
-        commands.insert_resource(EcosystemStatistics::new(&config));
-        generation_evolutions.per_species.clear();
-        for (species_id, organism_config) in config.species.iter() {
-            if let ReproductionConfig::GenerationEvolution {
-                generation_length: _,
-                min_population,
-                fertility_rate: _,
-                mutation_chance: _,
-                mutation_amplitude: _,
-                child_spawn_distance: _,
-            } = organism_config.reproduction
-            {
-                generation_evolutions
-                    .per_species
-                    .insert(*species_id, GenerationEvolution::new(organism_config));
-                // Create a new random population
-                let new_population = (0..min_population)
-                    .map(|_| OrganismIndividual::random(&mut ecosystem.rng, organism_config))
-                    .collect::<Vec<_>>();
-                // Spawn the organisms
-                new_population.into_iter().for_each(|individual| {
-                    let (body, eye, locomotion, brain) =
-                        individual.into_components(organism_config);
-                    let half_width = config.environment.width / 2;
-                    let half_height = config.environment.height / 2;
-                    let angle = ecosystem.rng.gen_range(-PI..PI);
-                    let x = ecosystem.rng.gen_range(-half_width..half_width);
-                    let y = ecosystem.rng.gen_range(-half_height..half_height);
-                    let position = Position::new(x as f32, y as f32, angle);
-                    spawn_organism(
-                        &mut commands,
-                        organism_config,
-                        body,
-                        eye,
-                        locomotion,
-                        brain,
-                        position,
-                    );
-                });
-            }
-        }
     }
 }

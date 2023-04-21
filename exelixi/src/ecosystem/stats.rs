@@ -112,11 +112,10 @@ impl EcosystemStatistics {
 }
 
 pub fn statistics_accumulation(
-    ecosystem: Res<Ecosystem>,
+    ecosystem: Res<EcosystemRuntime>,
     config: Res<EcosystemConfig>,
     mut ecosystem_statistics: ResMut<EcosystemStatistics>,
     organisms: Query<(&Organism, &Body)>,
-    generation_evolutions: Res<GenerationEvolutions>,
 ) {
     if ecosystem.steps % config.statistics_aggregation_rate == 0 {
         // Update current statistics
@@ -131,9 +130,9 @@ pub fn statistics_accumulation(
                 stat.set_current(size, energy[&name]);
             }
         }
-        for (species, generation_evolution) in generation_evolutions.per_species.iter() {
+        for (species, generation) in ecosystem.generation.iter() {
             if let Some(stat) = ecosystem_statistics.organisms.get_mut(species) {
-                stat.set_generation(generation_evolution.current_generation);
+                stat.set_generation(*generation);
             }
         }
         // Print in console

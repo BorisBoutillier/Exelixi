@@ -5,7 +5,7 @@ use bevy_egui::egui::{FontId, RichText};
 pub fn ui_status_bar(
     mut contexts: EguiContexts,
     simulation: Res<Simulation>,
-    ecosystem: Res<Ecosystem>,
+    ecosystem: Res<EcosystemRuntime>,
     mut action_state: ResMut<ActionState<SimulationAction>>,
     diagnostics: Res<Diagnostics>,
 ) {

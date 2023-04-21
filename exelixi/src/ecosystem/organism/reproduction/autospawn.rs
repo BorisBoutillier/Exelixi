@@ -3,7 +3,7 @@ use crate::ecosystem::*;
 pub fn auto_spawning(
     mut commands: Commands,
     ecosystem_config: Res<EcosystemConfig>,
-    mut ecosystem: ResMut<Ecosystem>,
+    mut ecosystem: ResMut<EcosystemRuntime>,
     kdtree: Res<OrganismKdTree>,
 ) {
     let half_width = ecosystem_config.environment.width / 2;

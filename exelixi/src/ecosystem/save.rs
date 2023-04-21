@@ -1,7 +1,7 @@
 use bevy::{reflect::TypeRegistryInternal, scene::DynamicEntity};
 use parking_lot::RwLockReadGuard;
 
-use crate::ecosystem::{self, *};
+use crate::ecosystem::*;
 
 pub struct SaveEcosystemEvent {
     pub path: String,
@@ -43,7 +43,7 @@ pub fn save_ecosystem_to_file(
         // Serialize Resource manually, as they are not yet part of the DynamicScene
         let config = world.get_resource::<EcosystemConfig>().unwrap();
         let config_ser = ron::to_string(config).unwrap();
-        let ecosystem = world.get_resource::<Ecosystem>().unwrap();
+        let ecosystem = world.get_resource::<EcosystemRuntime>().unwrap();
         let ecosystem_ser = ron::to_string(ecosystem).unwrap();
 
         // Manually separate in file

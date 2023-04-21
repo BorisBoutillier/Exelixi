@@ -15,6 +15,25 @@ use crate::ecosystem::*;
 pub struct GenerationEvolutions {
     pub per_species: HashMap<SpeciesId, GenerationEvolution>,
 }
+impl GenerationEvolutions {
+    pub fn new(config: &EcosystemConfig) -> Self {
+        let mut per_species = HashMap::new();
+        for (species_id, organism_config) in config.species.iter() {
+            if let ReproductionConfig::GenerationEvolution {
+                generation_length: _,
+                min_population: _,
+                fertility_rate: _,
+                mutation_chance: _,
+                mutation_amplitude: _,
+                child_spawn_distance: _,
+            } = organism_config.reproduction
+            {
+                per_species.insert(*species_id, GenerationEvolution::new(organism_config));
+            }
+        }
+        Self { per_species }
+    }
+}
 
 pub struct GenerationEvolution {
     pub config: SpeciesConfig,
@@ -25,8 +44,6 @@ pub struct GenerationEvolution {
     pub minimum_population: usize,
     pub fertility_rate: f32,
     pub child_spawn_distance: Option<f32>,
-    // Current generation for this organism
-    pub current_generation: u32,
 }
 impl GenerationEvolution {
     pub fn new(config: &SpeciesConfig) -> Self {
@@ -50,7 +67,6 @@ impl GenerationEvolution {
                 minimum_population: min_population,
                 fertility_rate,
                 child_spawn_distance,
-                current_generation: 0,
             }
         } else {
             panic!("Generation Evolution created for incorrect Config")

@@ -31,13 +31,13 @@ const MAX_SIMULATION_DURATION_PER_FRAME: f32 = 1.0 / (MIN_FPS as f32);
 pub fn run_ecosystem_schedule(world: &mut World) {
     let (start_steps, control, run_for) = {
         let simulation = world.get_resource::<Simulation>().unwrap();
-        let ecosystem = world.get_resource::<Ecosystem>().unwrap();
+        let ecosystem = world.get_resource::<EcosystemRuntime>().unwrap();
         (ecosystem.steps, simulation.control, simulation.run_for)
     };
     if let Some(n_steps) = run_for {
         loop {
             world.run_schedule(EcosystemSchedule);
-            let cur_steps = world.get_resource::<Ecosystem>().unwrap().steps;
+            let cur_steps = world.get_resource::<EcosystemRuntime>().unwrap().steps;
             // Always give back control on generation increase
             if cur_steps >= start_steps + n_steps {
                 world
