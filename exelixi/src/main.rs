@@ -44,6 +44,9 @@ struct Args {
     ///
     #[arg(long)]
     run_for: Option<u32>,
+    /// Path to the simulation state to load
+    #[arg(short, long)]
+    load: Option<PathBuf>,
 }
 
 fn main() {
@@ -59,6 +62,7 @@ fn main() {
     app.add_plugin(ecosystem::EcosystemPlugin {
         seed: args.seed,
         config_path: args.config,
+        load_path: args.load,
     });
     app.add_plugin(simulation::SimulationPlugin {
         run_for: args.run_for,

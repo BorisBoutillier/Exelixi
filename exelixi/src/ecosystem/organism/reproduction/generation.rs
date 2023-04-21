@@ -112,7 +112,8 @@ pub fn spawn_organism(
     brain: Brain,
     position: Position,
 ) {
-    let mut command = commands.spawn((Organism::new(organism_config), position, body, brain));
+    let organism = Organism::new(organism_config);
+    let mut command = commands.spawn((organism, position, body, brain));
     if let Some(locomotion) = locomotion {
         command.insert(locomotion);
     }

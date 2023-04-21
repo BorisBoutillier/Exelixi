@@ -2,7 +2,7 @@ use bevy::{reflect::TypeRegistryInternal, scene::DynamicEntity};
 use parking_lot::RwLockReadGuard;
 
 use crate::ecosystem::*;
-
+pub const SAVE_SEP: &str = "\n########\n";
 pub struct SaveEcosystemEvent {
     pub path: String,
 }
@@ -23,6 +23,7 @@ pub fn save_ecosystem_to_file(
             let entry = DynamicEntity {
                 entity: index,
                 components: vec![
+                    get_reflect_data::<Position>(entity, world, &type_registry),
                     get_reflect_data::<Organism>(entity, world, &type_registry),
                     get_reflect_data::<Body>(entity, world, &type_registry),
                     get_reflect_data::<Brain>(entity, world, &type_registry),
@@ -47,7 +48,7 @@ pub fn save_ecosystem_to_file(
         let ecosystem_ser = ron::to_string(ecosystem).unwrap();
 
         // Manually separate in file
-        let data = [entities_ser, config_ser, ecosystem_ser].join("\n########\n");
+        let data = [entities_ser, config_ser, ecosystem_ser].join(SAVE_SEP);
         std::fs::write(&event.path, data.as_bytes()).expect("ohoh2");
     }
 }

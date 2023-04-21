@@ -5,7 +5,7 @@ use crate::ecosystem::*;
 pub use organs::*;
 pub use reproduction::*;
 
-#[derive(Component, Reflect, Default)]
+#[derive(Component, Reflect, Default, Debug)]
 #[reflect(Component)]
 pub struct Organism {
     // Identifier of the species of this organism

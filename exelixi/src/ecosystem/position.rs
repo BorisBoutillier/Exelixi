@@ -2,7 +2,8 @@ use std::f32::consts::PI;
 
 use crate::ecosystem::*;
 
-#[derive(Clone, Copy, Component, Debug)]
+#[derive(Clone, Copy, Component, Debug, Reflect, Default)]
+#[reflect(Component)]
 pub struct Position {
     pub x: f32,
     pub y: f32,
