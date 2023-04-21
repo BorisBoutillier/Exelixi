@@ -20,7 +20,7 @@ pub fn ui_status_bar(
             ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
                 ui.add_space(30.0);
                 ui.heading(format!("Steps: {:6}", ecosystem.steps));
-                ui.add_space(ui.available_width() - half_width - 30.0 * 3.0);
+                ui.add_space(ui.available_width() - half_width - 30.0 * 3.5);
                 let (text, hover_text) =
                     if simulation.control.state == SimulationControlState::Paused {
                         ("▶", "Run")
@@ -62,6 +62,15 @@ pub fn ui_status_bar(
                     .clicked()
                 {
                     action_state.press(SimulationAction::Fastest);
+                }
+                if ui
+                    .add(egui::Button::new(
+                        egui::RichText::new("💾").color(egui::Color32::from_rgb(200, 255, 200)),
+                    ))
+                    .on_hover_text("Save")
+                    .clicked()
+                {
+                    action_state.press(SimulationAction::Save);
                 }
                 ui.add_space(ui.available_width() - 60.0);
                 let mut fps_s = "N/A".to_string();

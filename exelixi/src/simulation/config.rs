@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::prelude::*;
 
 // Resources
@@ -6,17 +8,15 @@ pub struct Simulation {
     pub control: SimulationControl,
     // Total active running of the simulation
     pub run_for: Option<u32>,
+    // Default path to save
+    pub save_path: Option<PathBuf>,
 }
 impl Simulation {
-    pub fn new(run_for: Option<u32>) -> Self {
-        let start_state = if run_for.is_some() {
-            SimulationControlState::Fastest
-        } else {
-            SimulationControlState::Paused
-        };
+    pub fn new(run_for: Option<u32>, save_path: Option<PathBuf>) -> Self {
         Self {
-            control: SimulationControl::new(start_state),
+            control: SimulationControl::new(),
             run_for,
+            save_path,
         }
     }
     // Dump current simulation information in a single line string.

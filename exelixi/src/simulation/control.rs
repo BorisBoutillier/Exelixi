@@ -9,9 +9,9 @@ pub struct SimulationControl {
     pub speed_factor: u32,
 }
 impl SimulationControl {
-    pub fn new(start_state: SimulationControlState) -> Self {
+    pub fn new() -> Self {
         Self {
-            state: start_state,
+            state: SimulationControlState::Paused,
             speed_factor: 1,
         }
     }
@@ -73,7 +73,11 @@ pub fn simulation_action_input(
     }
     if action_state.just_pressed(SimulationAction::Save) {
         save_events.send(SaveEcosystemEvent {
-            path: "test.sim".to_string(),
+            path: simulation
+                .save_path
+                .clone()
+                .unwrap_or("default.ecosim".into()),
+            then_exit: false,
         });
     }
 }

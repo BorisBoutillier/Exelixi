@@ -3,7 +3,7 @@
 
 --- Ecosystem
 - ECS:
-  - Save/Load population, with config to file. Should include 'git' checksum
+  - Save/Load should include 'git' checksum. And Warning in stdout when not matching, but still load.
   - Optimize KdTree to for quasi 'static' species ( only appear and die, do not move)
   - Converts standard component behaviour as traits :
       - Sensor

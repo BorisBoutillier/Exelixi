@@ -35,18 +35,21 @@ use prelude::*;
 #[command(author, version, about, long_about)]
 struct Args {
     /// Path to the simulation config to use
-    #[arg(short, long)]
+    #[arg(long)]
     config: Option<PathBuf>,
     /// Initial seed for the simulation, randomized when not provided.
-    #[arg(short, long)]
+    #[arg(long)]
     seed: Option<u64>,
     /// Auto start the simulation without gui for the provided number of steps
     ///
     #[arg(long)]
     run_for: Option<u32>,
     /// Path to the simulation state to load
-    #[arg(short, long)]
+    #[arg(long)]
     load: Option<PathBuf>,
+    /// Default path to the save the simulation to
+    #[arg(long)]
+    save: Option<PathBuf>,
 }
 
 fn main() {
@@ -66,6 +69,7 @@ fn main() {
     });
     app.add_plugin(simulation::SimulationPlugin {
         run_for: args.run_for,
+        save_path: args.save,
     });
     app.run();
 }

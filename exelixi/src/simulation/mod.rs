@@ -1,4 +1,4 @@
-use std::time::Instant;
+use std::{path::PathBuf, time::Instant};
 
 use crate::prelude::*;
 
@@ -11,10 +11,11 @@ pub use control::*;
 
 pub struct SimulationPlugin {
     pub run_for: Option<u32>,
+    pub save_path: Option<PathBuf>,
 }
 impl Plugin for SimulationPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(Simulation::new(self.run_for));
+        app.insert_resource(Simulation::new(self.run_for, self.save_path.clone()));
         app.add_system(run_ecosystem_schedule);
         if self.run_for.is_none() {
             app.add_plugin(InputManagerPlugin::<SimulationAction>::default());
@@ -29,25 +30,38 @@ const MIN_FPS: u32 = 10;
 const MAX_SIMULATION_DURATION_PER_FRAME: f32 = 1.0 / (MIN_FPS as f32);
 
 pub fn run_ecosystem_schedule(world: &mut World) {
-    let (start_steps, control, run_for) = {
-        let simulation = world.get_resource::<Simulation>().unwrap();
-        let ecosystem = world.get_resource::<EcosystemRuntime>().unwrap();
-        (ecosystem.steps, simulation.control, simulation.run_for)
-    };
-    if let Some(n_steps) = run_for {
+    if let Some(n_steps) = world
+        .get_resource_mut::<Simulation>()
+        .unwrap()
+        .run_for
+        .take()
+    {
+        let start_steps = world.get_resource::<EcosystemRuntime>().unwrap().steps;
         loop {
             world.run_schedule(EcosystemSchedule);
             let cur_steps = world.get_resource::<EcosystemRuntime>().unwrap().steps;
             // Always give back control on generation increase
             if cur_steps >= start_steps + n_steps {
-                world
-                    .get_resource_mut::<Events<AppExit>>()
-                    .unwrap()
-                    .send_default();
+                let mut simulation = world.get_resource_mut::<Simulation>().unwrap();
+                if let Some(save_path) = simulation.save_path.take() {
+                    world
+                        .get_resource_mut::<Events<SaveEcosystemEvent>>()
+                        .unwrap()
+                        .send(SaveEcosystemEvent {
+                            path: save_path,
+                            then_exit: true,
+                        });
+                } else {
+                    world
+                        .get_resource_mut::<Events<AppExit>>()
+                        .unwrap()
+                        .send_default();
+                }
                 break;
             }
         }
     } else {
+        let control = world.get_resource::<Simulation>().unwrap().control;
         if control.state == SimulationControlState::Paused {
             return;
         }
