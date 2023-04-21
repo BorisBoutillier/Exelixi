@@ -1,4 +1,7 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::{
+    collections::{BTreeMap, HashMap},
+    path::PathBuf,
+};
 
 use bevy_egui::egui::Color32;
 
@@ -28,7 +31,7 @@ pub struct UserEcosystemConfig {
 pub struct EcosystemConfig {
     pub environment: EnvironmentConfig,
     pub statistics_aggregation_rate: u32,
-    pub species: HashMap<SpeciesId, SpeciesConfig>,
+    pub species: BTreeMap<SpeciesId, SpeciesConfig>,
 }
 impl EcosystemConfig {
     pub fn from_path(path: Option<PathBuf>) -> Self {
@@ -62,7 +65,7 @@ impl EcosystemConfig {
         Self::from_user_config(user_config)
     }
     pub fn from_user_config(user_config: UserEcosystemConfig) -> Self {
-        let mut species = HashMap::new();
+        let mut species = BTreeMap::new();
         let mut species_name_to_id = HashMap::new();
         for (i, mut species_config) in user_config.species.into_iter().enumerate() {
             let species_id = SpeciesId::new(i as u8);

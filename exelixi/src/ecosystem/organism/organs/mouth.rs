@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 use crate::ecosystem::*;
 
@@ -30,7 +30,7 @@ pub fn mouth_eating(
     // Store for each eatable organisms, the list of each organism that want to eat it
     // with the distance it is at.
     // Only the closest will be able to eat it.
-    let mut want_to_eat = HashMap::new();
+    let mut want_to_eat = BTreeMap::new();
     for (entity, position, mouth) in eaters.iter_mut() {
         for species in mouth.edible.iter() {
             for other in kdtree.per_species[species]

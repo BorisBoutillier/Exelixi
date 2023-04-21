@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use crate::ecosystem::*;
 
@@ -6,11 +6,11 @@ use crate::ecosystem::*;
 pub struct EcosystemRuntime {
     pub rng: IsaacRng,
     pub steps: u32,
-    pub generation: HashMap<SpeciesId, u32>,
+    pub generation: BTreeMap<SpeciesId, u32>,
 }
 impl EcosystemRuntime {
     pub fn new(rng: IsaacRng, config: &EcosystemConfig) -> Self {
-        let mut generation = HashMap::new();
+        let mut generation = BTreeMap::new();
         for species in config.species.keys() {
             generation.insert(*species, 0);
         }

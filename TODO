@@ -1,9 +1,13 @@
 -- Bugs
-- Fix lost determinism when changing mouth eating algorithm
+- Fix lost determinism . RockPaperScissor instable after 500 steps on seed 0
+  For bench_B seed=0 between 5000 and 5500
+- load and run_for do not work together, load run-for and save should work all three together
 
 --- Ecosystem
 - ECS:
   - Save/Load should include 'git' checksum. And Warning in stdout when not matching, but still load.
+  - Should we save to directory to save with steps as name, and allow a save_every command line argument ?
+    We could also save the inline_stats for this steps in a txt file next to it. XX.ecosim and XX.stats ?
   - Optimize KdTree to for quasi 'static' species ( only appear and die, do not move)
   - Converts standard component behaviour as traits :
       - Sensor
