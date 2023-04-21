@@ -2,7 +2,8 @@ use crate::ecosystem::*;
 pub use lib_genetic_algorithm as ga;
 pub use lib_neural_network as nn;
 
-#[derive(Component)]
+#[derive(Component, Reflect, Default)]
+#[reflect(Component)]
 pub struct Brain {
     pub nn: nn::Network,
 }

@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 use crate::ecosystem::*;
 
-#[derive(Component)]
+#[derive(Component, Reflect, Default)]
+#[reflect(Component)]
 pub struct Body {
     cur_energy: f32,
     max_energy: f32,

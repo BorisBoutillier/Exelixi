@@ -1,4 +1,4 @@
-use super::*;
+use crate::ecosystem::*;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EnvironmentConfig {

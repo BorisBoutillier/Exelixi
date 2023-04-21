@@ -1,11 +1,12 @@
 mod organs;
 mod reproduction;
 
+use crate::ecosystem::*;
 pub use organs::*;
 pub use reproduction::*;
 
-use crate::ecosystem::*;
-#[derive(Component)]
+#[derive(Component, Reflect, Default)]
+#[reflect(Component)]
 pub struct Organism {
     // Identifier of the species of this organism
     species: SpeciesId,

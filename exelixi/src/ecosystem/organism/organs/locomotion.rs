@@ -5,7 +5,8 @@ use crate::ecosystem::*;
 /// Maximum angalur velocity in radians/step
 pub const V_ANGULAR_MAX: f32 = 0.2;
 
-#[derive(Component)]
+#[derive(Component, Reflect, Default)]
+#[reflect(Component)]
 pub struct Locomotion {
     // Linear  velocity in unit per step
     pub linear: f32,

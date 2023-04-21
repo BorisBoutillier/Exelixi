@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use bevy::reflect::{FromReflect, Reflect};
+
 use super::organs::{BodyConfig, EyeConfig, LocomotionConfig};
 use super::reproduction::ReproductionConfig;
 use super::*;
@@ -34,7 +36,20 @@ impl SpeciesConfig {
 }
 
 // Identifier for each different species in the simulation
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    Reflect,
+    FromReflect,
+)]
 pub struct SpeciesId(u8);
 
 const UNDEFINED_SPECIES_ID: u8 = u8::MAX;

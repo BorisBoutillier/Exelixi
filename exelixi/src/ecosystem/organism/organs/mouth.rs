@@ -2,7 +2,8 @@ use std::collections::{HashMap, HashSet};
 
 use crate::ecosystem::*;
 
-#[derive(Component)]
+#[derive(Component, Reflect, Default)]
+#[reflect(Component)]
 pub struct Mouth {
     // Maximum distance the mouth can catch something
     pub reach: f32,

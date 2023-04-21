@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use super::*;
+use crate::ecosystem::*;
 
-#[derive(Default, Serialize, Deserialize, Debug, Clone, Copy)]
+#[derive(Default, Serialize, Deserialize, Reflect, Debug, Clone, Copy)]
 pub enum CellSensors {
     // 2 sensors per cell, one for distance percentage, one for energy level pct of the
     // closest visible object in this cell.

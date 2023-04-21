@@ -14,7 +14,7 @@ pub fn user_selection(
     config: Res<EcosystemConfig>,
     simulation: Res<Simulation>,
     mut egui_contexts: EguiContexts,
-    mut simulation_action: ResMut<ActionState<SimulationSpeedAction>>,
+    mut simulation_action: ResMut<ActionState<SimulationAction>>,
 ) {
     // Detect mouse click
     // If the simulation is Fastest , this pauses the simulation
@@ -23,7 +23,7 @@ pub fn user_selection(
         && !egui_contexts.ctx_mut().wants_pointer_input()
     {
         if simulation.control.state == SimulationControlState::Fastest {
-            simulation_action.press(SimulationSpeedAction::PauseUnpause);
+            simulation_action.press(SimulationAction::PauseUnpause);
         } else {
             let window = primary_window.get_single().expect("Missing primary window");
             let (camera, camera_global_transform) = cameras.single();

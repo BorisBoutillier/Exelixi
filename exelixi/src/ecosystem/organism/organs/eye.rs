@@ -3,7 +3,8 @@ use lib_genetic_algorithm as ga;
 
 use std::f32::consts::PI;
 
-#[derive(Debug, Component)]
+#[derive(Debug, Component, Reflect, Default)]
+#[reflect(Component)]
 pub struct Eye {
     pub fov_range: f32,
     pub fov_angle: f32,

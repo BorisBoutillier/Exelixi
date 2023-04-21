@@ -17,9 +17,9 @@ impl Plugin for SimulationPlugin {
         app.insert_resource(Simulation::new(self.run_for));
         app.add_system(run_ecosystem_schedule);
         if self.run_for.is_none() {
-            app.add_plugin(InputManagerPlugin::<SimulationSpeedAction>::default());
+            app.add_plugin(InputManagerPlugin::<SimulationAction>::default());
             app.add_startup_system(setup_simulation_speed_action);
-            app.add_system(simulation_speed_action_input.in_base_set(CoreSet::PostUpdate));
+            app.add_system(simulation_action_input.in_base_set(CoreSet::PostUpdate));
         }
     }
 }

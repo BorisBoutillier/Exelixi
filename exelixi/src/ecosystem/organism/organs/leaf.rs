@@ -2,7 +2,8 @@ use crate::ecosystem::*;
 
 /// A leaf is an organ that will continuously create energy while present,
 /// a leaf has a limited lifetime after which it disappears.
-#[derive(Component)]
+#[derive(Component, Reflect, Default)]
+#[reflect(Component)]
 pub struct Leaf {
     // Energy produced per step
     pub energy_production: f32,

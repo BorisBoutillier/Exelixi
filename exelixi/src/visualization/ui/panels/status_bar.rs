@@ -6,7 +6,7 @@ pub fn ui_status_bar(
     mut contexts: EguiContexts,
     simulation: Res<Simulation>,
     ecosystem: Res<Ecosystem>,
-    mut action_state: ResMut<ActionState<SimulationSpeedAction>>,
+    mut action_state: ResMut<ActionState<SimulationAction>>,
     diagnostics: Res<Diagnostics>,
 ) {
     egui::TopBottomPanel::bottom("status_bar")
@@ -34,7 +34,7 @@ pub fn ui_status_bar(
                     .on_hover_text(hover_text)
                     .clicked()
                 {
-                    action_state.press(SimulationSpeedAction::PauseUnpause);
+                    action_state.press(SimulationAction::PauseUnpause);
                 }
                 if ui
                     .add(egui::Button::new(
@@ -43,7 +43,7 @@ pub fn ui_status_bar(
                     .on_hover_text("Decrease speed")
                     .clicked()
                 {
-                    action_state.press(SimulationSpeedAction::Decelerate);
+                    action_state.press(SimulationAction::Decelerate);
                 }
                 if ui
                     .add(egui::Button::new(
@@ -52,7 +52,7 @@ pub fn ui_status_bar(
                     .on_hover_text("Increase speed")
                     .clicked()
                 {
-                    action_state.press(SimulationSpeedAction::Accelerate);
+                    action_state.press(SimulationAction::Accelerate);
                 }
                 if ui
                     .add(egui::Button::new(
@@ -61,7 +61,7 @@ pub fn ui_status_bar(
                     .on_hover_text("Fastest")
                     .clicked()
                 {
-                    action_state.press(SimulationSpeedAction::Fastest);
+                    action_state.press(SimulationAction::Fastest);
                 }
                 ui.add_space(ui.available_width() - 60.0);
                 let mut fps_s = "N/A".to_string();

@@ -1438,8 +1438,9 @@ dependencies = [
  "leafwing-input-manager",
  "lib-genetic-algorithm",
  "lib-neural-network",
+ "parking_lot",
  "rand",
- "rand_chacha",
+ "rand_isaac",
  "ron 0.7.1",
  "serde",
  "typenum",
@@ -1949,6 +1950,7 @@ dependencies = [
 name = "lib-neural-network"
 version = "0.1.0"
 dependencies = [
+ "bevy_reflect",
  "rand",
  "rand_chacha",
 ]
@@ -2532,6 +2534,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 dependencies = [
  "getrandom",
+ "serde",
+]
+
+[[package]]
+name = "rand_isaac"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fac4373cd91b4f55722c553fb0f286edbb81ef3ff6eec7b99d1898a4110a0b28"
+dependencies = [
+ "rand_core",
+ "serde",
 ]
 
 [[package]]

@@ -1,11 +1,12 @@
 use std::iter::once;
 
+use bevy_reflect::{FromReflect, Reflect};
 use rand::Rng;
 pub struct LayerTopology {
     pub neurons: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Reflect, Default)]
 pub struct Network {
     layers: Vec<Layer>,
 }
@@ -52,8 +53,8 @@ impl Network {
     }
 }
 
-#[derive(Debug)]
-struct Layer {
+#[derive(Debug, Reflect, FromReflect, Default)]
+pub struct Layer {
     neurons: Vec<Neuron>,
 }
 impl Layer {
@@ -86,8 +87,8 @@ impl Layer {
     }
 }
 
-#[derive(Debug)]
-struct Neuron {
+#[derive(Debug, Reflect, FromReflect, Default)]
+pub struct Neuron {
     bias: f32,
     weights: Vec<f32>,
 }
