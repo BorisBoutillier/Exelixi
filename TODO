@@ -24,7 +24,6 @@
 - Eye:
   - Add hue of the wall as black
   - Move process_vision out of brain into its own system
-  - Add a DistanceEnergyPerVisible sensor configuration, n_sensor= n_cell*2*n_visible.
 
 - Brain:
   - Add hidden layer topology in config:

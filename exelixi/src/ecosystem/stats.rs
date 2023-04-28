@@ -13,17 +13,14 @@ pub struct SpeciesStatistic {
     pub energy_total: f32,
     // Number of dead organism by out_of_energy since last Step
     pub out_of_energy: u32,
-    // Number of eaten organism since last Step
-    pub eaten: u32,
 }
 impl SpeciesStatistic {
     pub fn inline_sprint(&self) -> String {
         format!(
-            "Size: {:4}, Energy: {:6.0}, Deaths:{:4}, Eaten:{:4}, Generation:{}",
+            "Size: {:4}, Energy: {:6.0}, Deaths:{:4}, Generation:{}",
             self.size,
             self.energy_total,
             self.out_of_energy,
-            self.eaten,
             if let Some(generation) = self.generation {
                 generation.to_string()
             } else {
@@ -52,9 +49,6 @@ impl SpeciesStatistics {
     }
     pub fn set_generation(&mut self, generation: u32) {
         self.current.generation = Some(generation);
-    }
-    pub fn add_eaten(&mut self, count: u32) {
-        self.current.eaten += count;
     }
     pub fn add_out_of_energy(&mut self, count: u32) {
         self.current.out_of_energy += count;
@@ -86,13 +80,6 @@ impl EcosystemStatistics {
             );
         }
         Self { organisms }
-    }
-    pub fn update_eaten(&mut self, eaten: BTreeMap<SpeciesId, u32>) {
-        for (species_id, count) in eaten {
-            if let Some(stat) = self.organisms.get_mut(&species_id) {
-                stat.add_eaten(count)
-            }
-        }
     }
     pub fn update_out_of_energy(&mut self, out_of_energy: BTreeMap<SpeciesId, u32>) {
         for (name, count) in out_of_energy.into_iter() {
