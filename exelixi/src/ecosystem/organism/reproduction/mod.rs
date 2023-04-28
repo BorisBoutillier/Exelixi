@@ -7,17 +7,17 @@ pub use generation::*;
 pub use individual::*;
 
 use lib_genetic_algorithm as ga;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use crate::ecosystem::*;
 
 #[derive(Resource, Default)]
 pub struct GenerationEvolutions {
-    pub per_species: HashMap<SpeciesId, GenerationEvolution>,
+    pub per_species: BTreeMap<SpeciesId, GenerationEvolution>,
 }
 impl GenerationEvolutions {
     pub fn new(config: &EcosystemConfig) -> Self {
-        let mut per_species = HashMap::new();
+        let mut per_species = BTreeMap::new();
         for (species_id, organism_config) in config.species.iter() {
             if let ReproductionConfig::GenerationEvolution {
                 generation_length: _,

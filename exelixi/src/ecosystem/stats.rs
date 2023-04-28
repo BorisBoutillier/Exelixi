@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 
 use crate::ecosystem::*;
 
@@ -87,14 +87,14 @@ impl EcosystemStatistics {
         }
         Self { organisms }
     }
-    pub fn update_eaten(&mut self, eaten: HashMap<SpeciesId, u32>) {
+    pub fn update_eaten(&mut self, eaten: BTreeMap<SpeciesId, u32>) {
         for (species_id, count) in eaten {
             if let Some(stat) = self.organisms.get_mut(&species_id) {
                 stat.add_eaten(count)
             }
         }
     }
-    pub fn update_out_of_energy(&mut self, out_of_energy: HashMap<SpeciesId, u32>) {
+    pub fn update_out_of_energy(&mut self, out_of_energy: BTreeMap<SpeciesId, u32>) {
         for (name, count) in out_of_energy.into_iter() {
             if let Some(stat) = self.organisms.get_mut(&name) {
                 stat.add_out_of_energy(count)
@@ -119,8 +119,8 @@ pub fn statistics_accumulation(
 ) {
     if ecosystem.steps % config.statistics_aggregation_rate == 0 {
         // Update current statistics
-        let mut size = HashMap::new();
-        let mut energy = HashMap::new();
+        let mut size = BTreeMap::new();
+        let mut energy = BTreeMap::new();
         for (organism, body) in organisms.iter() {
             *size.entry(organism.species()).or_insert(0) += 1;
             *energy.entry(organism.species()).or_insert(0.) += body.energy();

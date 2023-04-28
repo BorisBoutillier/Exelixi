@@ -44,10 +44,10 @@ struct Args {
     ///
     #[arg(long)]
     run_for: Option<u32>,
-    /// Path to the simulation state to load
+    /// Path to load a saved simulation state from
     #[arg(long)]
     load: Option<PathBuf>,
-    /// Default path to the save the simulation to
+    /// Default path to save the simulation to
     #[arg(long)]
     save: Option<PathBuf>,
 }

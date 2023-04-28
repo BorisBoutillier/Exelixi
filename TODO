@@ -1,7 +1,6 @@
 -- Bugs
-- Fix lost determinism . RockPaperScissor instable after 500 steps on seed 0
-  For bench_B seed=0 between 5000 and 5500
 - load and run_for do not work together, load run-for and save should work all three together
+- load + run + config gives different results that just load + run
 
 --- Ecosystem
 - ECS:

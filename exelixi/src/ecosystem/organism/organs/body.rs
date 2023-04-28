@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use crate::ecosystem::*;
 
@@ -56,7 +56,7 @@ pub fn body_energy_consumption(
     q3: Query<&Leaf>,
     mut ecosystem_statistics: ResMut<EcosystemStatistics>,
 ) {
-    let mut deaths = HashMap::new();
+    let mut deaths = BTreeMap::new();
     for (entity, mut body, organism) in bodies.iter_mut() {
         let mut total = body.energy_cost();
         if let Ok(organ) = q0.get(entity) {

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use kd_tree::{KdPoint, KdTree};
 
@@ -32,7 +32,7 @@ impl KdPoint for KdTreeEntry {
 
 #[derive(Resource, Default)]
 pub struct OrganismKdTree {
-    pub per_species: HashMap<SpeciesId, KdTree<KdTreeEntry>>,
+    pub per_species: BTreeMap<SpeciesId, KdTree<KdTreeEntry>>,
 }
 
 pub fn build_organism_kdtree(
@@ -44,7 +44,7 @@ pub fn build_organism_kdtree(
         .species
         .keys()
         .map(|k| (*k, vec![]))
-        .collect::<HashMap<_, _>>();
+        .collect::<BTreeMap<_, _>>();
     for (entity, organism, position) in organisms.iter() {
         per_species
             .entry(organism.species())
