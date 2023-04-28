@@ -1,0 +1,108 @@
+(
+   environment:(
+        width  : 7000
+    ,   height : 6000
+    ,   wall   : true
+    )
+,   species: [
+        (
+            name : "Herbivore"
+        ,   eye: Some(EyeConfig (
+                fov_angle: Gene(min:1.5,max:4.71)
+            ,   fov_range: Gene(min:70,max:250)
+            ,   energy_cost: 0.1
+            ,   n_cells: Fixed(9)
+            ,   visible: ["Plant","Carnivore"]
+            ,   cell_sensors: DistanceEnergyPerSpecies,
+            ))
+        ,   body: (
+                starting_energy: 10000
+            ,   maximum_energy: 40000
+            ,   body_cost: 4
+        )
+        ,   mouth: Some( MouthConfig(
+            reach: 10.0,
+            edible: ["Plant"],
+        ))
+        ,   locomotion: Some( LocomotionConfig(
+                linear: Neuron(min:0,max:4)
+            ,   linear_cost: 0.1
+            ,   angular_cost: 0.000
+            ))
+        ,   reproduction: GenerationEvolution(
+                generation_length : 5000
+            ,   min_population    : 80
+            ,   fertility_rate: 1.5
+            ,   mutation_chance: 0.1
+            ,   mutation_amplitude: 0.3
+            ,   child_spawn_distance: Some(20.0),
+        )
+        , visualization: (
+            hue:300.0,
+            sprite_file: "bird.png",
+            sprite_size: (20.0,20.0),
+        )
+        )
+    ,
+        (
+            name : "Carnivore"
+        ,   eye: Some(EyeConfig (
+                fov_angle: Gene(min:1.5,max:4.71)
+            ,   fov_range: Gene(min:70,max:450)
+            ,   energy_cost: 0.1
+            ,   n_cells: Fixed(9)
+            ,   visible: ["Herbivore"]
+            ,   cell_sensors: DistanceEnergy,
+            ))
+        ,   body: (
+                starting_energy: 10000
+            ,   maximum_energy: 40000
+            ,   body_cost: 8
+        )
+        ,   mouth: Some( MouthConfig(
+            reach: 15.0,
+            edible: ["Herbivore"],
+        ))
+        ,   locomotion: Some( LocomotionConfig(
+                linear: Neuron(min:0,max:6)
+            ,   linear_cost: 0.1
+            ,   angular_cost: 0.000
+            ))
+        ,   reproduction: GenerationEvolution(
+                generation_length : 7000
+            ,   min_population    : 4
+            ,   fertility_rate: 1.5
+            ,   mutation_chance: 0.1
+            ,   mutation_amplitude: 0.3
+            ,   child_spawn_distance: Some(30.0),
+        )
+        , visualization: (
+            hue:225.0,
+            sprite_file: "bird.png",
+            sprite_size: (30.0,30.0),
+        )
+        )
+    , (
+            name : "Plant"
+        ,   body: (
+                starting_energy: 1000
+            ,   maximum_energy: 40000
+            ,   body_cost: 40
+        )
+        ,   leaf: Some(LeafConfig(
+                lifetime: 500
+            ,   energy_production: 60
+        ))
+        ,   reproduction: AutoSpawn(
+                spawn_rate : 2.8,
+                minimum_distance_from_eater: 100,
+        )
+        , visualization: (
+            hue: 120.0,
+            sprite_file: "food.png",
+            sprite_size: (8.0,8.0),
+        )
+    )
+    ], 
+    statistics: () 
+)

@@ -1,7 +1,8 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use crate::ecosystem::*;
 
+#[allow(clippy::enum_variant_names)]
 #[derive(Default, Serialize, Deserialize, Reflect, Debug, Clone, Copy)]
 pub enum CellSensors {
     // 2 sensors per cell, one for distance percentage, one for energy level pct of the
@@ -11,18 +12,39 @@ pub enum CellSensors {
     // 3 sensors per cell, one for distance percentage, one for energy level pct ,
     // one for the hue pct of the closest visible object in this cell.
     DistanceEnergyHue,
+    // 2 * nVisibleSpecies per cell.
+    // distance, energy per visible species, per cell
+    DistanceEnergyPerSpecies,
 }
 impl CellSensors {
-    pub fn n_sensors(&self) -> usize {
+    pub fn n_sensors(&self, n_visible_species: usize) -> usize {
         match self {
             CellSensors::DistanceEnergy => 2,
             CellSensors::DistanceEnergyHue => 3,
+            CellSensors::DistanceEnergyPerSpecies => 2 * n_visible_species,
         }
     }
-    pub fn sensors(&self, distance_pct: f32, energy_pct: f32, hue: f32) -> Vec<f32> {
+    // For DistanceEnergyPerSpecies, this method must be called for each species.
+    pub fn sensors(&self, per_species: &BTreeMap<SpeciesId, (f32, f32, f32)>) -> Vec<f32> {
         match self {
-            CellSensors::DistanceEnergy => vec![distance_pct, energy_pct],
-            CellSensors::DistanceEnergyHue => vec![distance_pct, energy_pct, hue / 360.0],
+            CellSensors::DistanceEnergy => {
+                let &(distance_pct, energy_pct, _) = per_species
+                    .values()
+                    .min_by(|(d1, _, _), (d2, _, _)| d1.partial_cmp(d2).unwrap())
+                    .unwrap();
+                vec![distance_pct, energy_pct]
+            }
+            CellSensors::DistanceEnergyHue => {
+                let &(distance_pct, energy_pct, hue) = per_species
+                    .values()
+                    .min_by(|(d1, _, _), (d2, _, _)| d1.partial_cmp(d2).unwrap())
+                    .unwrap();
+                vec![distance_pct, energy_pct, hue / 360.0]
+            }
+            CellSensors::DistanceEnergyPerSpecies => per_species
+                .values()
+                .flat_map(|&(distance_pct, energy_pct, _)| vec![distance_pct, energy_pct])
+                .collect(),
         }
     }
 }
@@ -53,7 +75,11 @@ impl EyeConfig {
         self.visible_species = self
             .visible
             .iter()
-            .map(|name| species_name_to_id[name])
+            .map(|name| {
+                *species_name_to_id
+                    .get(name)
+                    .expect("Configuration of an Eye.visible contains an invalid species.")
+            })
             .collect();
     }
 }

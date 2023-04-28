@@ -1,7 +1,7 @@
 use crate::ecosystem::*;
 use lib_genetic_algorithm as ga;
 
-use std::f32::consts::PI;
+use std::{collections::BTreeMap, f32::consts::PI};
 
 #[derive(Debug, Component, Reflect, Default)]
 #[reflect(Component)]
@@ -41,7 +41,11 @@ impl Eye {
             visible: config.visible_species.clone(),
             energy_cost: compute_energy_cost(fov_range, fov_angle, config.energy_cost),
             cell_sensors: config.cell_sensors,
-            sensors: vec![0.0; n_cells as usize * config.cell_sensors.n_sensors()],
+            sensors: vec![
+                0.0;
+                n_cells as usize
+                    * config.cell_sensors.n_sensors(config.visible_species.len())
+            ],
         }
     }
     pub fn from_genes(genes: impl IntoIterator<Item = f32>, config: &EyeConfig) -> Self {
@@ -78,7 +82,11 @@ impl Eye {
             visible: config.visible_species.clone(),
             energy_cost: compute_energy_cost(fov_range, fov_angle, config.energy_cost),
             cell_sensors: config.cell_sensors,
-            sensors: vec![0.0; n_cells as usize * config.cell_sensors.n_sensors()],
+            sensors: vec![
+                0.0;
+                n_cells as usize
+                    * config.cell_sensors.n_sensors(config.visible_species.len())
+            ],
         }
     }
     pub fn as_chromosome(&self, config: &EyeConfig) -> ga::Chromosome {
@@ -104,20 +112,22 @@ impl Eye {
         &mut self,
         position: &Position,
         kdtree: &OrganismKdTree,
-        organims: &Query<(&Organism, &Body)>,
+        organisms: &Query<(&Organism, &Body)>,
     ) {
         self.sensors = vec![];
-        let mut visible = vec![];
+        let mut visible = BTreeMap::new();
         for species in self.visible.iter() {
+            let mut details = vec![];
             for entry in kdtree.per_species[species].within_radius(
                 &KdTreeEntry::new(position, Entity::PLACEHOLDER),
                 self.fov_range,
             ) {
                 // Organism in the KdTree can have been eaten within this step
-                if let Ok((organism, body)) = organims.get(entry.entity) {
-                    visible.push((&entry.position, body.energy_pct(), organism.hue()))
+                if let Ok((organism, body)) = organisms.get(entry.entity) {
+                    details.push((&entry.position, body.energy_pct(), organism.hue()))
                 }
             }
+            visible.insert(*species, details);
         }
         self.sensors.extend(self.sense_objects(position, &visible));
         assert_eq!(self.sensors.len(), self.n_sensors());
@@ -129,55 +139,56 @@ impl Eye {
     pub fn sense_objects(
         &self,
         position: &Position,
-        organims: &[(&Position, f32, f32)],
+        organisms: &BTreeMap<SpeciesId, Vec<(&Position, f32, f32)>>,
     ) -> Vec<f32> {
-        let mut closest_per_cell = vec![None; self.n_cells];
-        //println!("SENSE for {position:?}");
-        for &(organism_position, organism_energy_pct, organism_hue) in organims {
-            let distance_squared = position.distance_squared(organism_position);
-            assert!(
-                distance_squared <= self.fov_range.powi(2),
-                "Positions should already have been filtered by distance"
-            );
-            let view_angle = (position.angle() - position.angle_between(organism_position) + PI)
-                .rem_euclid(2. * PI)
-                - PI;
-            if view_angle < -self.fov_angle / 2.0 || view_angle > self.fov_angle / 2.0 {
-                continue;
-            }
-
-            let sector_angle = self.fov_angle / self.n_sectors as f32;
-            let sector = (view_angle + self.fov_angle / 2.0) / sector_angle;
-            let sector = (sector as usize).min(self.n_sectors - 1);
-
-            let distance_pct = (self.fov_range - distance_squared.sqrt()) / self.fov_range;
-            if let Some((other_distance_pct, _, _)) = closest_per_cell[sector] {
-                if distance_pct < other_distance_pct {
-                    closest_per_cell[sector] =
-                        Some((distance_pct, organism_energy_pct, organism_hue));
+        let default = organisms
+            .keys()
+            .map(|species| (*species, (0.0, 0.0, 0.0)))
+            .collect::<BTreeMap<_, _>>();
+        let mut closest_per_cell = vec![default; self.n_cells];
+        for (species, details) in organisms.iter() {
+            for &(organism_position, organism_energy_pct, organism_hue) in details {
+                let distance_squared = position.distance_squared(organism_position);
+                assert!(
+                    distance_squared <= self.fov_range.powi(2),
+                    "Positions should already have been filtered by distance"
+                );
+                let view_angle = (position.angle() - position.angle_between(organism_position)
+                    + PI)
+                    .rem_euclid(2. * PI)
+                    - PI;
+                if view_angle < -self.fov_angle / 2.0 || view_angle > self.fov_angle / 2.0 {
+                    continue;
                 }
-            } else {
-                closest_per_cell[sector] = Some((distance_pct, organism_energy_pct, organism_hue));
+
+                let sector_angle = self.fov_angle / self.n_sectors as f32;
+                let sector = (view_angle + self.fov_angle / 2.0) / sector_angle;
+                let sector = (sector as usize).min(self.n_sectors - 1);
+
+                let distance_pct = (self.fov_range - distance_squared.sqrt()) / self.fov_range;
+                let &(other_distance_pct, _, _) = closest_per_cell[sector].get(species).unwrap();
+                if distance_pct > other_distance_pct {
+                    closest_per_cell[sector]
+                        .insert(*species, (distance_pct, organism_energy_pct, organism_hue));
+                }
             }
         }
-        //println!("  -> Cells: {cells:?}");
         closest_per_cell
             .iter()
-            .flat_map(|closest| {
-                closest
-                    .map(|(distance_pct, energy_pct, hue)| {
-                        self.cell_sensors.sensors(distance_pct, energy_pct, hue)
-                    })
-                    .unwrap_or(vec![0.0; self.cell_sensors.n_sensors()])
-            })
+            .flat_map(|per_species| self.cell_sensors.sensors(per_species))
             .collect::<Vec<_>>()
     }
     pub fn energy_cost(&self) -> f32 {
         self.energy_cost
     }
+
+    // Return the number of sensors per cell of this eye
+    pub fn n_cell_sensors(&self) -> usize {
+        self.cell_sensors.n_sensors(self.visible.len())
+    }
     // Return the number of sensors associated with this eye configuration
     pub fn n_sensors(&self) -> usize {
-        self.n_cells * self.cell_sensors.n_sensors()
+        self.n_cells * self.n_cell_sensors()
     }
 
     pub fn get_sensors(&self) -> &[f32] {
