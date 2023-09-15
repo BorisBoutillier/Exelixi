@@ -3,6 +3,8 @@
 - load + run + config gives different results that just load + run
 
 --- Ecosystem
+- Save/Load:
+  - Take advantage of DynamicScene now supporting resources
 - ECS:
   - Save/Load should include 'git' checksum. And Warning in stdout when not matching, but still load.
   - Should we save to directory to save with steps as name, and allow a save_every command line argument ?

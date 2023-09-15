@@ -16,11 +16,11 @@ pub struct SimulationPlugin {
 impl Plugin for SimulationPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(Simulation::new(self.run_for, self.save_path.clone()));
-        app.add_system(run_ecosystem_schedule);
+        app.add_systems(Update, run_ecosystem_schedule);
         if self.run_for.is_none() {
-            app.add_plugin(InputManagerPlugin::<SimulationAction>::default());
-            app.add_startup_system(setup_simulation_speed_action);
-            app.add_system(simulation_action_input.in_base_set(CoreSet::PostUpdate));
+            app.add_plugins(InputManagerPlugin::<SimulationAction>::default());
+            app.add_systems(Startup, setup_simulation_speed_action);
+            app.add_systems(PostUpdate, simulation_action_input);
         }
     }
 }

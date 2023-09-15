@@ -117,7 +117,7 @@ impl EcosystemConfig {
     }
     pub fn update_after_load(&mut self) {
         let mut species_name_to_id = HashMap::new();
-        for (species_id, mut config) in self.species.iter_mut() {
+        for (species_id, config) in self.species.iter_mut() {
             species_name_to_id.insert(config.name.clone(), *species_id);
             config.id = *species_id;
         }

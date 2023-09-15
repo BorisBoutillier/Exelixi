@@ -1,8 +1,8 @@
-use bevy::app::AppExit;
+use bevy::{app::AppExit, reflect::TypePath};
 
 use crate::prelude::*;
 
-#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug)]
+#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, TypePath)]
 pub enum UiAction {
     OpenCloseSimulationPanel,
     OpenCloseSelectionPanel,
@@ -31,6 +31,6 @@ pub fn ui_action_input(
         ui_state.selection_open = !ui_state.selection_open;
     }
     if action_state.just_pressed(UiAction::Exit) {
-        exit_event.send(AppExit::default());
+        exit_event.send(AppExit);
     }
 }

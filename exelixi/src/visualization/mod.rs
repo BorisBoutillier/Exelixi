@@ -20,13 +20,13 @@ impl Plugin for VisualizationPlugin {
             }),
             ..Default::default()
         }))
-        .add_plugin(FrameTimeDiagnosticsPlugin::default());
-        app.add_plugin(EguiPlugin)
-            .add_plugin(ui::UiPlugin {})
-            .add_plugin(camera::CameraPlugin {})
-            .add_system(organism::organism_transform_update)
-            .add_system(floor::show_floor)
-            .add_system(organism::show_organism.in_base_set(CoreSet::PostUpdate))
-            .add_system(organism::sprite_lightness_from_body);
+        .add_plugins(FrameTimeDiagnosticsPlugin);
+        app.add_plugins(EguiPlugin)
+            .add_plugins(ui::UiPlugin {})
+            .add_plugins(camera::CameraPlugin {})
+            .add_systems(Update, organism::organism_transform_update)
+            .add_systems(Update, floor::show_floor)
+            .add_systems(PostUpdate, organism::show_organism)
+            .add_systems(Update, organism::sprite_lightness_from_body);
     }
 }

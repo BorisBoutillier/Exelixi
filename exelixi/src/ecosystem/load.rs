@@ -3,6 +3,7 @@ use serde::de::DeserializeSeed;
 
 use crate::ecosystem::*;
 
+#[derive(Event)]
 pub struct LoadEcosystemEvent {
     pub path: String,
 }

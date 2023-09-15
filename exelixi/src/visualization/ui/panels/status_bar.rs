@@ -1,5 +1,6 @@
 use crate::prelude::*;
 
+use bevy::diagnostic::DiagnosticsStore;
 use bevy_egui::egui::{FontId, RichText};
 
 pub fn ui_status_bar(
@@ -7,7 +8,7 @@ pub fn ui_status_bar(
     simulation: Res<Simulation>,
     ecosystem: Res<EcosystemRuntime>,
     mut action_state: ResMut<ActionState<SimulationAction>>,
-    diagnostics: Res<Diagnostics>,
+    diagnostics: Res<DiagnosticsStore>,
 ) {
     egui::TopBottomPanel::bottom("status_bar")
         .frame(egui::Frame::default().fill(egui::Color32::from_rgb(30, 30, 30)))
@@ -15,7 +16,7 @@ pub fn ui_status_bar(
         .default_height(UI_STATUS_BAR_HEIGHT)
         .show(contexts.ctx_mut(), |ui| {
             let half_width = ui.available_width() / 2.0;
-            let mut spacing = ui.spacing_mut();
+            let spacing = ui.spacing_mut();
             spacing.button_padding = egui::Vec2::new(2.0, 2.0);
             ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
                 ui.add_space(30.0);

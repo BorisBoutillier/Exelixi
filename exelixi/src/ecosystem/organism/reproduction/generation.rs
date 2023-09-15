@@ -1,6 +1,6 @@
 use crate::ecosystem::{organism::reproduction::individual::OrganismIndividual, *};
 
-#[derive(Debug)]
+#[derive(Debug, Event)]
 pub struct NewGenerationEvent {
     pub species: SpeciesId,
 }

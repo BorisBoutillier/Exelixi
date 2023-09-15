@@ -28,15 +28,15 @@ pub struct UiPlugin;
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(UiState::default())
-            .add_plugin(eye_viewer::EyeViewerPlugin)
-            .add_plugin(mouth_viewer::MouthViewerPlugin)
-            .add_system(ui_status_bar)
-            .add_system(ui_simulation)
-            .add_system(ui_selection)
-            .add_system(user_selection)
-            .add_system(selection_changed.in_base_set(CoreSet::PostUpdate));
-        app.add_plugin(InputManagerPlugin::<UiAction>::default())
-            .add_startup_system(setup_ui_action)
-            .add_system(ui_action_input);
+            .add_plugins(eye_viewer::EyeViewerPlugin)
+            .add_plugins(mouth_viewer::MouthViewerPlugin)
+            .add_systems(
+                Update,
+                (ui_status_bar, ui_simulation, ui_selection, user_selection),
+            )
+            .add_systems(PostUpdate, selection_changed);
+        app.add_plugins(InputManagerPlugin::<UiAction>::default())
+            .add_systems(Startup, setup_ui_action)
+            .add_systems(Update, ui_action_input);
     }
 }

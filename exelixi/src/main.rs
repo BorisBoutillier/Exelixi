@@ -58,16 +58,16 @@ fn main() {
     let mut app = App::new();
     let with_gui = args.run_for.is_none();
     if with_gui {
-        app.add_plugin(visualization::VisualizationPlugin);
+        app.add_plugins(visualization::VisualizationPlugin);
     } else {
         app.add_plugins(MinimalPlugins);
     }
-    app.add_plugin(ecosystem::EcosystemPlugin {
+    app.add_plugins(ecosystem::EcosystemPlugin {
         seed: args.seed,
         config_path: args.config,
         load_path: args.load,
     });
-    app.add_plugin(simulation::SimulationPlugin {
+    app.add_plugins(simulation::SimulationPlugin {
         run_for: args.run_for,
         save_path: args.save,
     });

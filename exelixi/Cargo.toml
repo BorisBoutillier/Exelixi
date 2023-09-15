@@ -9,16 +9,16 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 rand = "0.8"
-bevy = { version ="0.10" , default-features= false, features = ["bevy_asset","bevy_winit","bevy_core_pipeline","bevy_render","bevy_sprite","png","x11"] }
-bevy_egui = "0.20"
+bevy = { version ="0.11" , default-features= false, features = ["bevy_asset","bevy_winit","bevy_core_pipeline","bevy_render","bevy_sprite","png","x11"] }
+bevy_egui = "0.21"
 lib-neural-network = { path = "../libs/neural-network" }
 lib-genetic-algorithm = { path = "../libs/genetic-algorithm" }
 ron = "0.7"
 serde = { version = "1", features = ["derive"] }
 dirs = "4.0"
 clap = { version = "4.1.4", features = ["derive"] }
-leafwing-input-manager = "0.9.0"
-kd-tree = "0.5.1"
-typenum = "1.16.0"
+leafwing-input-manager = "0.10"
+kd-tree = "0.5"
+typenum = "1.16"
 rand_isaac = { version = "0.3.0", features = ["serde1"] }
 parking_lot = "0.12.1"

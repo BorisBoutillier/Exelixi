@@ -13,14 +13,14 @@ impl EcosystemSchedule {
                 locomotion_movement,
                 build_organism_kdtree,
                 mouth_eating,
-                apply_system_buffers,
+                apply_deferred,
                 brain_processing,
                 body_energy_consumption,
                 leaf_lifecycle,
-                apply_system_buffers,
+                apply_deferred,
                 evolve,
                 auto_spawning,
-                apply_system_buffers,
+                apply_deferred,
             )
                 .chain(),
         );

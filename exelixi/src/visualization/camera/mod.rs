@@ -15,8 +15,8 @@ pub struct CameraPlugin {}
 
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_camera);
-        app.add_system(camera_movement);
+        app.add_systems(Startup, spawn_camera);
+        app.add_systems(Update, camera_movement);
     }
 }
 

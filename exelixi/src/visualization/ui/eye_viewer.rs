@@ -1,3 +1,4 @@
+use bevy::reflect::TypePath;
 use bevy::render::render_resource::{AsBindGroup, ShaderRef};
 
 use bevy::sprite::Material2dPlugin;
@@ -11,9 +12,9 @@ use crate::prelude::*;
 pub struct EyeViewerPlugin;
 impl Plugin for EyeViewerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugin(Material2dPlugin::<FovViewerMaterial>::default())
-            .add_system(spawn_fov_viewer_on_selected)
-            .add_system(despawn_fov_viewer_on_deselected.in_base_set(CoreSet::PostUpdate));
+        app.add_plugins(Material2dPlugin::<FovViewerMaterial>::default())
+            .add_systems(Update, spawn_fov_viewer_on_selected)
+            .add_systems(PostUpdate, despawn_fov_viewer_on_deselected);
     }
 }
 /// a a FOV viewer child whenver a Selected component is added to an entity with an Eye
@@ -59,7 +60,7 @@ fn despawn_fov_viewer_on_deselected(
     }
 }
 
-#[derive(Component, Debug, Clone, TypeUuid, AsBindGroup)]
+#[derive(Component, Debug, Clone, TypeUuid, AsBindGroup, TypePath)]
 #[uuid = "516c3ab4-6a1c-4e7d-9795-6161ca083a1d"]
 struct FovViewerMaterial {
     // Total angle of the FOV to show, will be show from -fov_angle/2 to fov_anglel2

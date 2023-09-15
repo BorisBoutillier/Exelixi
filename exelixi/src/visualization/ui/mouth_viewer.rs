@@ -7,8 +7,8 @@ pub struct MouthViewer;
 pub struct MouthViewerPlugin;
 impl Plugin for MouthViewerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(spawn_mouth_viewer_on_selected)
-            .add_system(despawn_mouth_viewer_on_deselected.in_base_set(CoreSet::PostUpdate));
+        app.add_systems(Update, spawn_mouth_viewer_on_selected)
+            .add_systems(PostUpdate, despawn_mouth_viewer_on_deselected);
     }
 }
 /// a a FOV viewer child whenver a Selected component is added to an entity with an Eye

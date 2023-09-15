@@ -1,19 +1,19 @@
-use bevy::{
-    app::AppExit, ecs::schedule::SystemConfig, reflect::TypeRegistryInternal, scene::DynamicEntity,
-};
+use bevy::{app::AppExit, reflect::TypeRegistryInternal, scene::DynamicEntity};
 use parking_lot::RwLockReadGuard;
 
 use crate::ecosystem::*;
 pub const SAVE_SEP: &str = "\n########\n";
+
+#[derive(Event)]
 pub struct SaveEcosystemEvent {
     pub path: PathBuf,
     pub then_exit: bool,
 }
 
-pub fn save_ecosystem_to_file() -> SystemConfig {
-    save_to_file.pipe(then_exit).in_base_set(CoreSet::Update)
-}
-fn save_to_file(
+//pub fn save_ecosystem_to_file() -> impl IntoSystemConfigs {
+//    save_to_file.pipe(then_exit)
+//}
+pub fn save_to_file(
     world: &World,
     mut save_events: EventReader<SaveEcosystemEvent>,
     organisms: Query<Entity, With<Organism>>,
@@ -22,11 +22,13 @@ fn save_to_file(
     save_events.iter().any(|event| {
         // Save Entities, using Bevy Dynamic Scene
         let type_registry = registry.read();
-        let mut scene = DynamicScene { entities: vec![] };
+        let mut scene = DynamicScene {
+            entities: vec![],
+            resources: vec![],
+        };
         for entity in organisms.iter() {
-            let index = entity.index();
             let entry = DynamicEntity {
-                entity: index,
+                entity,
                 components: vec![
                     get_reflect_data::<Position>(entity, world, &type_registry),
                     get_reflect_data::<Organism>(entity, world, &type_registry),
@@ -61,7 +63,7 @@ fn save_to_file(
     })
 }
 
-fn then_exit(In(then_exit): In<bool>, mut exit_events: EventWriter<AppExit>) {
+pub fn then_exit(In(then_exit): In<bool>, mut exit_events: EventWriter<AppExit>) {
     if then_exit {
         exit_events.send_default();
     }

@@ -60,8 +60,8 @@ impl GenerationEvolution {
                 config: config.clone(),
                 generation_length,
                 genetic_algorithm: ga::GeneticAlgorithm::new(
-                    ga::RouletteWheelSelection::default(),
-                    ga::UniformCrossover::default(),
+                    ga::RouletteWheelSelection,
+                    ga::UniformCrossover,
                     ga::GaussianMutation::new(mutation_chance, mutation_amplitude),
                 ),
                 minimum_population: min_population,

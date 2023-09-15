@@ -73,8 +73,9 @@ impl Plugin for EcosystemPlugin {
         app.insert_resource(GenerationEvolutions::default());
         app.insert_resource(OrganismKdTree::default());
         app.add_schedule(EcosystemSchedule, EcosystemSchedule::new_schedule());
-        app.add_system(save_ecosystem_to_file());
-        app.add_system(load_ecosystem_from_file);
-        app.add_system(initialize_on_new_config.in_base_set(CoreSet::PreUpdate));
+        //app.add_systems(Update, save_ecosystem_to_file());
+        app.add_systems(Update, save_to_file.pipe(then_exit));
+        app.add_systems(Update, load_ecosystem_from_file);
+        app.add_systems(PreUpdate, initialize_on_new_config);
     }
 }

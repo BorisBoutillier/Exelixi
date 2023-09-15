@@ -1,3 +1,5 @@
+#import bevy_sprite::mesh2d_vertex_output MeshVertexOutput
+
 struct FovInfo {
     angle: f32,
     n_sectors: u32,
@@ -9,15 +11,15 @@ var<uniform> fov: FovInfo;
 
 @fragment
 fn fragment(
-    #import bevy_sprite::mesh2d_vertex_output
+    in: MeshVertexOutput
 ) -> @location(0) vec4<f32> {
     let none = vec4<f32>(0.);
     let edge_color = fov.color;
     let sector_color = vec4<f32>(edge_color.x, edge_color.y, edge_color.z, fov.sector_alpha);
     let min_angle = -fov.angle / 2.0;
     let max_angle = fov.angle / 2.0;
-    let lx = uv.x - 0.5;
-    let ly = uv.y - 0.5;
+    let lx = in.uv.x - 0.5;
+    let ly = in.uv.y - 0.5;
     let in_fov_range = (lx * lx + ly * ly) < 0.5 * 0.5;
     let angle = atan2(ly, lx);
     // Is the point in FOV
