@@ -36,7 +36,7 @@ fn camera_movement(
 ) {
     let window_entity = primary_window.get_single().expect("Missing Primary window");
     let window_resized = window_resized_events
-        .iter()
+        .read()
         .any(|e| e.window == window_entity);
     // Camera reset trigger on simulation config changed or Middle mouse button click
     let reset_camera = config.is_changed()
@@ -54,7 +54,7 @@ fn camera_movement(
 
     // Camera zooming triggered by mouse wheel up/down
     let mut zoom_update = 0.0;
-    for event in mouse_wheel_events.iter() {
+    for event in mouse_wheel_events.read() {
         zoom_update = event.y;
     }
     if zoom_update != 0.0 {
@@ -64,7 +64,7 @@ fn camera_movement(
 
     // Camera panning done pressing mouse button two and moving around.
     if mouse_button_input.pressed(MouseButton::Right) {
-        for event in mouse_motion_events.iter() {
+        for event in mouse_motion_events.read() {
             let mut camera_ortho = cameras.get_single_mut().expect("No ortho camera found");
             camera_ortho.viewport_origin.x -= event.delta.x / 200.0;
             camera_ortho.viewport_origin.y -= event.delta.y / 200.0;

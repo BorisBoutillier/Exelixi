@@ -47,7 +47,7 @@ fn despawn_mouth_viewer_on_deselected(
     mut deselected: RemovedComponents<Selected>,
     mouth_viewers: Query<(), With<MouthViewer>>,
 ) {
-    for entity in deselected.iter() {
+    for entity in deselected.read() {
         for child in children_query.iter_descendants(entity) {
             if mouth_viewers.contains(child) {
                 commands.entity(child).despawn();

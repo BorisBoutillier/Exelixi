@@ -7,7 +7,6 @@ mod visualization;
 
 pub use crate::ecosystem::*;
 pub use ecosystem::*;
-pub use environment::*;
 pub use organs::*;
 pub use reproduction::*;
 pub use species::*;

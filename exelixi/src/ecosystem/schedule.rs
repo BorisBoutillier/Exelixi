@@ -6,7 +6,7 @@ use crate::ecosystem::*;
 pub struct EcosystemSchedule;
 impl EcosystemSchedule {
     pub fn new_schedule() -> Schedule {
-        let mut schedule = Schedule::new();
+        let mut schedule = Schedule::new(EcosystemSchedule);
         schedule.add_systems(
             (
                 statistics_accumulation,

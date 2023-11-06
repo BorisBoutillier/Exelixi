@@ -1,4 +1,4 @@
-use bevy::{ecs::entity::EntityMap, scene::serde::SceneDeserializer};
+use bevy::{scene::serde::SceneDeserializer, utils::HashMap};
 use serde::de::DeserializeSeed;
 
 use crate::ecosystem::*;
@@ -11,7 +11,7 @@ pub struct LoadEcosystemEvent {
 pub fn load_ecosystem_from_file(world: &mut World) {
     let load_events = world.get_resource::<Events<LoadEcosystemEvent>>().unwrap();
     let mut data = None;
-    for event in load_events.get_reader().iter(load_events) {
+    for event in load_events.get_reader().read(load_events) {
         println!("LOADING {}", event.path);
         data = Some(std::fs::read_to_string(&event.path).unwrap());
     }
@@ -49,7 +49,7 @@ pub fn load_ecosystem_from_file(world: &mut World) {
             type_registry: &type_registry.read(),
         };
         let scene = scene_deserializer.deserialize(&mut deserializer).unwrap();
-        let mut entity_map = EntityMap::default();
+        let mut entity_map = HashMap::new();
         scene.write_to_world(world, &mut entity_map).unwrap();
     }
 }

@@ -37,7 +37,7 @@ pub fn ui_simulation(
                                 );
                                 if *checked {
                                     plot_lines.push(
-                                        egui::plot::Line::new(
+                                        egui_plot::Line::new(
                                             stats
                                                 .accumulation
                                                 .iter()
@@ -54,7 +54,7 @@ pub fn ui_simulation(
                         if plot_lines.is_empty() {
                             ui.label(RichText::new("No data yet").color(HONEY));
                         } else {
-                            let plot = egui::plot::Plot::new("Population").height(80.0);
+                            let plot = egui_plot::Plot::new("Population").height(80.0);
                             plot.show(ui, |plot_ui| {
                                 for plot_line in plot_lines {
                                     plot_ui.line(plot_line);
@@ -83,7 +83,7 @@ pub fn ui_simulation(
                                 );
                                 if *checked {
                                     plot_lines.push(
-                                        egui::plot::Line::new(
+                                        egui_plot::Line::new(
                                             stats
                                                 .accumulation
                                                 .iter()
@@ -100,7 +100,7 @@ pub fn ui_simulation(
                         if plot_lines.is_empty() {
                             ui.label(RichText::new("No data yet").color(HONEY));
                         } else {
-                            let plot = egui::plot::Plot::new("Energy total").height(80.0);
+                            let plot = egui_plot::Plot::new("Energy total").height(80.0);
                             plot.show(ui, |plot_ui| {
                                 for plot_line in plot_lines {
                                     plot_ui.line(plot_line);

@@ -51,7 +51,7 @@ fn despawn_fov_viewer_on_deselected(
     children_query: Query<&Children>,
     mut deselected: RemovedComponents<Selected>,
 ) {
-    for entity in deselected.iter() {
+    for entity in deselected.read() {
         for child in children_query.iter_descendants(entity) {
             if fov_viewers.contains(child) {
                 commands.entity(child).despawn();
@@ -60,7 +60,7 @@ fn despawn_fov_viewer_on_deselected(
     }
 }
 
-#[derive(Component, Debug, Clone, TypeUuid, AsBindGroup, TypePath)]
+#[derive(Component, Debug, Clone, TypeUuid, AsBindGroup, TypePath, Asset)]
 #[uuid = "516c3ab4-6a1c-4e7d-9795-6161ca083a1d"]
 struct FovViewerMaterial {
     // Total angle of the FOV to show, will be show from -fov_angle/2 to fov_anglel2

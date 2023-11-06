@@ -9,7 +9,7 @@ pub fn selection_changed(
     selected: Query<Entity, Added<Selected>>,
     mut organisms_sprite: Query<(&mut Sprite, &Organism)>,
 ) {
-    for entity in deselected.iter() {
+    for entity in deselected.read() {
         if let Ok((mut sprite, organism)) = organisms_sprite.get_mut(entity) {
             let [_h, s, l, a] = sprite.color.as_hsla_f32();
             sprite.color = Color::hsla(organism.hue(), s, l, a);

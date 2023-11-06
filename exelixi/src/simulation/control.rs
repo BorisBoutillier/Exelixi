@@ -1,4 +1,3 @@
-use bevy::reflect::TypePath;
 use serde::{Deserialize, Serialize};
 
 use crate::prelude::*;
@@ -27,7 +26,7 @@ pub enum SimulationControlState {
     Fastest,
 }
 
-#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, TypePath)]
+#[derive(Actionlike, Reflect, PartialEq, Eq, Clone, Copy, Hash, Debug)]
 pub enum SimulationAction {
     PauseUnpause,
     Accelerate,

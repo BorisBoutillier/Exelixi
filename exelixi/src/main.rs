@@ -5,20 +5,12 @@ mod visualization;
 
 mod prelude {
 
-    pub use std::f32::consts::{FRAC_PI_2, PI};
-
-    pub use bevy::diagnostic::Diagnostics;
     pub use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
-    pub use bevy::log;
     pub use bevy::prelude::*;
-    pub use bevy_egui::{egui, EguiContexts, EguiPlugin, EguiSettings};
+    pub use bevy_egui::{egui, EguiContexts, EguiPlugin};
     pub use leafwing_input_manager::prelude::*;
 
     pub use rand::Rng;
-    pub use rand::RngCore;
-
-    pub use lib_genetic_algorithm as ga;
-    pub use lib_neural_network as nn;
 
     pub use crate::ecosystem::*;
     pub use crate::simulation::*;

@@ -1,5 +1,5 @@
-use bevy::{app::AppExit, reflect::TypeRegistryInternal, scene::DynamicEntity};
-use parking_lot::RwLockReadGuard;
+use bevy::{app::AppExit, reflect::TypeRegistry, scene::DynamicEntity};
+use std::sync::RwLockReadGuard;
 
 use crate::ecosystem::*;
 pub const SAVE_SEP: &str = "\n########\n";
@@ -19,7 +19,7 @@ pub fn save_to_file(
     organisms: Query<Entity, With<Organism>>,
     registry: Res<AppTypeRegistry>,
 ) -> bool {
-    save_events.iter().any(|event| {
+    save_events.read().any(|event| {
         // Save Entities, using Bevy Dynamic Scene
         let type_registry = registry.read();
         let mut scene = DynamicScene {
@@ -72,7 +72,7 @@ pub fn then_exit(In(then_exit): In<bool>, mut exit_events: EventWriter<AppExit>)
 fn get_reflect_data<T: Component>(
     entity: Entity,
     world: &World,
-    registry: &RwLockReadGuard<'_, TypeRegistryInternal>,
+    registry: &RwLockReadGuard<'_, TypeRegistry>,
 ) -> Option<Box<dyn Reflect>> {
     world
         .component_id::<T>()
