@@ -1,8 +1,8 @@
-use bevy::{app::AppExit, reflect::TypePath};
+use bevy::app::AppExit;
 
 use crate::prelude::*;
 
-#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, TypePath)]
+#[derive(Actionlike, Reflect, PartialEq, Eq, Clone, Copy, Hash, Debug)]
 pub enum UiAction {
     OpenCloseSimulationPanel,
     OpenCloseSelectionPanel,
