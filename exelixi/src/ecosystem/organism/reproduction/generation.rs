@@ -24,7 +24,7 @@ pub fn evolve(
                     OrganismIndividual::from_components(&state.config, body, &eye, brain)
                 })
                 .collect::<Vec<_>>();
-            ecosystem.increate_generation(species);
+            ecosystem.increment_generation(species);
             let total_energy = organisms
                 .iter()
                 .filter(|(_, organism, _, _, _, _)| &organism.species() == species)

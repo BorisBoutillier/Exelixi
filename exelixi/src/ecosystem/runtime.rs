@@ -20,7 +20,7 @@ impl EcosystemRuntime {
             generation,
         }
     }
-    pub fn increate_generation(&mut self, species: &SpeciesId) {
+    pub fn increment_generation(&mut self, species: &SpeciesId) {
         if let Some(generation) = self.generation.get_mut(species) {
             *generation += 1;
         }

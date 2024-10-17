@@ -1,5 +1,4 @@
-use bevy::{app::AppExit, reflect::TypeRegistry, scene::DynamicEntity};
-use std::sync::RwLockReadGuard;
+use bevy::app::AppExit;
 
 use crate::ecosystem::*;
 pub const SAVE_SEP: &str = "\n########\n";
@@ -22,7 +21,7 @@ pub fn save_to_file(
     save_events.read().any(|event| {
         // Save Entities, using Bevy Dynamic Scene
         let type_registry = registry.read();
-        let mut scene = DynamicSceneBuilder::from_world(world)
+        let scene = DynamicSceneBuilder::from_world(world)
             .deny_all()
             .allow::<Position>()
             .allow::<Organism>()
