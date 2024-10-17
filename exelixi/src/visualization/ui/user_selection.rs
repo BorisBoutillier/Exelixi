@@ -5,7 +5,7 @@ use crate::prelude::*;
 #[allow(clippy::too_many_arguments)]
 pub fn user_selection(
     mut commands: Commands,
-    mouse_button_input: Res<Input<MouseButton>>,
+    mouse_button_input: Res<ButtonInput<MouseButton>>,
     primary_window: Query<&Window, With<PrimaryWindow>>,
     // query to get camera transform
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
@@ -23,7 +23,7 @@ pub fn user_selection(
         && !egui_contexts.ctx_mut().wants_pointer_input()
     {
         if simulation.control.state == SimulationControlState::Fastest {
-            simulation_action.press(SimulationAction::PauseUnpause);
+            simulation_action.press(&SimulationAction::PauseUnpause);
         } else {
             let window = primary_window.get_single().expect("Missing primary window");
             let (camera, camera_global_transform) = cameras.single();

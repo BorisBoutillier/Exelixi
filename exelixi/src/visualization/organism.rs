@@ -35,8 +35,7 @@ pub fn show_organism(
 // Organism sprite color lightness based on body energy pct.
 pub fn sprite_lightness_from_body(mut query: Query<(&mut Sprite, &Body)>) {
     for (mut sprite, body) in query.iter_mut() {
-        let [h, s, _l, a] = sprite.color.as_hsla_f32();
         let l = 0.1 + body.energy_pct().sqrt() * 0.7; // Keep in [0.1 .. 0.8 ]
-        sprite.color = Color::hsla(h, s, l, a);
+        sprite.color = sprite.color.with_luminance(l);
     }
 }

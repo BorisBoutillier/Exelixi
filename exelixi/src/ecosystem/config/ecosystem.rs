@@ -109,8 +109,12 @@ impl EcosystemConfig {
         lightness: f32,
     ) -> Color32 {
         let hue = self.species[species_id].visualization.hue;
-        let [r, g, b, _] = Color::hsl(hue, saturation, lightness).as_rgba_f32();
-        Color32::from_rgb((r * 256.0) as u8, (g * 256.0) as u8, (b * 256.0) as u8)
+        let linear = Color::hsl(hue, saturation, lightness).to_linear();
+        Color32::from_rgb(
+            (linear.red * 256.0) as u8,
+            (linear.green * 256.0) as u8,
+            (linear.blue * 256.0) as u8,
+        )
     }
     pub fn get_species_name(&self, species_id: &SpeciesId) -> &str {
         &self.species[species_id].name

@@ -20,44 +20,46 @@ pub fn save_to_file(
     registry: Res<AppTypeRegistry>,
 ) -> bool {
     save_events.read().any(|event| {
-        // Save Entities, using Bevy Dynamic Scene
-        let type_registry = registry.read();
-        let mut scene = DynamicScene {
-            entities: vec![],
-            resources: vec![],
-        };
-        for entity in organisms.iter() {
-            let entry = DynamicEntity {
-                entity,
-                components: vec![
-                    get_reflect_data::<Position>(entity, world, &type_registry),
-                    get_reflect_data::<Organism>(entity, world, &type_registry),
-                    get_reflect_data::<Body>(entity, world, &type_registry),
-                    get_reflect_data::<Brain>(entity, world, &type_registry),
-                    get_reflect_data::<Mouth>(entity, world, &type_registry),
-                    get_reflect_data::<Leaf>(entity, world, &type_registry),
-                    get_reflect_data::<Locomotion>(entity, world, &type_registry),
-                    get_reflect_data::<Eye>(entity, world, &type_registry),
-                ]
-                .into_iter()
-                .flatten()
-                .collect(),
-            };
+        // FIXME: DynamicScene has been enhanced to include resources, etc
+        println!("NO SAVING DONE");
+        //// Save Entities, using Bevy Dynamic Scene
+        //let type_registry = registry.read();
+        //let mut scene = DynamicScene {
+        //    entities: vec![],
+        //    resources: vec![],
+        //};
+        //for entity in organisms.iter() {
+        //    let entry = DynamicEntity {
+        //        entity,
+        //        components: vec![
+        //            get_reflect_data::<Position>(entity, world, &type_registry),
+        //            get_reflect_data::<Organism>(entity, world, &type_registry),
+        //            get_reflect_data::<Body>(entity, world, &type_registry),
+        //            get_reflect_data::<Brain>(entity, world, &type_registry),
+        //            get_reflect_data::<Mouth>(entity, world, &type_registry),
+        //            get_reflect_data::<Leaf>(entity, world, &type_registry),
+        //            get_reflect_data::<Locomotion>(entity, world, &type_registry),
+        //            get_reflect_data::<Eye>(entity, world, &type_registry),
+        //        ]
+        //        .into_iter()
+        //        .flatten()
+        //        .collect(),
+        //    };
 
-            scene.entities.push(entry);
-        }
-        let entities_ser = scene.serialize_ron(&registry).expect("OHoh");
+        //    scene.entities.push(entry);
+        //}
+        //let entities_ser = scene.serialize(&registry).expect("OHoh");
 
-        // Serialize Resource manually, as they are not yet part of the DynamicScene
-        let config = world.get_resource::<EcosystemConfig>().unwrap();
-        let config_ser = ron::to_string(config).unwrap();
-        let ecosystem = world.get_resource::<EcosystemRuntime>().unwrap();
-        let ecosystem_ser = ron::to_string(ecosystem).unwrap();
+        //// Serialize Resource manually, as they are not yet part of the DynamicScene
+        //let config = world.get_resource::<EcosystemConfig>().unwrap();
+        //let config_ser = ron::to_string(config).unwrap();
+        //let ecosystem = world.get_resource::<EcosystemRuntime>().unwrap();
+        //let ecosystem_ser = ron::to_string(ecosystem).unwrap();
 
-        // Manually separate in file
-        let data = [entities_ser, config_ser, ecosystem_ser].join(SAVE_SEP);
-        std::fs::write(&event.path, data.as_bytes()).expect("ohoh2");
-        println!("Ecosystem has been saved to '{:?}'", event.path);
+        //// Manually separate in file
+        //let data = [entities_ser, config_ser, ecosystem_ser].join(SAVE_SEP);
+        //std::fs::write(&event.path, data.as_bytes()).expect("ohoh2");
+        //println!("Ecosystem has been saved to '{:?}'", event.path);
 
         event.then_exit
     })

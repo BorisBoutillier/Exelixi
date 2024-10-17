@@ -11,14 +11,12 @@ pub fn selection_changed(
 ) {
     for entity in deselected.read() {
         if let Ok((mut sprite, organism)) = organisms_sprite.get_mut(entity) {
-            let [_h, s, l, a] = sprite.color.as_hsla_f32();
-            sprite.color = Color::hsla(organism.hue(), s, l, a);
+            sprite.color = sprite.color.with_hue(organism.hue());
         }
     }
     for entity in selected.iter() {
         if let Ok((mut sprite, _)) = organisms_sprite.get_mut(entity) {
-            let [_h, s, l, a] = sprite.color.as_hsla_f32();
-            sprite.color = Color::hsla(SELECTED_HUE, s, l, a);
+            sprite.color = sprite.color.with_hue(SELECTED_HUE);
         }
     }
 }

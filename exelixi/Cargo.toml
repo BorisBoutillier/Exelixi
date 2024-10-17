@@ -9,20 +9,20 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 rand = "0.8"
-bevy = { version = "0.12", default-features = false, features = ["bevy_asset", "bevy_winit", "bevy_core_pipeline", "bevy_render", "bevy_scene", "bevy_sprite", "png", "x11", "dynamic_linking"] }
-bevy_egui = "0.23"
+bevy = { version = "0.14", default-features = false, features = ["bevy_asset", "bevy_winit", "bevy_core_pipeline", "bevy_render", "bevy_scene", "bevy_sprite", "png", "x11", "dynamic_linking"] }
+bevy_egui = "0.30"
 lib-neural-network = { path = "../libs/neural-network" }
 lib-genetic-algorithm = { path = "../libs/genetic-algorithm" }
 ron = "0.7"
 serde = { version = "1", features = ["derive"] }
 dirs = "4.0"
 clap = { version = "4.1.4", features = ["derive"] }
-leafwing-input-manager = "0.11"
+leafwing-input-manager = "0.15"
 kd-tree = "0.5"
 typenum = "1.16"
 rand_isaac = { version = "0.3.0", features = ["serde1"] }
 parking_lot = "0.12.1"
-egui_plot = "0.23.0"
+egui_plot = "0.29"
 
 # Enable a small amount of optimization in the dev profile.
 [profile.dev]

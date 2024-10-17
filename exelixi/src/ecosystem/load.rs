@@ -1,4 +1,4 @@
-use bevy::{scene::serde::SceneDeserializer, utils::HashMap};
+use bevy::scene::serde::SceneDeserializer;
 use serde::de::DeserializeSeed;
 
 use crate::ecosystem::*;
@@ -49,7 +49,7 @@ pub fn load_ecosystem_from_file(world: &mut World) {
             type_registry: &type_registry.read(),
         };
         let scene = scene_deserializer.deserialize(&mut deserializer).unwrap();
-        let mut entity_map = HashMap::new();
+        let mut entity_map = bevy::ecs::entity::EntityHashMap::default();
         scene.write_to_world(world, &mut entity_map).unwrap();
     }
 }

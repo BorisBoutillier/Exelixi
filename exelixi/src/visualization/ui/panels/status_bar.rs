@@ -35,7 +35,7 @@ pub fn ui_status_bar(
                     .on_hover_text(hover_text)
                     .clicked()
                 {
-                    action_state.press(SimulationAction::PauseUnpause);
+                    action_state.press(&SimulationAction::PauseUnpause);
                 }
                 if ui
                     .add(egui::Button::new(
@@ -44,7 +44,7 @@ pub fn ui_status_bar(
                     .on_hover_text("Decrease speed")
                     .clicked()
                 {
-                    action_state.press(SimulationAction::Decelerate);
+                    action_state.press(&SimulationAction::Decelerate);
                 }
                 if ui
                     .add(egui::Button::new(
@@ -53,7 +53,7 @@ pub fn ui_status_bar(
                     .on_hover_text("Increase speed")
                     .clicked()
                 {
-                    action_state.press(SimulationAction::Accelerate);
+                    action_state.press(&SimulationAction::Accelerate);
                 }
                 if ui
                     .add(egui::Button::new(
@@ -62,7 +62,7 @@ pub fn ui_status_bar(
                     .on_hover_text("Fastest")
                     .clicked()
                 {
-                    action_state.press(SimulationAction::Fastest);
+                    action_state.press(&SimulationAction::Fastest);
                 }
                 if ui
                     .add(egui::Button::new(
@@ -71,11 +71,11 @@ pub fn ui_status_bar(
                     .on_hover_text("Save")
                     .clicked()
                 {
-                    action_state.press(SimulationAction::Save);
+                    action_state.press(&SimulationAction::Save);
                 }
                 ui.add_space(ui.available_width() - 60.0);
                 let mut fps_s = "N/A".to_string();
-                if let Some(fps) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {
+                if let Some(fps) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS) {
                     if let Some(average) = fps.average() {
                         fps_s = format!("{average:.1}");
                     }

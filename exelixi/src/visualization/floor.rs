@@ -16,7 +16,7 @@ pub fn show_floor(
                         config.environment.width as f32 + 20.0,
                         config.environment.height as f32 + 20.0,
                     )),
-                    color: Color::rgb_u8(0x4B, 0x37, 0x1C),
+                    color: Color::srgb_u8(0x4B, 0x37, 0x1C),
                     ..Default::default()
                 },
                 ..Default::default()

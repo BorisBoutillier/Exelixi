@@ -1,4 +1,4 @@
-#import bevy_sprite::mesh2d_vertex_output MeshVertexOutput
+#import bevy_sprite::mesh2d_vertex_output::VertexOutput
 
 struct FovInfo {
     angle: f32,
@@ -6,12 +6,12 @@ struct FovInfo {
     color: vec4<f32>,
     sector_alpha: f32,
 };
-@group(1) @binding(0)
+@group(2) @binding(0)
 var<uniform> fov: FovInfo;
 
 @fragment
 fn fragment(
-    in: MeshVertexOutput
+    in: VertexOutput
 ) -> @location(0) vec4<f32> {
     let none = vec4<f32>(0.);
     let edge_color = fov.color;

@@ -27,7 +27,7 @@ fn spawn_camera(mut commands: Commands) {
 #[allow(clippy::too_many_arguments)]
 fn camera_movement(
     mut cameras: Query<&mut OrthographicProjection, With<MainCamera>>,
-    mouse_button_input: Res<Input<MouseButton>>,
+    mouse_button_input: Res<ButtonInput<MouseButton>>,
     mut mouse_wheel_events: EventReader<MouseWheel>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     config: Res<EcosystemConfig>,

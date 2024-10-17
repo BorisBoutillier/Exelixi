@@ -37,11 +37,11 @@ pub enum SimulationAction {
 
 pub fn setup_simulation_speed_action(mut commands: Commands) {
     let input_map = InputMap::<SimulationAction>::new([
-        (KeyCode::Up, SimulationAction::Fastest),
-        (KeyCode::Right, SimulationAction::Accelerate),
-        (KeyCode::Left, SimulationAction::Decelerate),
-        (KeyCode::Space, SimulationAction::PauseUnpause),
-        (KeyCode::S, SimulationAction::Save),
+        (SimulationAction::Fastest, KeyCode::ArrowUp),
+        (SimulationAction::Accelerate, KeyCode::ArrowRight),
+        (SimulationAction::Decelerate, KeyCode::ArrowLeft),
+        (SimulationAction::PauseUnpause, KeyCode::Space),
+        (SimulationAction::Save, KeyCode::KeyS),
     ]);
     commands.insert_resource(input_map);
     commands.insert_resource(ActionState::<SimulationAction>::default());
@@ -52,7 +52,7 @@ pub fn simulation_action_input(
     mut simulation: ResMut<Simulation>,
     mut save_events: EventWriter<SaveEcosystemEvent>,
 ) {
-    if action_state.just_pressed(SimulationAction::PauseUnpause) {
+    if action_state.just_pressed(&SimulationAction::PauseUnpause) {
         if simulation.control.state == SimulationControlState::Paused {
             simulation.control.state = SimulationControlState::Run;
             simulation.control.speed_factor = 1;
@@ -60,18 +60,18 @@ pub fn simulation_action_input(
             simulation.control.state = SimulationControlState::Paused;
         }
     }
-    if action_state.just_pressed(SimulationAction::Fastest) {
+    if action_state.just_pressed(&SimulationAction::Fastest) {
         simulation.control.state = SimulationControlState::Fastest;
     }
-    if action_state.just_pressed(SimulationAction::Accelerate) {
+    if action_state.just_pressed(&SimulationAction::Accelerate) {
         simulation.control.state = SimulationControlState::Run;
         simulation.control.speed_factor *= 2;
     }
-    if action_state.just_pressed(SimulationAction::Decelerate) {
+    if action_state.just_pressed(&SimulationAction::Decelerate) {
         simulation.control.state = SimulationControlState::Run;
         simulation.control.speed_factor = (simulation.control.speed_factor / 2).max(1);
     }
-    if action_state.just_pressed(SimulationAction::Save) {
+    if action_state.just_pressed(&SimulationAction::Save) {
         save_events.send(SaveEcosystemEvent {
             path: simulation
                 .save_path

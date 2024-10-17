@@ -65,13 +65,13 @@ impl Brain {
 pub fn brain_processing(
     mut organisms: Query<(&Body, &Position, &mut Locomotion, &mut Eye, &Brain)>,
     kdtree: Res<OrganismKdTree>,
-    organims: Query<(&Organism, &Body)>,
+    organism: Query<(&Organism, &Body)>,
 ) {
-    organisms.for_each_mut(|(body, position, mut locomotion, mut eye, brain)| {
-        eye.process_vision(position, &kdtree, &organims);
+    for (body, position, mut locomotion, mut eye, brain) in organisms.iter_mut() {
+        eye.process_vision(position, &kdtree, &organism);
         let mut inputs = eye.get_sensors().to_vec();
         inputs.extend(body.get_sensors().iter());
         let response = brain.nn.propagate(&inputs);
         locomotion.actuates(response);
-    });
+    }
 }

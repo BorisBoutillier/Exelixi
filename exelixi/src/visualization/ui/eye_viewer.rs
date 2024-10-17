@@ -2,10 +2,7 @@ use bevy::reflect::TypePath;
 use bevy::render::render_resource::{AsBindGroup, ShaderRef};
 
 use bevy::sprite::Material2dPlugin;
-use bevy::{
-    reflect::TypeUuid,
-    sprite::{Material2d, MaterialMesh2dBundle},
-};
+use bevy::sprite::{Material2d, MaterialMesh2dBundle};
 
 use crate::prelude::*;
 
@@ -27,7 +24,7 @@ fn spawn_fov_viewer_on_selected(
     for (parent, eye) in parents.iter() {
         let fov_viewer = commands
             .spawn(MaterialMesh2dBundle {
-                mesh: meshes.add(Mesh::from(shape::Quad::default())).into(),
+                mesh: meshes.add(Mesh::from(Rectangle::default())).into(),
                 transform: Transform {
                     translation: Vec3::new(0.0, 0.0, 1.0),
                     scale: Vec3::new(eye.fov_range * 2.0, eye.fov_range * 2.0, 1.0),
@@ -36,7 +33,7 @@ fn spawn_fov_viewer_on_selected(
                 material: materials.add(FovViewerMaterial {
                     fov_angle: eye.fov_angle,
                     n_sectors: eye.n_cells as u32,
-                    color: Color::BLUE,
+                    color: Color::Srgba(bevy::color::palettes::css::BLUE).to_linear(),
                     sector_alpha: 0.1,
                 }),
                 ..Default::default()
@@ -60,8 +57,7 @@ fn despawn_fov_viewer_on_deselected(
     }
 }
 
-#[derive(Component, Debug, Clone, TypeUuid, AsBindGroup, TypePath, Asset)]
-#[uuid = "516c3ab4-6a1c-4e7d-9795-6161ca083a1d"]
+#[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 struct FovViewerMaterial {
     // Total angle of the FOV to show, will be show from -fov_angle/2 to fov_anglel2
     #[uniform(0)]
@@ -71,7 +67,7 @@ struct FovViewerMaterial {
     n_sectors: u32,
     // Color of the edges of the sector triangle
     #[uniform(0)]
-    color: Color,
+    color: LinearRgba,
     // Alpha replacement to color for the sector 'background'
     #[uniform(0)]
     sector_alpha: f32,

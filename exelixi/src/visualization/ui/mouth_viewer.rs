@@ -11,7 +11,7 @@ impl Plugin for MouthViewerPlugin {
             .add_systems(PostUpdate, despawn_mouth_viewer_on_deselected);
     }
 }
-/// a a FOV viewer child whenver a Selected component is added to an entity with an Eye
+/// a a FOV viewer child whenever a Selected component is added to an entity with an Eye
 fn spawn_mouth_viewer_on_selected(
     mut commands: Commands,
     parents: Query<(Entity, &Mouth), Added<Selected>>,
@@ -23,9 +23,8 @@ fn spawn_mouth_viewer_on_selected(
             .spawn((
                 MaterialMesh2dBundle {
                     mesh: meshes
-                        .add(Mesh::from(shape::Circle {
+                        .add(Mesh::from(Circle {
                             radius: mouth.reach,
-                            vertices: 32,
                         }))
                         .into(),
                     transform: Transform {
