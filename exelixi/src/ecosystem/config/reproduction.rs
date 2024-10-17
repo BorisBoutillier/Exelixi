@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Reflect, Serialize, Deserialize, Debug, Clone)]
 pub enum ReproductionConfig {
     AutoSpawn {
         // Average number of organism that spawns per step

@@ -6,9 +6,10 @@ use super::organs::{BodyConfig, EyeConfig, LocomotionConfig};
 use super::reproduction::ReproductionConfig;
 use super::*;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Reflect, Serialize, Deserialize, Debug, Clone)]
 pub struct SpeciesConfig {
     pub name: String,
+    #[reflect(ignore)]
     #[serde(skip)]
     pub id: SpeciesId,
     pub body: BodyConfig,
@@ -37,8 +38,9 @@ impl SpeciesConfig {
 
 // Identifier for each different species in the simulation
 #[derive(
-    Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, Reflect,
+    Reflect, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize,
 )]
+#[reflect(Hash, PartialEq)]
 pub struct SpeciesId(u8);
 
 const UNDEFINED_SPECIES_ID: u8 = u8::MAX;

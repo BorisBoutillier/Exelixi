@@ -12,7 +12,7 @@ pub use reproduction::*;
 pub use species::*;
 pub use visualization::*;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Reflect, Serialize, Deserialize, Debug, Clone)]
 pub enum ConfigValue<T> {
     Fixed(T),
     Gene { min: T, max: T },

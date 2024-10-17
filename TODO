@@ -1,6 +1,4 @@
 -- Bugs
-- After update to 0.14:
-  - Saving implementation removed
 - load and run_for do not work together, load run-for and save should work all three together
 - load + run + config gives different results that just load + run
 

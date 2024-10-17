@@ -27,7 +27,8 @@ pub struct UserEcosystemConfig {
 //
 // Resources
 //
-#[derive(Resource, Clone, Serialize, Deserialize)]
+#[derive(Resource, Reflect, Clone, Serialize, Deserialize)]
+#[reflect(Resource)]
 pub struct EcosystemConfig {
     pub environment: EnvironmentConfig,
     pub statistics_aggregation_rate: u32,

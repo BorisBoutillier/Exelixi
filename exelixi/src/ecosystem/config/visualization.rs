@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Reflect, Serialize, Deserialize, Debug, Clone)]
 pub struct OrganismVisualizationConfig {
     pub hue: f32,
     pub sprite_file: String,

@@ -1,6 +1,6 @@
 use crate::ecosystem::*;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Reflect, Serialize, Deserialize, Debug, Clone)]
 pub struct EnvironmentConfig {
     // Width of the floor
     pub width: i32,
