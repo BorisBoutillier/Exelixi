@@ -31,7 +31,7 @@ fn spawn_mouth_viewer_on_selected(
                         translation: Vec3::new(0.0, 0.0, 0.5),
                         ..Default::default()
                     },
-                    material: materials.add(ColorMaterial::from(Color::rgba(1.0, 0.0, 0.0, 0.6))),
+                    material: materials.add(ColorMaterial::from(Color::srgba(1.0, 0.0, 0.0, 0.6))),
                     ..Default::default()
                 },
                 MouthViewer,
