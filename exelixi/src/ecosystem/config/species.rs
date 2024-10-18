@@ -40,7 +40,7 @@ impl SpeciesConfig {
 #[derive(
     Reflect, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize,
 )]
-#[reflect(Hash, PartialEq)]
+#[reflect_value(Hash, Serialize, Deserialize)]
 pub struct SpeciesId(u8);
 
 const UNDEFINED_SPECIES_ID: u8 = u8::MAX;

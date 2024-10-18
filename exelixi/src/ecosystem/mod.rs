@@ -12,9 +12,9 @@ pub use bevy::log;
 pub use bevy::prelude::*;
 pub use rand::Rng;
 pub use rand::RngCore;
-pub use rand_isaac::IsaacRng;
 pub use serde::{Deserialize, Serialize};
 
+use bevy_rand::prelude::*;
 pub use config::*;
 pub use kdtree::*;
 pub use load::*;
@@ -25,7 +25,6 @@ pub use save::*;
 pub use schedule::*;
 pub use stats::*;
 
-use rand::SeedableRng;
 use std::path::PathBuf;
 
 pub struct EcosystemPlugin {
@@ -35,11 +34,12 @@ pub struct EcosystemPlugin {
 }
 impl Plugin for EcosystemPlugin {
     fn build(&self, app: &mut App) {
-        let rng = if let Some(seed) = self.seed {
-            IsaacRng::seed_from_u64(seed)
+        let entropy_plugin = if let Some(seed) = self.seed {
+            EntropyPlugin::<WyRand>::with_seed(seed.to_ne_bytes())
         } else {
-            IsaacRng::from_entropy()
+            EntropyPlugin::<WyRand>::default()
         };
+        app.add_plugins(entropy_plugin);
         let ecosystem_config = EcosystemConfig::from_path(self.config_path.clone());
         app.add_event::<NewGenerationEvent>();
         app.add_event::<SaveEcosystemEvent>();
@@ -65,6 +65,7 @@ impl Plugin for EcosystemPlugin {
             .register_type::<Locomotion>()
             .register_type::<Eye>()
             .register_type::<EcosystemConfig>()
+            .register_type::<EcosystemRuntime>()
             .register_type::<SpeciesConfig>()
             .register_type::<BodyConfig>()
             .register_type::<EyeConfig>()
@@ -72,7 +73,7 @@ impl Plugin for EcosystemPlugin {
             .register_type::<Vec<nn::Layer>>()
             .register_type::<Vec<nn::Neuron>>()
             .register_type::<Vec<f32>>();
-        app.insert_resource(EcosystemRuntime::new(rng, &ecosystem_config));
+        app.insert_resource(EcosystemRuntime::new(&ecosystem_config));
         app.insert_resource(ecosystem_config);
         app.insert_resource(GenerationEvolutions::default());
         app.insert_resource(OrganismKdTree::default());

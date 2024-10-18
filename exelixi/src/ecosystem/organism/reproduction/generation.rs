@@ -11,6 +11,7 @@ pub fn evolve(
     config: Res<EcosystemConfig>,
     organisms: Query<(Entity, &Organism, &Position, &Body, &Brain, Option<&Eye>)>,
     mut ecosystem: ResMut<EcosystemRuntime>,
+    mut rng: ResMut<GlobalEntropy<WyRand>>,
     mut new_generation_events: EventWriter<NewGenerationEvent>,
     mut generation_evolutions: ResMut<GenerationEvolutions>,
 ) {
@@ -32,7 +33,7 @@ pub fn evolve(
                 .sum::<f32>();
 
             let mut new_population = state.genetic_algorithm.evolve(
-                &mut ecosystem.rng,
+                &mut *rng,
                 &current_population,
                 state.fertility_rate,
                 (state.minimum_population as f32 * 0.9) as usize,
@@ -42,10 +43,7 @@ pub fn evolve(
             // If not enough survived, add random organisms
             let missing_population = state.minimum_population as i32 - new_population.len() as i32;
             for _ in 0..missing_population {
-                new_population.push(OrganismIndividual::random(
-                    &mut ecosystem.rng,
-                    &state.config,
-                ));
+                new_population.push(OrganismIndividual::random(&mut *rng, &state.config));
             }
 
             new_generation_events.send(NewGenerationEvent { species: *species });
@@ -66,11 +64,11 @@ pub fn evolve(
                     if i < n_evolve {
                         body.set_energy(evolve_energy);
                     }
-                    let angle = ecosystem.rng.gen_range(-PI..PI);
+                    let angle = rng.gen_range(-PI..PI);
                     let (x, y) = match (current_positions.is_empty(), state.child_spawn_distance) {
                         (false, Some(distance)) => {
-                            let dx = ecosystem.rng.gen_range(-distance..distance);
-                            let dy = ecosystem.rng.gen_range(-distance..distance);
+                            let dx = rng.gen_range(-distance..distance);
+                            let dy = rng.gen_range(-distance..distance);
                             (
                                 (current_positions[i % current_positions.len()].x + dx)
                                     .clamp(-half_width, half_width),
@@ -79,8 +77,8 @@ pub fn evolve(
                             )
                         }
                         _ => (
-                            ecosystem.rng.gen_range(-half_width..half_width),
-                            ecosystem.rng.gen_range(-half_height..half_height),
+                            rng.gen_range(-half_width..half_width),
+                            rng.gen_range(-half_height..half_height),
                         ),
                     };
                     let position = Position::new(x, y, angle);

@@ -2,20 +2,19 @@ use std::collections::BTreeMap;
 
 use crate::ecosystem::*;
 
-#[derive(Resource, Serialize, Deserialize)]
+#[derive(Resource, Reflect, Serialize, Deserialize)]
+#[reflect(Resource)]
 pub struct EcosystemRuntime {
-    pub rng: IsaacRng,
     pub steps: u32,
     pub generation: BTreeMap<SpeciesId, u32>,
 }
 impl EcosystemRuntime {
-    pub fn new(rng: IsaacRng, config: &EcosystemConfig) -> Self {
+    pub fn new(config: &EcosystemConfig) -> Self {
         let mut generation = BTreeMap::new();
         for species in config.species.keys() {
             generation.insert(*species, 0);
         }
         Self {
-            rng,
             steps: 0,
             generation,
         }

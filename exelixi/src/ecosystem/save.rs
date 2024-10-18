@@ -32,26 +32,21 @@ pub fn save_to_file(
             .allow::<Locomotion>()
             .allow::<Eye>()
             .deny_all_resources()
-            //.allow_resource::<EcosystemConfig>()
-            //.allow_resource::<EcosystemRuntime>()
+            .allow_resource::<GlobalEntropy<WyRand>>()
+            .allow_resource::<EcosystemConfig>()
+            .allow_resource::<EcosystemRuntime>()
             .extract_entities(organisms.iter())
             .extract_resources()
             .build();
-        println!("Entities: {}", scene.entities.len());
-        println!("Resources: {}", scene.resources.len());
+        info!(
+            "Saved {} entities and {} resources",
+            scene.entities.len(),
+            scene.resources.len()
+        );
         let world_ser = scene
             .serialize(&type_registry)
             .expect("Scene serialization failed.");
-
-        // Serialize Resource manually, as they are not yet part of the DynamicScene
-        let config = world.get_resource::<EcosystemConfig>().unwrap();
-        let config_ser = ron::to_string(config).unwrap();
-        let ecosystem = world.get_resource::<EcosystemRuntime>().unwrap();
-        let ecosystem_ser = ron::to_string(ecosystem).unwrap();
-
-        // Manually separate in file
-        let data = [world_ser, config_ser, ecosystem_ser].join(SAVE_SEP);
-        std::fs::write(&event.path, data.as_bytes()).expect("ohoh2");
+        std::fs::write(&event.path, world_ser.as_bytes()).expect("Failed to write to save path");
         println!("Ecosystem has been saved to '{:?}'", event.path);
 
         event.then_exit
