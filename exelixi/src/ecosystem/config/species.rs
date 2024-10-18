@@ -9,7 +9,6 @@ use super::*;
 #[derive(Reflect, Serialize, Deserialize, Debug, Clone)]
 pub struct SpeciesConfig {
     pub name: String,
-    #[reflect(ignore)]
     #[serde(skip)]
     pub id: SpeciesId,
     pub body: BodyConfig,

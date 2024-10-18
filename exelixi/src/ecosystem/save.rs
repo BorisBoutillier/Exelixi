@@ -1,7 +1,6 @@
 use bevy::app::AppExit;
 
 use crate::ecosystem::*;
-pub const SAVE_SEP: &str = "\n########\n";
 
 #[derive(Event)]
 pub struct SaveEcosystemEvent {

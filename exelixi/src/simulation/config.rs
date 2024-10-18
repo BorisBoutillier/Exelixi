@@ -19,5 +19,4 @@ impl Simulation {
             save_path,
         }
     }
-    // Dump current simulation information in a single line string.
 }

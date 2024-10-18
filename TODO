@@ -1,10 +1,9 @@
 -- Bugs
 - load and run_for do not work together, load run-for and save should work all three together
 - load + run + config gives different results that just load + run
+- Replace BTreeMap of SpeciesId,Species to a Vec<Species>
 
 --- Ecosystem
-- Save/Load:
-  - Take advantage of DynamicScene now supporting resources
 - ECS:
   - Save/Load should include 'git' checksum. And Warning in stdout when not matching, but still load.
   - Should we save to directory to save with steps as name, and allow a save_every command line argument ?
