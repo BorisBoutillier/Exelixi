@@ -1,26 +1,10 @@
-use bevy::app::AppExit;
-
 use crate::ecosystem::*;
 
-#[derive(Event)]
-pub struct SaveEcosystemEvent {
-    pub path: PathBuf,
-    pub then_exit: bool,
-}
-
-//pub fn save_ecosystem_to_file() -> impl IntoSystemConfigs {
-//    save_to_file.pipe(then_exit)
-//}
-pub fn save_to_file(
-    world: &World,
-    mut save_events: EventReader<SaveEcosystemEvent>,
-    organisms: Query<Entity, With<Organism>>,
-    registry: Res<AppTypeRegistry>,
-) -> bool {
-    save_events.read().any(|event| {
-        // Save Entities, using Bevy Dynamic Scene
-        let type_registry = registry.read();
-        let scene = DynamicSceneBuilder::from_world(world)
+pub fn save_ecosystem_to_file(path: &PathBuf, world: &mut World) {
+    // Save Entities, using Bevy Dynamic Scene
+    let scene = {
+        let mut organisms = world.query_filtered::<Entity, With<Organism>>();
+        DynamicSceneBuilder::from_world(world)
             .deny_all()
             .allow::<Position>()
             .allow::<Organism>()
@@ -34,26 +18,19 @@ pub fn save_to_file(
             .allow_resource::<GlobalEntropy<WyRand>>()
             .allow_resource::<EcosystemConfig>()
             .allow_resource::<EcosystemRuntime>()
-            .extract_entities(organisms.iter())
+            .extract_entities(organisms.iter(world))
             .extract_resources()
-            .build();
-        info!(
-            "Saved {} entities and {} resources",
-            scene.entities.len(),
-            scene.resources.len()
-        );
-        let world_ser = scene
-            .serialize(&type_registry)
-            .expect("Scene serialization failed.");
-        std::fs::write(&event.path, world_ser.as_bytes()).expect("Failed to write to save path");
-        println!("Ecosystem has been saved to '{:?}'", event.path);
-
-        event.then_exit
-    })
-}
-
-pub fn then_exit(In(then_exit): In<bool>, mut exit_events: EventWriter<AppExit>) {
-    if then_exit {
-        exit_events.send_default();
-    }
+            .build()
+    };
+    info!(
+        "Saved {} entities and {} resources",
+        scene.entities.len(),
+        scene.resources.len()
+    );
+    let type_registry = world.resource::<AppTypeRegistry>().read();
+    let world_ser = scene
+        .serialize(&type_registry)
+        .expect("Scene serialization failed.");
+    std::fs::write(path, world_ser.as_bytes()).expect("Failed to write to save path");
+    info!("Ecosystem has been saved to '{:?}'", path);
 }

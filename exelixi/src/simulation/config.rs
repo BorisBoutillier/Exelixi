@@ -3,20 +3,14 @@ use std::path::PathBuf;
 use crate::prelude::*;
 
 // Resources
-#[derive(Resource)]
+#[derive(Resource, Default)]
 pub struct Simulation {
     pub control: SimulationControl,
+    pub load: Option<PathBuf>,
     // Total active running of the simulation
-    pub run_for: Option<u32>,
+    pub run: Option<u32>,
     // Default path to save
-    pub save_path: Option<PathBuf>,
-}
-impl Simulation {
-    pub fn new(run_for: Option<u32>, save_path: Option<PathBuf>) -> Self {
-        Self {
-            control: SimulationControl::new(),
-            run_for,
-            save_path,
-        }
-    }
+    pub save: Option<PathBuf>,
+    // Defines if the simulation should exit after doing all defined steps in load/run/save
+    pub exit: bool,
 }

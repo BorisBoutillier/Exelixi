@@ -30,7 +30,6 @@ use std::path::PathBuf;
 pub struct EcosystemPlugin {
     pub seed: Option<u64>,
     pub config_path: Option<PathBuf>,
-    pub load_path: Option<PathBuf>,
 }
 impl Plugin for EcosystemPlugin {
     fn build(&self, app: &mut App) {
@@ -42,15 +41,6 @@ impl Plugin for EcosystemPlugin {
         app.add_plugins(entropy_plugin);
         let ecosystem_config = EcosystemConfig::from_path(self.config_path.clone());
         app.add_event::<NewGenerationEvent>();
-        app.add_event::<SaveEcosystemEvent>();
-        app.add_event::<LoadEcosystemEvent>();
-        if let Some(path) = self.load_path.as_ref() {
-            let mut load_events = Events::<LoadEcosystemEvent>::default();
-            load_events.send(LoadEcosystemEvent {
-                path: path.to_string_lossy().into_owned(),
-            });
-            app.insert_resource(load_events);
-        }
         app.register_type::<SpeciesId>()
             .register_type::<CellSensors>()
             .register_type::<Position>()
@@ -78,9 +68,6 @@ impl Plugin for EcosystemPlugin {
         app.insert_resource(GenerationEvolutions::default());
         app.insert_resource(OrganismKdTree::default());
         app.add_schedule(EcosystemSchedule::new_schedule());
-        //app.add_systems(Update, save_ecosystem_to_file());
-        app.add_systems(Update, save_to_file.pipe(then_exit));
-        app.add_systems(Update, load_ecosystem_from_file);
         app.add_systems(PreUpdate, initialize_on_new_config);
     }
 }

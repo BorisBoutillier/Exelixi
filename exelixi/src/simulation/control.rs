@@ -8,8 +8,8 @@ pub struct SimulationControl {
     // Speed_factor, a factor of 1 is 60 steps per seconds,
     pub speed_factor: u32,
 }
-impl SimulationControl {
-    pub fn new() -> Self {
+impl Default for SimulationControl {
+    fn default() -> Self {
         Self {
             state: SimulationControlState::Paused,
             speed_factor: 1,
@@ -50,7 +50,6 @@ pub fn setup_simulation_speed_action(mut commands: Commands) {
 pub fn simulation_action_input(
     action_state: Res<ActionState<SimulationAction>>,
     mut simulation: ResMut<Simulation>,
-    mut save_events: EventWriter<SaveEcosystemEvent>,
 ) {
     if action_state.just_pressed(&SimulationAction::PauseUnpause) {
         if simulation.control.state == SimulationControlState::Paused {
@@ -72,12 +71,6 @@ pub fn simulation_action_input(
         simulation.control.speed_factor = (simulation.control.speed_factor / 2).max(1);
     }
     if action_state.just_pressed(&SimulationAction::Save) {
-        save_events.send(SaveEcosystemEvent {
-            path: simulation
-                .save_path
-                .clone()
-                .unwrap_or("default.ecosim".into()),
-            then_exit: false,
-        });
+        simulation.save = Some(simulation.save.clone().unwrap_or("default.ecosim".into()));
     }
 }

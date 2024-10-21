@@ -20,6 +20,7 @@ mod prelude {
 use std::path::PathBuf;
 
 use clap::Parser;
+use log::LogPlugin;
 use prelude::*;
 
 // Organism evolution simulation
@@ -42,26 +43,30 @@ struct Args {
     /// Default path to save the simulation to
     #[arg(long)]
     save: Option<PathBuf>,
+    /// Defines if the GUI is launched. Default to false --run-for is defined, else defaults to true
+    #[arg(long)]
+    gui: bool,
 }
 
 fn main() {
     let args = Args::parse();
     // Handle command line argument overrides
     let mut app = App::new();
-    let with_gui = args.run_for.is_none();
+    let with_gui = args.run_for.is_none() || args.gui;
     if with_gui {
         app.add_plugins(visualization::VisualizationPlugin);
     } else {
-        app.add_plugins(MinimalPlugins);
+        app.add_plugins((MinimalPlugins, LogPlugin::default()));
     }
     app.add_plugins(ecosystem::EcosystemPlugin {
         seed: args.seed,
         config_path: args.config,
-        load_path: args.load,
     });
     app.add_plugins(simulation::SimulationPlugin {
+        load_path: args.load,
         run_for: args.run_for,
         save_path: args.save,
+        with_gui,
     });
     app.run();
 }
