@@ -18,6 +18,7 @@ pub fn save_ecosystem_to_file(path: &PathBuf, world: &mut World) {
             .allow_resource::<GlobalEntropy<WyRand>>()
             .allow_resource::<EcosystemConfig>()
             .allow_resource::<EcosystemRuntime>()
+            .allow_resource::<EcosystemStatistics>()
             .extract_entities(organisms.iter(world))
             .extract_resources()
             .build()

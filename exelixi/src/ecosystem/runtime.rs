@@ -29,7 +29,6 @@ impl EcosystemRuntime {
 pub fn initialize_on_new_config(mut commands: Commands, config: Res<EcosystemConfig>) {
     if config.is_changed() {
         // Rebuild all the 'compiled' resources
-        commands.insert_resource(EcosystemStatistics::new(&config));
         commands.insert_resource(GenerationEvolutions::new(&config));
     }
 }

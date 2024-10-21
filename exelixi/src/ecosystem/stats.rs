@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use crate::ecosystem::*;
 
-#[derive(Default, Debug, Clone)]
+#[derive(Reflect, Serialize, Deserialize, Default, Debug, Clone)]
 pub struct SpeciesStatistic {
     // Current generation for this organism.
     // Applicable only for organism with GenerationEvolution reproduction
@@ -29,7 +29,7 @@ impl SpeciesStatistic {
         )
     }
 }
-#[derive(Debug)]
+#[derive(Reflect, Serialize, Deserialize, Debug)]
 pub struct SpeciesStatistics {
     pub name: String,
     pub current: SpeciesStatistic,
@@ -65,7 +65,8 @@ impl SpeciesStatistics {
     }
 }
 
-#[derive(Resource, Debug, Default)]
+#[derive(Resource, Reflect, Serialize, Deserialize, Debug, Default)]
+#[reflect(Resource)]
 pub struct EcosystemStatistics {
     pub organisms: BTreeMap<SpeciesId, SpeciesStatistics>,
 }

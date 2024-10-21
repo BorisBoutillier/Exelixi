@@ -39,7 +39,6 @@ impl Plugin for EcosystemPlugin {
             EntropyPlugin::<WyRand>::default()
         };
         app.add_plugins(entropy_plugin);
-        let ecosystem_config = EcosystemConfig::from_path(self.config_path.clone());
         app.add_event::<NewGenerationEvent>();
         app.register_type::<SpeciesId>()
             .register_type::<CellSensors>()
@@ -56,6 +55,9 @@ impl Plugin for EcosystemPlugin {
             .register_type::<Eye>()
             .register_type::<EcosystemConfig>()
             .register_type::<EcosystemRuntime>()
+            .register_type::<EcosystemStatistics>()
+            .register_type::<SpeciesStatistics>()
+            .register_type::<SpeciesStatistic>()
             .register_type::<SpeciesConfig>()
             .register_type::<BodyConfig>()
             .register_type::<EyeConfig>()
@@ -63,9 +65,13 @@ impl Plugin for EcosystemPlugin {
             .register_type::<Vec<nn::Layer>>()
             .register_type::<Vec<nn::Neuron>>()
             .register_type::<Vec<f32>>();
+
+        let ecosystem_config = EcosystemConfig::from_path(self.config_path.clone());
         app.insert_resource(EcosystemRuntime::new(&ecosystem_config));
+        app.insert_resource(EcosystemStatistics::new(&ecosystem_config));
+        app.insert_resource(GenerationEvolutions::new(&ecosystem_config));
         app.insert_resource(ecosystem_config);
-        app.insert_resource(GenerationEvolutions::default());
+
         app.insert_resource(OrganismKdTree::default());
         app.add_schedule(EcosystemSchedule::new_schedule());
         app.add_systems(PreUpdate, initialize_on_new_config);
