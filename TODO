@@ -1,7 +1,5 @@
 -- Bugs
-- load and run_for do not work together, load run-for and save should work all three together
-- load + run + config gives different results that just load + run
-- Replace BTreeMap of SpeciesId,Species to a Vec<Species>
+- default conf run-for 10002 != run-for 10000 save then run-for 2. ( 10001 is identical -> positions are != ?)
 
 --- Ecosystem
 - ECS:

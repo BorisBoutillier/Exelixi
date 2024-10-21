@@ -24,7 +24,7 @@ pub fn ui_simulation(
                     .show(ui, |ui| {
                         let mut plot_lines = vec![];
                         for (species, stats) in ecosystem_statistics.organisms.iter() {
-                            if let Some(stat) = stats.last_stored() {
+                            if let Some(stat) = stats.last() {
                                 let color = ecosystem_config.get_egui_color(species, 1.0, 0.7);
                                 let checked = ui_state
                                     .simulation_energy_checked
@@ -67,7 +67,7 @@ pub fn ui_simulation(
                     .show(ui, |ui| {
                         let mut plot_lines = vec![];
                         for (species, stats) in ecosystem_statistics.organisms.iter() {
-                            if let Some(stat) = stats.last_stored() {
+                            if let Some(stat) = stats.last() {
                                 let color = ecosystem_config.get_egui_color(species, 1.0, 0.7);
                                 let checked = ui_state
                                     .simulation_population_checked
@@ -112,7 +112,7 @@ pub fn ui_simulation(
                     .default_open(true)
                     .show(ui, |ui| {
                         for (species, stats) in ecosystem_statistics.organisms.iter() {
-                            if let Some(stat) = stats.last_stored() {
+                            if let Some(stat) = stats.last() {
                                 let color = ecosystem_config.get_egui_color(species, 1.0, 0.7);
                                 let value = if let Some(generation) = stat.generation {
                                     generation.to_string()

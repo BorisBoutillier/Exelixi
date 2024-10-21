@@ -5,7 +5,7 @@ pub enum ReproductionConfig {
     AutoSpawn {
         // Average number of organism that spawns per step
         spawn_rate: f64,
-        // Mininum distance from an organism that can eat me
+        // Minimum distance from an organism that can eat me
         #[serde(default)]
         minimum_distance_from_eater: f32,
     },

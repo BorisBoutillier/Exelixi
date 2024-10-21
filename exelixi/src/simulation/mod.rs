@@ -5,7 +5,7 @@ use crate::prelude::*;
 mod config;
 mod control;
 
-use bevy::app::AppExit;
+use bevy::{app::AppExit, ecs::system::RunSystemOnce};
 pub use config::*;
 pub use control::*;
 
@@ -83,6 +83,7 @@ pub fn run_ecosystem_schedule(world: &mut World) {
     }
     // Check for save request and apply
     if let Some(save_path) = world.resource_mut::<Simulation>().save.take() {
+        world.run_system_once(accumulate_statistics);
         crate::ecosystem::save_ecosystem_to_file(&save_path, world);
     }
     // Check for exit request and apply

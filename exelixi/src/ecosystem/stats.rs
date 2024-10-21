@@ -32,35 +32,32 @@ impl SpeciesStatistic {
 #[derive(Reflect, Serialize, Deserialize, Debug)]
 pub struct SpeciesStatistics {
     pub name: String,
-    pub current: SpeciesStatistic,
+    pub out_of_energy_count: u32,
     pub accumulation: Vec<(u32, SpeciesStatistic)>,
 }
 impl SpeciesStatistics {
     pub fn new(name: String) -> Self {
         Self {
             name,
-            current: SpeciesStatistic::default(),
+            out_of_energy_count: 0,
             accumulation: vec![],
         }
     }
-    pub fn set_current(&mut self, size: u32, energy_total: f32) {
-        self.current.size = size;
-        self.current.energy_total = energy_total;
-    }
-    pub fn set_generation(&mut self, generation: u32) {
-        self.current.generation = Some(generation);
-    }
     pub fn add_out_of_energy(&mut self, count: u32) {
-        self.current.out_of_energy += count;
+        self.out_of_energy_count += count;
     }
     pub fn inline_sprint(&self) -> String {
-        format!("{:19} - {}", self.name, self.current.inline_sprint())
+        if let Some(stat) = self.last() {
+            format!("{:19} - {}", self.name, stat.inline_sprint())
+        } else {
+            String::new()
+        }
     }
-    pub fn store_at_step(&mut self, step: u32) {
-        self.accumulation.push((step, self.current.clone()));
-        self.current = SpeciesStatistic::default();
+    pub fn add(&mut self, step: u32, stat: SpeciesStatistic) {
+        self.accumulation.push((step, stat));
+        self.out_of_energy_count = 0;
     }
-    pub fn last_stored(&self) -> Option<&SpeciesStatistic> {
+    pub fn last(&self) -> Option<&SpeciesStatistic> {
         self.accumulation.last().map(|(_, stat)| stat)
     }
 }
@@ -100,34 +97,47 @@ impl EcosystemStatistics {
 }
 
 pub fn statistics_accumulation(
-    ecosystem: Res<EcosystemRuntime>,
+    ecosystem_statistics: ResMut<EcosystemStatistics>,
+    ecosystem_runtime: Res<EcosystemRuntime>,
     config: Res<EcosystemConfig>,
-    mut ecosystem_statistics: ResMut<EcosystemStatistics>,
     organisms: Query<(&Organism, &Body)>,
 ) {
-    if ecosystem.steps % config.statistics_aggregation_rate == 0 {
+    if ecosystem_runtime.steps % config.statistics_aggregation_rate == 0 {
         // Update current statistics
-        let mut size = BTreeMap::new();
-        let mut energy = BTreeMap::new();
-        for (organism, body) in organisms.iter() {
-            *size.entry(organism.species()).or_insert(0) += 1;
-            *energy.entry(organism.species()).or_insert(0.) += body.energy();
-        }
-        for (name, size) in size.into_iter() {
-            if let Some(stat) = ecosystem_statistics.organisms.get_mut(&name) {
-                stat.set_current(size, energy[&name]);
-            }
-        }
-        for (species, generation) in ecosystem.generation.iter() {
-            if let Some(stat) = ecosystem_statistics.organisms.get_mut(species) {
-                stat.set_generation(*generation);
-            }
-        }
-        // Print in console
-        println!("{}", ecosystem_statistics.sprint(ecosystem.steps));
-        // Store current statistics, and prepare new one
-        for stat in ecosystem_statistics.organisms.values_mut() {
-            stat.store_at_step(ecosystem.steps);
-        }
+        accumulate_statistics(ecosystem_statistics, ecosystem_runtime, organisms);
     }
+}
+
+pub fn accumulate_statistics(
+    mut ecosystem_statistics: ResMut<EcosystemStatistics>,
+    ecosystem_runtime: Res<EcosystemRuntime>,
+    organisms: Query<(&Organism, &Body)>,
+) {
+    let mut current_stats = BTreeMap::new();
+    for (species, generation) in ecosystem_runtime.generation.iter() {
+        current_stats.insert(
+            species,
+            SpeciesStatistic {
+                generation: Some(*generation),
+                ..Default::default()
+            },
+        );
+    }
+    for (organism, body) in organisms.iter() {
+        let stat = current_stats
+            .get_mut(&organism.species())
+            .expect("Found an Organism with a SpeciesId not in EcosystemRuntime.generation");
+        stat.energy_total += body.energy();
+        stat.size += 1;
+    }
+    for (species, stats) in ecosystem_statistics.organisms.iter_mut() {
+        stats.add(
+            ecosystem_runtime.steps,
+            current_stats
+                .remove(species)
+                .expect("EcosystemStatistics has a SpeciesId unknown to EcosystemRuntime"),
+        );
+    }
+    // Print in console
+    println!("{}", ecosystem_statistics.sprint(ecosystem_runtime.steps));
 }
