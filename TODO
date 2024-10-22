@@ -1,10 +1,8 @@
 -- Bugs
-- default conf run-for 10002 != run-for 10000 save then run-for 2. ( 10001 is identical -> positions are != ?)
 
 --- Ecosystem
 - ECS:
-  - Save/Load should include 'git' checksum. And Warning in stdout when not matching, but still load.
-  - Should we save to directory to save with steps as name, and allow a save_every command line argument ?
+  - Add support for Simulation config auto-saving to a directory, with directory and save rate configurable.
     We could also save the inline_stats for this steps in a txt file next to it. XX.ecosim and XX.stats ?
   - Optimize KdTree to for quasi 'static' species ( only appear and die, do not move)
   - Converts standard component behaviour as traits :
@@ -13,9 +11,6 @@
       - EnergyConsumer
   - should kdtree include multiple time same entity for torus worlds ( without wall)
   - Check if having an OrganismBundle make code cleaner
-
-- Config:
-  - Move config file to yaml or json.
 
 - Mouth:
   - Add the reach of the Mouth as fixed energy cost, and also a gene 
@@ -35,10 +30,11 @@
     Base cost of brain on number of non-0 edges.
   
 - Reproduction:
-  - Add reproduction through Birth.
-    - Contacts with co-organisms store their genetics.
-    - Give birth when reaching max-energy, create child from self and stored genetics with half 'start' energy, that self loses.
-
+  - Add reproduction through Birth, with a new Uterus organ
+    - Contacts with co-organisms store their genetics of other in Uterus, only last one.
+    - Energy_for_birth is a gene value.
+    - Give birth when reaching energy_for_birth, create child from self and stored genetics with half 'start' energy, that self loses.
+    - On death, if will go under min_population, spawn a new random one. We probably need to keep a count of population size.
 - Statistics:
   - Performance aggregation of stats to max length, through merges. (1/3 kept 2/3 merged 2 by twos -> 2/3)
 
