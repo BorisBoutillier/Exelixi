@@ -43,17 +43,16 @@ struct Args {
     /// Default path to save the simulation to
     #[arg(long)]
     save: Option<PathBuf>,
-    /// Defines if the GUI is launched. Default to false --run-for is defined, else defaults to true
+    /// When set, no GUI is open and program exist after doing the possible load/run_for/save commands.
     #[arg(long)]
-    gui: bool,
+    exit: bool,
 }
 
 fn main() {
     let args = Args::parse();
     // Handle command line argument overrides
     let mut app = App::new();
-    let with_gui = args.run_for.is_none() || args.gui;
-    if with_gui {
+    if !args.exit {
         app.add_plugins(visualization::VisualizationPlugin);
     } else {
         app.add_plugins((MinimalPlugins, LogPlugin::default()));
@@ -66,7 +65,7 @@ fn main() {
         load_path: args.load,
         run_for: args.run_for,
         save_path: args.save,
-        with_gui,
+        exit: args.exit,
     });
     app.run();
 }

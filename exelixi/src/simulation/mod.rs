@@ -13,7 +13,7 @@ pub struct SimulationPlugin {
     pub load_path: Option<PathBuf>,
     pub run_for: Option<u32>,
     pub save_path: Option<PathBuf>,
-    pub with_gui: bool,
+    pub exit: bool,
 }
 impl Plugin for SimulationPlugin {
     fn build(&self, app: &mut App) {
@@ -21,11 +21,11 @@ impl Plugin for SimulationPlugin {
             load: self.load_path.clone(),
             run: self.run_for,
             save: self.save_path.clone(),
-            exit: !self.with_gui,
+            exit: self.exit,
             ..Default::default()
         });
         app.add_systems(Update, run_ecosystem_schedule);
-        if self.with_gui {
+        if !self.exit {
             app.add_plugins(InputManagerPlugin::<SimulationAction>::default());
             app.add_systems(Startup, setup_simulation_speed_action);
             app.add_systems(PostUpdate, simulation_action_input);
@@ -83,11 +83,11 @@ pub fn run_ecosystem_schedule(world: &mut World) {
     }
     // Check for save request and apply
     if let Some(save_path) = world.resource_mut::<Simulation>().save.take() {
-        world.run_system_once(accumulate_statistics);
         crate::ecosystem::save_ecosystem_to_file(&save_path, world);
     }
-    // Check for exit request and apply
+    // Check for exit request, store and dump last statistics and exit
     if world.resource::<Simulation>().exit {
+        world.run_system_once(accumulate_statistics);
         world.send_event(AppExit::Success);
     }
 }
