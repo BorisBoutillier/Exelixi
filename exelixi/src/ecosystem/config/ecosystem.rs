@@ -11,8 +11,11 @@ use super::{environment::EnvironmentConfig, species::SpeciesConfig, *};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct EcosystemStatsConfig {
+    // Defines the number of steps before data aggregation starts..
+    // If not provided, will be 0.1*smallest generation length.
+    pub aggregation_start: Option<u32>,
     // Defines the number of steps between each data aggregation.
-    // If not provided, with be 0.1*smallest generation length.
+    // If not provided, will be 0.1*smallest generation length.
     pub aggregation_rate: Option<u32>,
 }
 #[derive(Serialize, Deserialize)]
@@ -32,6 +35,7 @@ pub struct UserEcosystemConfig {
 pub struct EcosystemConfig {
     pub environment: EnvironmentConfig,
     pub statistics_aggregation_rate: u32,
+    pub statistics_aggregation_start: u32,
     pub species: BTreeMap<SpeciesId, SpeciesConfig>,
 }
 impl EcosystemConfig {
@@ -97,10 +101,12 @@ impl EcosystemConfig {
                     1000
                 }
             });
+        let statistics_aggregation_start = user_config.statistics.aggregation_start.unwrap_or(0);
         Self {
             environment: user_config.environment,
             species,
             statistics_aggregation_rate,
+            statistics_aggregation_start,
         }
     }
     pub fn get_egui_color(

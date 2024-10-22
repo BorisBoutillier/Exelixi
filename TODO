@@ -10,7 +10,7 @@
   - Converts standard component behaviour as traits :
       - Sensor
       - Actuator
-      - EnergyConsummer
+      - EnergyConsumer
   - should kdtree include multiple time same entity for torus worlds ( without wall)
   - Check if having an OrganismBundle make code cleaner
 

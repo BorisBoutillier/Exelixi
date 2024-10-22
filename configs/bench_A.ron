@@ -64,5 +64,8 @@
         )
     )
     ],
-    statistics: () 
+    statistics: (
+        aggregation_rate: Some(1),
+        aggregation_start: Some(33000),
+    ) 
 )

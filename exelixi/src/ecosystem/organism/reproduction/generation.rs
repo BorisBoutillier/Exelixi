@@ -17,12 +17,16 @@ pub fn evolve(
 ) {
     for (species, state) in generation_evolutions.per_species.iter_mut() {
         if ecosystem.steps % state.generation_length == 0 {
+            let mut organisms = organisms.iter().collect::<Vec<_>>();
+            organisms.sort_unstable_by(|(_, _, p1, _, _, _), (_, _, p2, _, _, _)| {
+                p1.partial_cmp(p2).unwrap()
+            });
             let current_population = organisms
                 .iter()
                 .filter(|(_, organism, _, _, _, _)| &organism.species() == species)
                 .map(|(entity, _, _, body, brain, eye)| {
-                    commands.entity(entity).despawn_recursive();
-                    OrganismIndividual::from_components(&state.config, body, &eye, brain)
+                    commands.entity(*entity).despawn_recursive();
+                    OrganismIndividual::from_components(&state.config, body, eye, brain)
                 })
                 .collect::<Vec<_>>();
             ecosystem.increment_generation(species);

@@ -13,11 +13,14 @@ pub struct SpeciesStatistic {
     pub energy_total: f32,
     // Number of dead organism by out_of_energy since last Step
     pub out_of_energy: u32,
+    // Mean pos X
+    pub total_position_x: f32,
+    pub total_position_y: f32,
 }
 impl SpeciesStatistic {
     pub fn inline_sprint(&self) -> String {
         format!(
-            "Size: {:4}, Energy: {:6.0}, Deaths:{:4}, Generation:{}",
+            "Size:{:5} Energy:{:9.0} Deaths:{:5} Generation:{:-4} Mean_Pos:({:9.3},{:9.3})",
             self.size,
             self.energy_total,
             self.out_of_energy,
@@ -25,7 +28,9 @@ impl SpeciesStatistic {
                 generation.to_string()
             } else {
                 "N/A".to_string()
-            }
+            },
+            self.total_position_x / (self.size as f32),
+            self.total_position_y / (self.size as f32),
         )
     }
 }
@@ -48,7 +53,7 @@ impl SpeciesStatistics {
     }
     pub fn inline_sprint(&self) -> String {
         if let Some(stat) = self.last() {
-            format!("{:19} - {}", self.name, stat.inline_sprint())
+            format!("{:10} - {}", self.name, stat.inline_sprint())
         } else {
             String::new()
         }
@@ -90,7 +95,7 @@ impl EcosystemStatistics {
         let mut s = String::new();
         s.push_str(&format!("Steps: {:6}\n", cur_step));
         for stat in self.organisms.values() {
-            s.push_str(&format!("    {}\n", stat.inline_sprint()));
+            s.push_str(&format!("  {}\n", stat.inline_sprint()));
         }
         s
     }
@@ -100,9 +105,11 @@ pub fn statistics_accumulation(
     ecosystem_statistics: ResMut<EcosystemStatistics>,
     ecosystem_runtime: Res<EcosystemRuntime>,
     config: Res<EcosystemConfig>,
-    organisms: Query<(&Organism, &Body)>,
+    organisms: Query<(&Organism, &Body, &Position)>,
 ) {
-    if ecosystem_runtime.steps % config.statistics_aggregation_rate == 0 {
+    if ecosystem_runtime.steps >= config.statistics_aggregation_start
+        && ecosystem_runtime.steps % config.statistics_aggregation_rate == 0
+    {
         // Update current statistics
         accumulate_statistics(ecosystem_statistics, ecosystem_runtime, organisms);
     }
@@ -111,7 +118,7 @@ pub fn statistics_accumulation(
 pub fn accumulate_statistics(
     mut ecosystem_statistics: ResMut<EcosystemStatistics>,
     ecosystem_runtime: Res<EcosystemRuntime>,
-    organisms: Query<(&Organism, &Body)>,
+    organisms: Query<(&Organism, &Body, &Position)>,
 ) {
     let mut current_stats = BTreeMap::new();
     for (species, generation) in ecosystem_runtime.generation.iter() {
@@ -123,12 +130,14 @@ pub fn accumulate_statistics(
             },
         );
     }
-    for (organism, body) in organisms.iter() {
+    for (organism, body, position) in organisms.iter() {
         let stat = current_stats
             .get_mut(&organism.species())
             .expect("Found an Organism with a SpeciesId not in EcosystemRuntime.generation");
-        stat.energy_total += body.energy();
         stat.size += 1;
+        stat.energy_total += body.energy();
+        stat.total_position_x += position.x;
+        stat.total_position_y += position.y;
     }
     for (species, stats) in ecosystem_statistics.organisms.iter_mut() {
         stats.add(
