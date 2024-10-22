@@ -20,7 +20,8 @@ impl Mouth {
     }
 }
 
-// Each organism mouth will eat the closest reachable other organisms.
+// Each organism mouth will try to eat the closest reachable other organisms.
+// When multiple organism when to eat the same target, only the closest one will eat it.
 pub fn mouth_eating(
     mut commands: Commands,
     mut eaters: Query<(Entity, &Position, &Mouth)>,
@@ -30,38 +31,45 @@ pub fn mouth_eating(
     // Store for each eatable organisms, the list of each organism that want to eat it
     // with the distance it is at.
     // Only the closest will be able to eat it.
-    let mut want_to_eat = BTreeMap::new();
+    let mut foods = BTreeMap::new();
     for (entity, position, mouth) in eaters.iter_mut() {
         for species in mouth.edible.iter() {
+            let mut food = None;
             for other in kdtree.per_species[species]
                 .within_radius(&KdTreeEntry::new(position, entity), mouth.reach)
             {
-                if other.entity != entity {
-                    want_to_eat
-                        .entry(other.entity)
-                        .or_insert(vec![])
-                        .push((position.distance_squared(&other.position), entity));
+                let distance = position.distance_squared(&other.position);
+                if let Some((_, food_distance)) = food {
+                    if distance < food_distance {
+                        food = Some((other.entity, distance));
+                    }
+                } else {
+                    food = Some((other.entity, distance))
                 }
+            }
+            if let Some((food_entity, food_distance)) = food {
+                foods
+                    .entry(food_entity)
+                    .or_insert(vec![])
+                    .push((food_distance, entity));
             }
         }
     }
     let mut has_eaten = HashSet::new();
     // We store the energy of each eaten organism before applying any mouth eating
-    // so that eaten energy is independant of order of mouth eating.
-    let eaten_energy = HashMap::<Entity, f32>::from_iter(
-        want_to_eat
-            .keys()
-            .map(|e| (*e, bodies.get(*e).unwrap().energy())),
+    // so that eaten energy is independent of order of mouth eating.
+    let food_energy = HashMap::<Entity, f32>::from_iter(
+        foods.keys().map(|e| (*e, bodies.get(*e).unwrap().energy())),
     );
-    for (eaten_entity, mut eaters) in want_to_eat.into_iter() {
+    for (food_entity, mut eaters) in foods.into_iter() {
         eaters.sort_by(|(d1, _), (d2, _)| d1.partial_cmp(d2).unwrap());
         if let Some((_, e)) = eaters.into_iter().find(|(_, e)| !has_eaten.contains(e)) {
             bodies
                 .get_mut(e)
                 .unwrap()
-                .add_energy(eaten_energy[&eaten_entity]);
+                .add_energy(food_energy[&food_entity]);
             has_eaten.insert(e);
-            commands.entity(eaten_entity).despawn_recursive();
+            commands.entity(food_entity).despawn_recursive();
         }
     }
 }
