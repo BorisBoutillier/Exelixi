@@ -33,7 +33,7 @@ impl Body {
         self.cur_energy = energy.min(self.max_energy);
     }
     pub fn is_dead(&self) -> bool {
-        self.cur_energy.is_sign_negative()
+        self.cur_energy <= 0.0
     }
 }
 impl Sensor for Body {
