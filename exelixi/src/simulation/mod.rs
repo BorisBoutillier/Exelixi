@@ -61,12 +61,6 @@ pub fn run_ecosystem_schedule(world: &mut World) {
             loop {
                 world.run_schedule(EcosystemSchedule);
                 cur_steps += 1;
-                if let Some(mut events) = world.get_resource_mut::<Events<NewGenerationEvent>>() {
-                    if !events.is_empty() {
-                        events.update();
-                        break;
-                    }
-                }
 
                 // Give back control every 1/60s
                 if (Instant::now() - start_time).as_secs_f32() >= MAX_SIMULATION_DURATION_PER_FRAME

@@ -1,2 +1,2 @@
-mod sensor;
-pub use sensor::*;
+mod brain;
+pub use brain::*;

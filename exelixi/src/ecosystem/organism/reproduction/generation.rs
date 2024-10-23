@@ -1,10 +1,5 @@
 use crate::ecosystem::{organism::reproduction::individual::OrganismIndividual, *};
 
-#[derive(Debug, Event)]
-pub struct NewGenerationEvent {
-    pub species: SpeciesId,
-}
-
 #[allow(clippy::too_many_arguments)]
 pub fn evolve(
     mut commands: Commands,
@@ -12,7 +7,6 @@ pub fn evolve(
     organisms: Query<(Entity, &Organism, &Position, &Body, &Brain, Option<&Eye>)>,
     mut ecosystem: ResMut<EcosystemRuntime>,
     mut rng: ResMut<GlobalEntropy<WyRand>>,
-    mut new_generation_events: EventWriter<NewGenerationEvent>,
     mut generation_evolutions: ResMut<GenerationEvolutions>,
 ) {
     for (species, state) in generation_evolutions.per_species.iter_mut() {
@@ -50,7 +44,6 @@ pub fn evolve(
                 new_population.push(OrganismIndividual::random(&mut *rng, &state.config));
             }
 
-            new_generation_events.send(NewGenerationEvent { species: *species });
             // Spawn new organisms
             let current_positions = organisms
                 .iter()

@@ -11,8 +11,6 @@ pub struct SpeciesStatistic {
     pub size: u32,
     // Total energy of all organism in this species.
     pub energy_total: f32,
-    // Number of dead organism by out_of_energy since last Step
-    pub out_of_energy: u32,
     // Mean pos X
     pub total_position_x: f32,
     pub total_position_y: f32,
@@ -20,10 +18,9 @@ pub struct SpeciesStatistic {
 impl SpeciesStatistic {
     pub fn inline_sprint(&self) -> String {
         format!(
-            "Size:{:5} Energy:{:9.0} Deaths:{:5} Generation:{:-4} Mean_Pos:({:9.3},{:9.3})",
+            "Size:{:5} Energy:{:9.0} Generation:{:-4} Mean_Pos:({:9.3},{:9.3})",
             self.size,
             self.energy_total,
-            self.out_of_energy,
             if let Some(generation) = self.generation {
                 generation.to_string()
             } else {
@@ -37,19 +34,14 @@ impl SpeciesStatistic {
 #[derive(Reflect, Serialize, Deserialize, Debug)]
 pub struct SpeciesStatistics {
     pub name: String,
-    pub out_of_energy_count: u32,
     pub accumulation: Vec<(u32, SpeciesStatistic)>,
 }
 impl SpeciesStatistics {
     pub fn new(name: String) -> Self {
         Self {
             name,
-            out_of_energy_count: 0,
             accumulation: vec![],
         }
-    }
-    pub fn add_out_of_energy(&mut self, count: u32) {
-        self.out_of_energy_count += count;
     }
     pub fn inline_sprint(&self) -> String {
         if let Some(stat) = self.last() {
@@ -60,7 +52,6 @@ impl SpeciesStatistics {
     }
     pub fn add(&mut self, step: u32, stat: SpeciesStatistic) {
         self.accumulation.push((step, stat));
-        self.out_of_energy_count = 0;
     }
     pub fn last(&self) -> Option<&SpeciesStatistic> {
         self.accumulation.last().map(|(_, stat)| stat)
@@ -83,13 +74,6 @@ impl EcosystemStatistics {
             );
         }
         Self { organisms }
-    }
-    pub fn update_out_of_energy(&mut self, out_of_energy: BTreeMap<SpeciesId, u32>) {
-        for (name, count) in out_of_energy.into_iter() {
-            if let Some(stat) = self.organisms.get_mut(&name) {
-                stat.add_out_of_energy(count)
-            }
-        }
     }
     pub fn sprint(&self, cur_step: u32) -> String {
         let mut s = String::new();

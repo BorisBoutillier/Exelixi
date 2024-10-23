@@ -39,7 +39,6 @@ impl Plugin for EcosystemPlugin {
             EntropyPlugin::<WyRand>::default()
         };
         app.add_plugins(entropy_plugin);
-        app.add_event::<NewGenerationEvent>();
         app.register_type::<SpeciesId>()
             .register_type::<CellSensors>()
             .register_type::<Position>()

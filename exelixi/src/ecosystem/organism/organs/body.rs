@@ -1,5 +1,3 @@
-use std::collections::BTreeMap;
-
 use crate::ecosystem::*;
 
 #[derive(Component, Reflect, Default)]
@@ -52,15 +50,13 @@ impl super::traits::Sensor for Body {
 #[allow(clippy::too_many_arguments)]
 pub fn body_energy_consumption(
     mut commands: Commands,
-    mut bodies: Query<(Entity, &mut Body, &Organism)>,
+    mut bodies: Query<(Entity, &mut Body)>,
     q0: Query<&Brain>,
     q1: Query<&Eye>,
     q2: Query<&Locomotion>,
     q3: Query<&Leaf>,
-    mut ecosystem_statistics: ResMut<EcosystemStatistics>,
 ) {
-    let mut deaths = BTreeMap::new();
-    for (entity, mut body, organism) in bodies.iter_mut() {
+    for (entity, mut body) in bodies.iter_mut() {
         let mut total = body.energy_cost();
         if let Ok(organ) = q0.get(entity) {
             total += organ.energy_cost();
@@ -76,10 +72,6 @@ pub fn body_energy_consumption(
         }
         if !body.spend_energy(total) {
             commands.entity(entity).despawn_recursive();
-            *deaths.entry(organism.species()).or_insert(0) += 1;
         }
-    }
-    if !deaths.is_empty() {
-        ecosystem_statistics.update_out_of_energy(deaths);
     }
 }
