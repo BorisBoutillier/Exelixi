@@ -156,9 +156,6 @@ impl Eye {
             .flat_map(|per_species| self.cell_sensors.sensors(per_species))
             .collect::<Vec<_>>();
     }
-    pub fn energy_cost(&self) -> f32 {
-        self.energy_cost
-    }
 
     // Return the number of sensors per cell of this eye
     pub fn n_cell_sensors(&self) -> usize {
@@ -166,6 +163,11 @@ impl Eye {
     }
     fn compute_energy_cost(fov_range: f32, fov_angle: f32, energy_per_area: f32) -> f32 {
         (PI * fov_range.powi(2) * 2.0 * PI / fov_angle) * energy_per_area / (PI * 150.0 * 150.0)
+    }
+}
+impl EnergyConsumer for Eye {
+    fn energy_consumed(&self) -> f32 {
+        self.energy_cost
     }
 }
 

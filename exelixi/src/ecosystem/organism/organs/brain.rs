@@ -59,7 +59,11 @@ impl Brain {
             },
         ]
     }
-    pub fn energy_cost(&self) -> f32 {
+}
+
+impl super::traits::EnergyConsumer for Brain {
+    // Currently brain has no cost.
+    fn energy_consumed(&self) -> f32 {
         0.0
     }
 }

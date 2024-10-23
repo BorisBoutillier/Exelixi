@@ -16,9 +16,6 @@ impl Body {
             body_cost: config.body_cost,
         }
     }
-    pub fn energy_cost(&self) -> f32 {
-        self.body_cost
-    }
     pub fn energy(&self) -> f32 {
         self.cur_energy
     }
@@ -26,9 +23,8 @@ impl Body {
     pub fn energy_pct(&self) -> f32 {
         self.cur_energy / self.max_energy
     }
-    pub fn spend_energy(&mut self, energy: f32) -> bool {
+    pub fn spend_energy(&mut self, energy: f32) {
         self.cur_energy -= energy;
-        self.cur_energy > 0.0
     }
     pub fn add_energy(&mut self, energy: f32) {
         self.cur_energy = (self.cur_energy + energy).min(self.max_energy);
@@ -36,8 +32,11 @@ impl Body {
     pub fn set_energy(&mut self, energy: f32) {
         self.cur_energy = energy.min(self.max_energy);
     }
+    pub fn is_dead(&self) -> bool {
+        self.cur_energy.is_sign_negative()
+    }
 }
-impl super::traits::Sensor for Body {
+impl Sensor for Body {
     fn n_sensors(&self) -> usize {
         1
     }
@@ -46,31 +45,41 @@ impl super::traits::Sensor for Body {
         vec![self.cur_energy / self.max_energy]
     }
 }
+impl EnergyConsumer for Body {
+    fn energy_consumed(&self) -> f32 {
+        self.body_cost
+    }
+}
 
-#[allow(clippy::too_many_arguments)]
 pub fn body_energy_consumption(
     mut commands: Commands,
     mut bodies: Query<(Entity, &mut Body)>,
-    q0: Query<&Brain>,
-    q1: Query<&Eye>,
-    q2: Query<&Locomotion>,
-    q3: Query<&Leaf>,
+    producers: Query<(Option<&Leaf>, Option<&Mouth>), With<Body>>,
+    consumers: Query<(Option<&Brain>, Option<&Eye>, Option<&Locomotion>), With<Body>>,
 ) {
     for (entity, mut body) in bodies.iter_mut() {
-        let mut total = body.energy_cost();
-        if let Ok(organ) = q0.get(entity) {
-            total += organ.energy_cost();
+        let (a, b) = producers.get(entity).unwrap();
+        if let Some(producer) = a {
+            body.add_energy(producer.energy_produced());
         }
-        if let Ok(organ) = q1.get(entity) {
-            total += organ.energy_cost();
+        if let Some(producer) = b {
+            body.add_energy(producer.energy_produced());
         }
-        if let Ok(organ) = q2.get(entity) {
-            total += organ.energy_cost();
+        let own_consumption = body.energy_consumed();
+        body.spend_energy(own_consumption);
+        let (a, b, c) = consumers.get(entity).unwrap();
+        if let Some(consumer) = a {
+            body.spend_energy(consumer.energy_consumed())
         }
-        if let Ok(organ) = q3.get(entity) {
-            total += organ.energy_cost();
+        if let Some(consumer) = b {
+            body.spend_energy(consumer.energy_consumed())
         }
-        if !body.spend_energy(total) {
+        if let Some(consumer) = c {
+            body.spend_energy(consumer.energy_consumed())
+        }
+        if body.is_dead() {
+            // We have consume more energy than we had in stock, we are dead.
+            // Death consists simply in fully despawning ourself.
             commands.entity(entity).despawn_recursive();
         }
     }

@@ -40,10 +40,18 @@ impl Locomotion {
             _ => panic!(),
         }
     }
-    pub fn n_actuators(&self) -> usize {
+}
+impl EnergyConsumer for Locomotion {
+    fn energy_consumed(&self) -> f32 {
+        self.linear_cost * self.linear.powi(2) + self.angular_cost * self.angular.powi(2)
+    }
+}
+
+impl Actuator for Locomotion {
+    fn n_actuators(&self) -> usize {
         1 + if self.linear_actuator { 1 } else { 0 }
     }
-    pub fn actuates(&mut self, outputs: &mut impl Iterator<Item = f32>) {
+    fn actuates(&mut self, outputs: &mut impl Iterator<Item = f32>) {
         // Linear
         if self.linear_actuator {
             let output = outputs
@@ -57,9 +65,6 @@ impl Locomotion {
             let output = outputs.next().expect("Not enough output neurons");
             self.angular = (output.clamp(0.0, 1.0) - 0.5) * V_ANGULAR_MAX;
         }
-    }
-    pub fn energy_cost(&self) -> f32 {
-        self.linear_cost * self.linear.powi(2) + self.angular_cost * self.angular.powi(2)
     }
 }
 

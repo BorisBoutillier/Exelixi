@@ -9,6 +9,8 @@ pub struct Mouth {
     pub reach: f32,
     // Vec of name of organisms that are edible for this one
     pub edible: Vec<SpeciesId>,
+    // Total energy eaten from food this tick.
+    pub energy_eaten: f32,
 }
 
 impl Mouth {
@@ -16,7 +18,13 @@ impl Mouth {
         Self {
             reach: config.reach,
             edible: config.edible_species.clone(),
+            energy_eaten: 0.0,
         }
+    }
+}
+impl EnergyProducer for Mouth {
+    fn energy_produced(&self) -> f32 {
+        self.energy_eaten
     }
 }
 
@@ -24,15 +32,16 @@ impl Mouth {
 // When multiple organism when to eat the same target, only the closest one will eat it.
 pub fn mouth_eating(
     mut commands: Commands,
-    mut eaters: Query<(Entity, &Position, &Mouth)>,
+    mut eaters: Query<(Entity, &Position, &mut Mouth)>,
     kdtree: Res<OrganismKdTree>,
-    mut bodies: Query<&mut Body>,
+    bodies: Query<&Body>,
 ) {
     // Store for each eatable organisms, the list of each organism that want to eat it
     // with the distance it is at.
     // Only the closest will be able to eat it.
     let mut foods = BTreeMap::new();
-    for (entity, position, mouth) in eaters.iter_mut() {
+    for (entity, position, mut mouth) in eaters.iter_mut() {
+        mouth.energy_eaten = 0.0;
         for species in mouth.edible.iter() {
             let mut food = None;
             for other in kdtree.per_species[species]
@@ -61,13 +70,14 @@ pub fn mouth_eating(
     let food_energy = HashMap::<Entity, f32>::from_iter(
         foods.keys().map(|e| (*e, bodies.get(*e).unwrap().energy())),
     );
-    for (food_entity, mut eaters) in foods.into_iter() {
-        eaters.sort_by(|(d1, _), (d2, _)| d1.partial_cmp(d2).unwrap());
-        if let Some((_, e)) = eaters.into_iter().find(|(_, e)| !has_eaten.contains(e)) {
-            bodies
-                .get_mut(e)
-                .unwrap()
-                .add_energy(food_energy[&food_entity]);
+    for (food_entity, mut food_eaters) in foods.into_iter() {
+        food_eaters.sort_by(|(d1, _), (d2, _)| d1.partial_cmp(d2).unwrap());
+        if let Some((_, e)) = food_eaters
+            .into_iter()
+            .find(|(_, e)| !has_eaten.contains(e))
+        {
+            let (_, _, mut mouth) = eaters.get_mut(e).unwrap();
+            mouth.energy_eaten += food_energy[&food_entity];
             has_eaten.insert(e);
             commands.entity(food_entity).despawn_recursive();
         }

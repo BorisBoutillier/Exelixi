@@ -19,9 +19,10 @@ impl Leaf {
             energy_production: config.energy_production,
         }
     }
-    pub fn energy_cost(&self) -> f32 {
-        // Negative, as this is an energy production organ
-        -self.energy_production
+}
+impl EnergyProducer for Leaf {
+    fn energy_produced(&self) -> f32 {
+        self.energy_production
     }
 }
 
