@@ -14,6 +14,7 @@ impl EcosystemSchedule {
                 build_organism_kdtree,
                 mouth_eating,
                 apply_deferred,
+                eye_processing,
                 brain_processing,
                 body_energy_consumption,
                 leaf_lifecycle,

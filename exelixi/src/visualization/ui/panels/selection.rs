@@ -59,7 +59,7 @@ pub fn ui_selection(
                                         egui::Grid::new("Eye sensors").spacing((0.0, 0.0)).show(
                                             ui,
                                             |ui| {
-                                                let eye_sensors = eye.get_sensors();
+                                                let eye_sensors = eye.sensors();
                                                 for cx in 0..eye.n_cell_sensors() {
                                                     for x in 0..eye.n_cells {
                                                         let value = eye_sensors

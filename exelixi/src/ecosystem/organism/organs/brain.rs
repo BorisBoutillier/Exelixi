@@ -2,6 +2,8 @@ use crate::ecosystem::*;
 pub use lib_genetic_algorithm as ga;
 pub use lib_neural_network as nn;
 
+use super::traits::Sensor;
+
 #[derive(Component, Reflect, Default)]
 #[reflect(Component)]
 pub struct Brain {
@@ -63,15 +65,24 @@ impl Brain {
 }
 
 pub fn brain_processing(
-    mut organisms: Query<(&Body, &Position, &mut Locomotion, &mut Eye, &Brain)>,
-    kdtree: Res<OrganismKdTree>,
-    organism: Query<(&Organism, &Body)>,
+    brains: Query<(Entity, &Brain)>,
+    sensors: Query<(&Body, &Eye)>,
+    mut actuators: Query<&mut Locomotion>,
 ) {
-    for (body, position, mut locomotion, mut eye, brain) in organisms.iter_mut() {
-        eye.process_vision(position, &kdtree, &organism);
-        let mut inputs = eye.get_sensors().to_vec();
-        inputs.extend(body.get_sensors().iter());
-        let response = brain.nn.propagate(&inputs);
-        locomotion.actuates(response);
+    for (entity, brain) in brains.iter() {
+        let nn_inputs = if let Ok((body, eye)) = sensors.get(entity) {
+            [eye.sensors(), body.sensors()].concat()
+        } else {
+            vec![]
+        };
+        let mut nn_output = brain.nn.propagate(&nn_inputs).into_iter();
+        if let Ok(mut locomotion) = actuators.get_mut(entity) {
+            locomotion.actuates(&mut nn_output);
+        }
+        assert_eq!(
+            nn_output.next(),
+            None,
+            "Not all neuron outputs have been consumed"
+        );
     }
 }

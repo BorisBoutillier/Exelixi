@@ -38,11 +38,14 @@ impl Body {
     pub fn set_energy(&mut self, energy: f32) {
         self.cur_energy = energy.min(self.max_energy);
     }
-    pub fn get_sensors(&self) -> Vec<f32> {
-        vec![self.cur_energy / self.max_energy]
-    }
-    pub fn n_sensors(&self) -> usize {
+}
+impl super::traits::Sensor for Body {
+    fn n_sensors(&self) -> usize {
         1
+    }
+
+    fn sensors(&self) -> Vec<f32> {
+        vec![self.cur_energy / self.max_energy]
     }
 }
 

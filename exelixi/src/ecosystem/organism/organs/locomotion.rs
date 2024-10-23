@@ -43,8 +43,7 @@ impl Locomotion {
     pub fn n_actuators(&self) -> usize {
         1 + if self.linear_actuator { 1 } else { 0 }
     }
-    pub fn actuates(&mut self, outputs: impl IntoIterator<Item = f32>) {
-        let mut outputs = outputs.into_iter();
+    pub fn actuates(&mut self, outputs: &mut impl Iterator<Item = f32>) {
         // Linear
         if self.linear_actuator {
             let output = outputs
@@ -55,7 +54,7 @@ impl Locomotion {
         }
         // Angular
         {
-            let output = outputs.next().expect("Not enough otuput neurons");
+            let output = outputs.next().expect("Not enough output neurons");
             self.angular = (output.clamp(0.0, 1.0) - 0.5) * V_ANGULAR_MAX;
         }
     }
