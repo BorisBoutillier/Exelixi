@@ -77,6 +77,17 @@ pub fn body_energy_consumption(
         if let Some(consumer) = c {
             body.spend_energy(consumer.energy_consumed())
         }
+        //let consumers = consumers.get(entity).unwrap();
+        //for consumer in [
+        //    consumers.0.map(|v| Box::new(v as &dyn EnergyConsumer)),
+        //    consumers.1.map(|v| Box::new(v as &dyn EnergyConsumer)),
+        //    consumers.2.map(|v| Box::new(v as &dyn EnergyConsumer)),
+        //]
+        //.into_iter()
+        //.flatten()
+        //{
+        //    body.spend_energy(consumer.energy_consumed());
+        //}
         if body.is_dead() {
             // We have consume more energy than we had in stock, we are dead.
             // Death consists simply in fully despawning ourself.
