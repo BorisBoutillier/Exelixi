@@ -1,5 +1,8 @@
 -- Bugs
 
+-- Short term:
+  - Uterus organ.
+  - Birth reproduction.
 --- Ecosystem
 - ECS:
   - Add support for Simulation config auto-saving to a directory, with directory and save rate configurable.

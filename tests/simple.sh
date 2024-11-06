@@ -1,7 +1,12 @@
 # Easy simple runs, typically use to compare between runs, code modification that should not impact the simulation
 CONFIG=bench_A
 SEED=0
-STEPS=10
-cargo run -- --seed=${SEED} --config=configs/${CONFIG}.ron --run-for=${STEPS} --save=saves/simple.sim --exit > saves/simple.txt
+STEPS=10000
 
-tail -n 5 saves/simple.txt
+TIME=`date +%y-%m-%d-%H:%M`
+COMMIT=`git log --format="%h" -n 1`
+SAVE="saves/simple-${CONFIG}-SEED_${SEED}-STEPS_${STEPS}-${TIME}-${COMMIT}"
+echo "Output saved to ${SAVE}.txt"
+cargo run -- --seed=${SEED} --config=configs/${CONFIG}.ron --run-for=${STEPS} --save=${SAVE}.sim --exit > ${SAVE}.txt
+
+tail -n 5 ${SAVE}.txt
