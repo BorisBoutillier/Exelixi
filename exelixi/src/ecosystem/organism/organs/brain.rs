@@ -61,7 +61,7 @@ impl Brain {
     }
 }
 
-impl super::traits::EnergyConsumer for Brain {
+impl EnergyActor for Brain {
     // Currently brain has no cost.
     fn energy_consumed(&self) -> f32 {
         0.0

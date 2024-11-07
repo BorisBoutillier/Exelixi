@@ -7,7 +7,7 @@ use crate::ecosystem::*;
 pub struct Leaf {
     // Energy produced per step
     pub energy_production: f32,
-    // Number of step remaing before disappearing,
+    // Number of step remaining before disappearing,
     // It decreates every step.
     pub lifetime: u32,
 }
@@ -20,14 +20,14 @@ impl Leaf {
         }
     }
 }
-impl EnergyProducer for Leaf {
+impl EnergyActor for Leaf {
     fn energy_produced(&self) -> f32 {
         self.energy_production
     }
 }
 
-pub fn leaf_lifecycle(mut commands: Commands, mut leafs: Query<(Entity, &mut Leaf)>) {
-    for (entity, mut leaf) in leafs.iter_mut() {
+pub fn leaf_lifecycle(mut commands: Commands, mut leaves: Query<(Entity, &mut Leaf)>) {
+    for (entity, mut leaf) in leaves.iter_mut() {
         if leaf.lifetime > 1 {
             leaf.lifetime -= 1
         } else {

@@ -22,7 +22,7 @@ impl Mouth {
         }
     }
 }
-impl EnergyProducer for Mouth {
+impl EnergyActor for Mouth {
     fn energy_produced(&self) -> f32 {
         self.energy_eaten
     }

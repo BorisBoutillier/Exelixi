@@ -165,7 +165,7 @@ impl Eye {
         (PI * fov_range.powi(2) * 2.0 * PI / fov_angle) * energy_per_area / (PI * 150.0 * 150.0)
     }
 }
-impl EnergyConsumer for Eye {
+impl EnergyActor for Eye {
     fn energy_consumed(&self) -> f32 {
         self.energy_cost
     }

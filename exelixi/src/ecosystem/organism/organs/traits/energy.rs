@@ -1,11 +1,10 @@
-// Defines that an organ can consume energy each tick.
-pub trait EnergyConsumer {
+pub trait EnergyActor {
     // Return the energy consumed in this tick.
-    fn energy_consumed(&self) -> f32;
-}
-//
-// Defines that an organ can produce energy each tick.
-pub trait EnergyProducer {
+    fn energy_consumed(&self) -> f32 {
+        0.0
+    }
     // Return the energy produced in this tick.
-    fn energy_produced(&self) -> f32;
+    fn energy_produced(&self) -> f32 {
+        0.0
+    }
 }

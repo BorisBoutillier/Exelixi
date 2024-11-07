@@ -41,7 +41,7 @@ impl Locomotion {
         }
     }
 }
-impl EnergyConsumer for Locomotion {
+impl EnergyActor for Locomotion {
     fn energy_consumed(&self) -> f32 {
         self.linear_cost * self.linear.powi(2) + self.angular_cost * self.angular.powi(2)
     }

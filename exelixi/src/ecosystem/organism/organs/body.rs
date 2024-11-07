@@ -23,9 +23,6 @@ impl Body {
     pub fn energy_pct(&self) -> f32 {
         self.cur_energy / self.max_energy
     }
-    pub fn spend_energy(&mut self, energy: f32) {
-        self.cur_energy -= energy;
-    }
     pub fn add_energy(&mut self, energy: f32) {
         self.cur_energy = (self.cur_energy + energy).min(self.max_energy);
     }
@@ -45,7 +42,7 @@ impl Sensor for Body {
         vec![self.cur_energy / self.max_energy]
     }
 }
-impl EnergyConsumer for Body {
+impl EnergyActor for Body {
     fn energy_consumed(&self) -> f32 {
         self.body_cost
     }
@@ -53,41 +50,38 @@ impl EnergyConsumer for Body {
 
 pub fn body_energy_consumption(
     mut commands: Commands,
-    mut bodies: Query<(Entity, &mut Body)>,
-    producers: Query<(Option<&Leaf>, Option<&Mouth>), With<Body>>,
-    consumers: Query<(Option<&Brain>, Option<&Eye>, Option<&Locomotion>), With<Body>>,
+    mut actors: Query<(
+        Entity,
+        &mut Body,
+        Option<&Leaf>,
+        Option<&Mouth>,
+        Option<&Brain>,
+        Option<&Eye>,
+        Option<&Locomotion>,
+    )>,
 ) {
-    for (entity, mut body) in bodies.iter_mut() {
-        let (a, b) = producers.get(entity).unwrap();
-        if let Some(producer) = a {
-            body.add_energy(producer.energy_produced());
+    //let mut energy_updates = HashMap::new();
+    for (entity, mut body, a0, a1, a2, a3, a4) in actors.iter_mut() {
+        // Aggregate all energy produced and consumed this tick by this entity
+        // Accumulate in a variable before updating the body energy only once,
+        // so that clamping only happen once.
+        let mut tick_energy = body.energy_produced() - body.energy_consumed();
+        if let Some(actor) = a0 {
+            tick_energy += actor.energy_produced() - actor.energy_consumed();
         }
-        if let Some(producer) = b {
-            body.add_energy(producer.energy_produced());
+        if let Some(actor) = a1 {
+            tick_energy += actor.energy_produced() - actor.energy_consumed();
         }
-        let own_consumption = body.energy_consumed();
-        body.spend_energy(own_consumption);
-        let (a, b, c) = consumers.get(entity).unwrap();
-        if let Some(consumer) = a {
-            body.spend_energy(consumer.energy_consumed())
+        if let Some(actor) = a2 {
+            tick_energy += actor.energy_produced() - actor.energy_consumed();
         }
-        if let Some(consumer) = b {
-            body.spend_energy(consumer.energy_consumed())
+        if let Some(actor) = a3 {
+            tick_energy += actor.energy_produced() - actor.energy_consumed();
         }
-        if let Some(consumer) = c {
-            body.spend_energy(consumer.energy_consumed())
+        if let Some(actor) = a4 {
+            tick_energy += actor.energy_produced() - actor.energy_consumed();
         }
-        //let consumers = consumers.get(entity).unwrap();
-        //for consumer in [
-        //    consumers.0.map(|v| Box::new(v as &dyn EnergyConsumer)),
-        //    consumers.1.map(|v| Box::new(v as &dyn EnergyConsumer)),
-        //    consumers.2.map(|v| Box::new(v as &dyn EnergyConsumer)),
-        //]
-        //.into_iter()
-        //.flatten()
-        //{
-        //    body.spend_energy(consumer.energy_consumed());
-        //}
+        body.add_energy(tick_energy);
         if body.is_dead() {
             // We have consume more energy than we had in stock, we are dead.
             // Death consists simply in fully despawning ourself.
