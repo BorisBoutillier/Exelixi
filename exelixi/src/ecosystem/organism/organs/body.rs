@@ -1,3 +1,5 @@
+use bevy_trait_query::All;
+
 use crate::ecosystem::*;
 
 #[derive(Component, Reflect, Default)]
@@ -23,8 +25,12 @@ impl Body {
     pub fn energy_pct(&self) -> f32 {
         self.cur_energy / self.max_energy
     }
-    pub fn add_energy(&mut self, energy: f32) {
-        self.cur_energy = (self.cur_energy + energy).min(self.max_energy);
+    // Update the body internal energy with the provided change.
+    // positive energy_diff means energy has been produced by organs this tick ( negative mean consumed)
+    // Must be called only once per tick, we also subtract the own body consumption
+    // As Body cannot itself implement the EnergyActor trait without issue with Queries
+    pub fn update_energy(&mut self, energy: f32) {
+        self.cur_energy = (self.cur_energy + energy - self.body_cost).min(self.max_energy);
     }
     pub fn set_energy(&mut self, energy: f32) {
         self.cur_energy = energy.min(self.max_energy);
@@ -42,46 +48,24 @@ impl Sensor for Body {
         vec![self.cur_energy / self.max_energy]
     }
 }
-impl EnergyActor for Body {
-    fn energy_consumed(&self) -> f32 {
-        self.body_cost
-    }
-}
 
 pub fn body_energy_consumption(
     mut commands: Commands,
-    mut actors: Query<(
-        Entity,
-        &mut Body,
-        Option<&Leaf>,
-        Option<&Mouth>,
-        Option<&Brain>,
-        Option<&Eye>,
-        Option<&Locomotion>,
-    )>,
+    mut bodies: Query<(Entity, &mut Body)>,
+    actors: Query<All<&dyn EnergyActor>>,
 ) {
-    //let mut energy_updates = HashMap::new();
-    for (entity, mut body, a0, a1, a2, a3, a4) in actors.iter_mut() {
-        // Aggregate all energy produced and consumed this tick by this entity
-        // Accumulate in a variable before updating the body energy only once,
-        // so that clamping only happen once.
-        let mut tick_energy = body.energy_produced() - body.energy_consumed();
-        if let Some(actor) = a0 {
-            tick_energy += actor.energy_produced() - actor.energy_consumed();
-        }
-        if let Some(actor) = a1 {
-            tick_energy += actor.energy_produced() - actor.energy_consumed();
-        }
-        if let Some(actor) = a2 {
-            tick_energy += actor.energy_produced() - actor.energy_consumed();
-        }
-        if let Some(actor) = a3 {
-            tick_energy += actor.energy_produced() - actor.energy_consumed();
-        }
-        if let Some(actor) = a4 {
-            tick_energy += actor.energy_produced() - actor.energy_consumed();
-        }
-        body.add_energy(tick_energy);
+    for (entity, mut body) in bodies.iter_mut() {
+        let tick_energy = if let Ok(energy_actors) = actors.get(entity) {
+            // Aggregate all energy produced and consumed this tick by this entity
+            energy_actors
+                .into_iter()
+                .map(|actor| actor.energy_produced() - actor.energy_consumed())
+                .sum()
+        } else {
+            // Some organism can only have a Body, like plants with all leaves lost.
+            0.0
+        };
+        body.update_energy(tick_energy);
         if body.is_dead() {
             // We have consume more energy than we had in stock, we are dead.
             // Death consists simply in fully despawning ourself.

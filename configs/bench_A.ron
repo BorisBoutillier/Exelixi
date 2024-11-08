@@ -65,7 +65,7 @@
     )
     ],
     statistics: (
-        aggregation_rate: Some(100),
+        aggregation_rate: Some(50),
         aggregation_start: Some(0),
     ) 
 )

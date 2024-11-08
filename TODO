@@ -11,17 +11,18 @@
   - Converts standard component behaviour as traits :
       - Sensor
       - Actuator
-      - EnergyConsumer
   - should kdtree include multiple time same entity for torus worlds ( without wall)
   - Check if having an OrganismBundle make code cleaner
 
+- Body:
+  - What about an 'age' attribute. The number of ticks since birth of this organism.
+    - Sensor in the brain
+    - Birth could be associated to age, as a gene ? Minimum/Maximum age to give birth ?
 - Mouth:
   - Add the reach of the Mouth as fixed energy cost, and also a gene 
-
 - Eye:
   - Add hue of the wall as black
   - Move process_vision out of brain into its own system
-
 - Brain:
   - Add hidden layer topology in config:
     - ex: [2S,3S,2A] = 3 hidden layers, 2*n_sensors, 3*n_sensors, 2*n_actuactors.
@@ -31,13 +32,16 @@
     Cannot change during reinforcement learning.
     Mutation can go from 0 -> non-zero or reverse.
     Base cost of brain on number of non-0 edges.
-  
+
 - Reproduction:
   - Add reproduction through Birth, with a new Uterus organ
     - Contacts with co-organisms store their genetics of other in Uterus, only last one.
     - Energy_for_birth is a gene value.
     - Give birth when reaching energy_for_birth, create child from self and stored genetics with half 'start' energy, that self loses.
     - On death, if will go under min_population, spawn a new random one. We probably need to keep a count of population size.
+    - Should Uterus be controlled by brain actuator ( open/closed), to allow selection of partners ?
+    - Should mating take time ( preventing Locomotion), should Birth take time ?
+
 - Statistics:
   - Performance aggregation of stats to max length, through merges. (1/3 kept 2/3 merged 2 by twos -> 2/3)
 

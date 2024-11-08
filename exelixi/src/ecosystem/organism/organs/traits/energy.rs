@@ -1,3 +1,4 @@
+#[bevy_trait_query::queryable]
 pub trait EnergyActor {
     // Return the energy consumed in this tick.
     fn energy_consumed(&self) -> f32 {

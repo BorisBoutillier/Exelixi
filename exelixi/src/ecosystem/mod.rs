@@ -39,6 +39,12 @@ impl Plugin for EcosystemPlugin {
             EntropyPlugin::<WyRand>::default()
         };
         app.add_plugins(entropy_plugin);
+        use bevy_trait_query::RegisterExt;
+        app.register_component_as::<dyn EnergyActor, Brain>();
+        app.register_component_as::<dyn EnergyActor, Eye>();
+        app.register_component_as::<dyn EnergyActor, Leaf>();
+        app.register_component_as::<dyn EnergyActor, Locomotion>();
+        app.register_component_as::<dyn EnergyActor, Mouth>();
         app.register_type::<SpeciesId>()
             .register_type::<CellSensors>()
             .register_type::<Position>()
