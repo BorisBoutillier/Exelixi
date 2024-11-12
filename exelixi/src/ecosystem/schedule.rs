@@ -13,6 +13,7 @@ impl EcosystemSchedule {
                 locomotion_movement,
                 build_organism_kdtree,
                 mouth_eating,
+                mating,
                 apply_deferred,
                 eye_processing,
                 brain_processing,

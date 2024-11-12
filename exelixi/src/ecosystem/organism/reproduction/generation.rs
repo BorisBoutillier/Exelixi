@@ -121,4 +121,7 @@ pub fn spawn_organism(
     if let Some(mouth_config) = &organism_config.mouth {
         command.insert(Mouth::new(mouth_config));
     }
+    if let Some(uterus_config) = &organism_config.uterus {
+        command.insert(Uterus::new(uterus_config));
+    }
 }

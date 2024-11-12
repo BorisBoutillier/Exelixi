@@ -18,8 +18,10 @@ pub struct SpeciesConfig {
     pub leaf: Option<LeafConfig>,
     // Optional locomotion organ
     pub locomotion: Option<LocomotionConfig>,
-    // Optional mouth organ
+    // optional mouth organ
     pub mouth: Option<MouthConfig>,
+    // optional uterus organ, present if and only if ReproductionConfig is Birth
+    pub uterus: Option<UterusConfig>,
     // Mean of creating new organism
     pub reproduction: ReproductionConfig,
     pub visualization: OrganismVisualizationConfig,

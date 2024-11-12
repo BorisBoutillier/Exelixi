@@ -45,19 +45,21 @@ impl Plugin for EcosystemPlugin {
         app.register_component_as::<dyn EnergyActor, Leaf>();
         app.register_component_as::<dyn EnergyActor, Locomotion>();
         app.register_component_as::<dyn EnergyActor, Mouth>();
+        app.register_component_as::<dyn EnergyActor, Uterus>();
         app.register_type::<SpeciesId>()
             .register_type::<CellSensors>()
             .register_type::<Position>()
             .register_type::<Organism>()
             .register_type::<Body>()
-            .register_type::<Leaf>()
-            .register_type::<Mouth>()
             .register_type::<Brain>()
+            .register_type::<Eye>()
+            .register_type::<Leaf>()
+            .register_type::<Locomotion>()
+            .register_type::<Mouth>()
+            .register_type::<Uterus>()
             .register_type::<nn::Network>()
             .register_type::<nn::Layer>()
             .register_type::<nn::Neuron>()
-            .register_type::<Locomotion>()
-            .register_type::<Eye>()
             .register_type::<EcosystemConfig>()
             .register_type::<EcosystemRuntime>()
             .register_type::<EcosystemStatistics>()

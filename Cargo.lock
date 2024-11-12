@@ -2372,6 +2372,7 @@ dependencies = [
 name = "lib-genetic-algorithm"
 version = "0.1.0"
 dependencies = [
+ "bevy_reflect",
  "rand",
  "rand_chacha",
 ]

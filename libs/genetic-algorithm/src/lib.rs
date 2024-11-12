@@ -2,6 +2,7 @@
 #![feature(impl_trait_in_assoc_type)]
 use std::ops::Index;
 
+use bevy_reflect::Reflect;
 use rand::{prelude::SliceRandom, Rng, RngCore};
 
 pub trait Individual {
@@ -29,7 +30,7 @@ pub trait MutationMethod: Send + Sync {
     fn mutate(&self, rng: &mut dyn RngCore, chromosome: &mut Chromosome);
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Reflect)]
 pub struct Chromosome {
     genes: Vec<f32>,
 }

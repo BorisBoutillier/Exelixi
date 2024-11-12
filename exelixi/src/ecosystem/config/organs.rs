@@ -58,7 +58,7 @@ pub struct EyeConfig {
     // Energy cost, per step of a full circle of 150.0 radius,
     pub energy_cost: f32,
     // Number of eye cells.
-    // The eye fov angle is seperated in n_cells sectors.
+    // The eye fov angle is separated in n_cells sectors.
     // Each cells accumulate information of content in its sector
     pub n_cells: ConfigValue<u8>,
     // Type of sensors per cell.
@@ -109,7 +109,7 @@ pub struct LeafConfig {
     pub lifetime: u32,
 }
 
-// Configuration for the eye organ.
+// Configuration for the mouth organ.
 #[derive(Reflect, Serialize, Deserialize, Debug, Clone)]
 pub struct MouthConfig {
     pub reach: f32,
@@ -125,4 +125,10 @@ impl MouthConfig {
             .map(|name| species_name_to_id[name])
             .collect();
     }
+}
+
+// Configuration for the uterus organ.
+#[derive(Reflect, Serialize, Deserialize, Debug, Clone)]
+pub struct UterusConfig {
+    pub mating_distance: f32,
 }
