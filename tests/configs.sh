@@ -3,13 +3,13 @@
 ERRORS=0
 SEED=0
 STEPS=100
-cargo build --release
+cargo build
 export CARGO_MANIFEST_DIR=`pwd`/exelixi
 echo "-----------"
 for CONFIG in `ls configs/`
 do
-    echo "-- Runing with ${CONFIG}"
-    ./target/release/exelixi --seed=${SEED} --config=configs/${CONFIG} --run-for=${STEPS} --exit >& /dev/null
+    echo "-- Running with ${CONFIG}"
+    cargo run -- --seed=${SEED} --config=configs/${CONFIG} --run-for=${STEPS} --exit >& /dev/null
     if [ $? != "0" ]
     then
         echo "  ##### ERROR #####"
