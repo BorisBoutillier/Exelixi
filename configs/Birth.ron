@@ -7,6 +7,7 @@
 ,   species: [
         (
             name : "Herbivore"
+        ,   minimum_population : 5
         ,   eye: Some(EyeConfig (
                 fov_angle: Fixed(3.14)
             ,   fov_range: Fixed(100)
@@ -20,11 +21,11 @@
             ,   body_cost: 6
         )
         ,   mouth: Some( MouthConfig(
-            reach: 10.0,
-            edible: ["Plant"],
+                reach: 10.0,
+                edible: ["Plant"],
         ))
         ,   uterus: Some( UterusConfig(
-            mating_distance: 5.0,
+                mating_distance: 5.0,
         ))
         ,   locomotion: Some( LocomotionConfig(
                 linear: Fixed(4)
@@ -33,7 +34,6 @@
             ))
         ,   reproduction: GenerationEvolution(
                 generation_length : 500
-            ,   min_population    : 5
             ,   fertility_rate: 1.5
             ,   mutation_chance: 0.01
             ,   mutation_amplitude: 0.3

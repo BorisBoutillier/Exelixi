@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 rand = "0.8"
-bevy = { version = "0.14", default-features = false, features = ["bevy_asset", "bevy_winit", "bevy_core_pipeline", "bevy_render", "bevy_scene", "bevy_sprite", "png", "x11", "dynamic_linking"] }
+bevy = { version = "0.14", default-features = false, features = ["bevy_asset", "bevy_winit", "bevy_core_pipeline", "bevy_render", "bevy_scene", "bevy_sprite", "png", "x11"] }
 bevy_egui = "0.30"
 bevy_rand = { version = "0.7", features = ["wyrand"]}
 bevy-trait-query = "0.6"
@@ -25,3 +25,6 @@ typenum = "1.16"
 rand_isaac = { version = "0.3.0", features = ["serde1"] }
 parking_lot = "0.12.1"
 egui_plot = "0.29"
+
+[dev-dependencies]
+bevy = { version = "*", features = ["dynamic_linking"]}

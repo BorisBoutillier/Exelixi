@@ -83,7 +83,6 @@ impl EcosystemConfig {
             species.update(&species_name_to_id);
             if let ReproductionConfig::GenerationEvolution {
                 generation_length,
-                min_population: _,
                 fertility_rate: _,
                 mutation_chance: _,
                 mutation_amplitude: _,

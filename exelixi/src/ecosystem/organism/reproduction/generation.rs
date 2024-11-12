@@ -11,6 +11,7 @@ pub fn evolve(
 ) {
     for (species, state) in generation_evolutions.per_species.iter_mut() {
         if ecosystem.steps % state.generation_length == 0 {
+            let minimum_population = config.species[species].minimum_population;
             let mut organisms = organisms.iter().collect::<Vec<_>>();
             organisms.sort_unstable_by(|(_, _, p1, _, _, _), (_, _, p2, _, _, _)| {
                 p1.partial_cmp(p2).unwrap()
@@ -34,12 +35,14 @@ pub fn evolve(
                 &mut *rng,
                 &current_population,
                 state.fertility_rate,
-                (state.minimum_population as f32 * 0.9) as usize,
+                // We want 90% of the minimum population to be created from evolving previous generation creature
+                // This is let at most 10% of minimum population be fully random.
+                (minimum_population as f32 * 0.9) as usize,
             );
             let n_evolve = new_population.len();
             let evolve_energy = total_energy / n_evolve as f32;
             // If not enough survived, add random organisms
-            let missing_population = state.minimum_population as i32 - new_population.len() as i32;
+            let missing_population = minimum_population as i32 - new_population.len() as i32;
             for _ in 0..missing_population {
                 new_population.push(OrganismIndividual::random(&mut *rng, &state.config));
             }

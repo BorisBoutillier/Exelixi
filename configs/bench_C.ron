@@ -7,6 +7,7 @@
 ,   species: [
         (
             name : "Herbivore"
+        ,   minimum_population : 20
         ,   eye: Some(EyeConfig (
                 fov_angle: Gene(min:1.5,max:4.71)
             ,   fov_range: Gene(min:70,max:250)
@@ -31,7 +32,6 @@
             ))
         ,   reproduction: GenerationEvolution(
                 generation_length : 5000
-            ,   min_population    : 20
             ,   fertility_rate: 1.5
             ,   mutation_chance: 0.1
             ,   mutation_amplitude: 0.3
@@ -46,6 +46,7 @@
     ,
         (
             name : "Carnivore"
+        ,   minimum_population : 1
         ,   eye: Some(EyeConfig (
                 fov_angle: Gene(min:1.5,max:4.71)
             ,   fov_range: Gene(min:70,max:450)
@@ -70,7 +71,6 @@
             ))
         ,   reproduction: GenerationEvolution(
                 generation_length : 7000
-            ,   min_population    : 1
             ,   fertility_rate: 1.5
             ,   mutation_chance: 0.1
             ,   mutation_amplitude: 0.3

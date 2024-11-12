@@ -7,6 +7,7 @@
 ,   species: [
         (
             name : "Rock"
+        ,   minimum_population : 20
         ,   eye: Some(EyeConfig (
                 fov_angle: Gene(min:1.5,max:4.71)
             ,   fov_range: Gene(min:70,max:250)
@@ -31,7 +32,6 @@
             ))
         ,   reproduction: GenerationEvolution(
                 generation_length : 5000
-            ,   min_population    : 20
             ,   fertility_rate: 2
             ,   mutation_chance: 0.1
             ,   mutation_amplitude: 0.2
@@ -44,6 +44,7 @@
         )
     ),  (
             name : "Paper"
+        ,   minimum_population : 20
         ,   eye: Some(EyeConfig (
                 fov_angle: Gene(min:1.5,max:4.71)
             ,   fov_range: Gene(min:70,max:250)
@@ -68,7 +69,6 @@
             ))
         ,   reproduction: GenerationEvolution(
                 generation_length : 5000
-            ,   min_population    : 20
             ,   fertility_rate: 2
             ,   mutation_chance: 0.1
             ,   mutation_amplitude: 0.2
@@ -81,6 +81,7 @@
         )
     ),  (
             name : "Scissor"
+        ,   minimum_population : 20
         ,   eye: Some(EyeConfig (
                 fov_angle: Gene(min:1.5,max:4.71)
             ,   fov_range: Gene(min:70,max:250)
@@ -105,7 +106,6 @@
             ))
         ,   reproduction: GenerationEvolution(
                 generation_length : 5000
-            ,   min_population    : 20
             ,   fertility_rate: 2
             ,   mutation_chance: 0.1
             ,   mutation_amplitude: 0.2

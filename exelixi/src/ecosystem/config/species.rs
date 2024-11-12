@@ -9,6 +9,10 @@ use super::*;
 #[derive(Reflect, Serialize, Deserialize, Debug, Clone)]
 pub struct SpeciesConfig {
     pub name: String,
+    // Minimum number of organisms of this species at each tick, defaults to 0
+    // If at the beginning of the tick the current population is lower, create new random organisms.
+    #[serde(default)]
+    pub minimum_population: usize,
     #[serde(skip)]
     pub id: SpeciesId,
     pub body: BodyConfig,

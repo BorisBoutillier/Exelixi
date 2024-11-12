@@ -21,7 +21,6 @@ impl GenerationEvolutions {
         for (species_id, organism_config) in config.species.iter() {
             if let ReproductionConfig::GenerationEvolution {
                 generation_length: _,
-                min_population: _,
                 fertility_rate: _,
                 mutation_chance: _,
                 mutation_amplitude: _,
@@ -41,7 +40,6 @@ pub struct GenerationEvolution {
     pub genetic_algorithm: ga::GeneticAlgorithm<ga::RouletteWheelSelection>,
     //
     pub generation_length: u32,
-    pub minimum_population: usize,
     pub fertility_rate: f32,
     pub child_spawn_distance: Option<f32>,
 }
@@ -49,7 +47,6 @@ impl GenerationEvolution {
     pub fn new(config: &SpeciesConfig) -> Self {
         if let ReproductionConfig::GenerationEvolution {
             generation_length,
-            min_population,
             fertility_rate,
             mutation_chance,
             mutation_amplitude,
@@ -64,7 +61,6 @@ impl GenerationEvolution {
                     ga::UniformCrossover,
                     ga::GaussianMutation::new(mutation_chance, mutation_amplitude),
                 ),
-                minimum_population: min_population,
                 fertility_rate,
                 child_spawn_distance,
             }
