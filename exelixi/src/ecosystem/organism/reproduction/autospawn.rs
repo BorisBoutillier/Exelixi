@@ -6,8 +6,6 @@ pub fn auto_spawning(
     mut organisms_lifecycle: ResMut<OrganismsLifecycle>,
     kdtree: Res<OrganismKdTree>,
 ) {
-    let half_width = ecosystem_config.environment.width / 2;
-    let half_height = ecosystem_config.environment.height / 2;
     for (species, config) in ecosystem_config.species.iter() {
         if let ReproductionConfig::AutoSpawn {
             spawn_rate,
@@ -33,11 +31,7 @@ pub fn auto_spawning(
                 // do 100 tentatives to find a valid spawn position.
                 // If we can't find one, don't spawn.
                 for _ in 0..100 {
-                    let rng_pos = Position::new(
-                        rng.gen_range(-half_width..half_width) as f32,
-                        rng.gen_range(-half_height..half_height) as f32,
-                        0.0,
-                    );
+                    let rng_pos = ecosystem_config.environment.get_random_position(&mut *rng);
                     for species_kdtree in can_eat_me
                         .iter()
                         .map(|other_species| kdtree.per_species.get(other_species).unwrap())

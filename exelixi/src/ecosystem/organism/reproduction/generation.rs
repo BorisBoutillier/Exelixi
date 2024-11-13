@@ -57,24 +57,21 @@ pub fn evolve(
                 .into_iter()
                 .enumerate()
                 .for_each(|(i, individual)| {
-                    let angle = rng.gen_range(-PI..PI);
-                    let (x, y) = match (current_positions.is_empty(), state.child_spawn_distance) {
+                    let position = match (current_positions.is_empty(), state.child_spawn_distance)
+                    {
                         (false, Some(distance)) => {
                             let dx = rng.gen_range(-distance..distance);
                             let dy = rng.gen_range(-distance..distance);
-                            (
+                            Position::new(
                                 (current_positions[i % current_positions.len()].x + dx)
                                     .clamp(-half_width, half_width),
                                 (current_positions[i % current_positions.len()].y + dy)
                                     .clamp(-half_height, half_height),
+                                rng.gen_range(-PI..PI),
                             )
                         }
-                        _ => (
-                            rng.gen_range(-half_width..half_width),
-                            rng.gen_range(-half_height..half_height),
-                        ),
+                        _ => config.environment.get_random_position(&mut *rng),
                     };
-                    let position = Position::new(x, y, angle);
                     organisms_lifecycle.births.push(OrganismBirth {
                         species: state.config.id,
                         position: Some(position),

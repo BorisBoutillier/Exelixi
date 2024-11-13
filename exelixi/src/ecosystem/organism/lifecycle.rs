@@ -1,5 +1,3 @@
-use std::f32::consts::PI;
-
 use lib_genetic_algorithm::{Chromosome, Individual};
 
 use crate::ecosystem::*;
@@ -30,6 +28,16 @@ pub struct OrganismBirth {
     pub chromosome: Option<Chromosome>,
 }
 
+//pub fn organism_death(world: &mut World) {
+//    let deaths = std::mem::take(&mut world.resource_mut::<OrganismsLifecycle>().deaths);
+//    for &entity in deaths.iter() {
+//        let species = world.get::<Organism>(entity).unwrap().species();
+//        world
+//            .resource_mut::<EcosystemRuntime>()
+//            .increase_population(&species);
+//        world.entity_mut(entity).despawn_recursive();
+//    }
+//}
 pub fn organism_lifecycle(
     mut commands: Commands,
     mut lifecycle: ResMut<OrganismsLifecycle>,
@@ -38,22 +46,15 @@ pub fn organism_lifecycle(
     mut rng: ResMut<GlobalEntropy<WyRand>>,
     organisms: Query<&Organism>,
 ) {
-    let half_width = ecosystem_config.environment.width / 2;
-    let half_height = ecosystem_config.environment.height / 2;
-    for &entity in lifecycle.deaths.iter() {
+    for &entity in std::mem::take(&mut lifecycle.deaths).iter() {
         let organism = organisms.get(entity).expect("Death of a non-Organism");
         ecosystem.decrease_population(&organism.species());
         commands.entity(entity).despawn_recursive();
     }
-    lifecycle.deaths.clear();
-    for birth in lifecycle.births.iter() {
-        let position = birth.position.unwrap_or_else(|| {
-            Position::new(
-                rng.gen_range(-half_width..half_width) as f32,
-                rng.gen_range(-half_height..half_height) as f32,
-                rng.gen_range(-PI..PI),
-            )
-        });
+    for birth in std::mem::take(&mut lifecycle.births).iter() {
+        let position = birth
+            .position
+            .unwrap_or_else(|| ecosystem_config.environment.get_random_position(&mut *rng));
         let config = ecosystem_config
             .species
             .get(&birth.species)
@@ -95,5 +96,4 @@ pub fn organism_lifecycle(
         }
         ecosystem.increase_population(&config.id);
     }
-    lifecycle.births.clear();
 }
