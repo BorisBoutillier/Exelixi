@@ -1,5 +1,6 @@
 -- Bugs
-
+   with default cargo run, in GUI, a food blink at the exact middle of environment.
+   new errors with reproductibility
 -- Short term:
   - Uterus organ.
   - Birth reproduction.

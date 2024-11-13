@@ -38,11 +38,13 @@ pub fn mating(
 ) {
     for (entity, position, organism, mut uterus) in uteruses.iter_mut() {
         let species = organism.species();
+        // Look for two nearest to position, as we will get ourself.
         let nearests =
             kdtree.per_species[&species].nearests(&KdTreeEntry::new(position, entity), 2);
-        assert_eq!(nearests[0].item.entity, entity);
-        if nearests.len() == 2 && nearests[1].squared_distance <= uterus.mating_distance.powi(2) {
-            let other = nearests[1].item.entity;
+        if let Some(nearest) = nearests.iter().find(|n| {
+            n.item.entity != entity && n.squared_distance <= uterus.mating_distance.powi(2)
+        }) {
+            let other = nearest.item.entity;
             let (other_body, other_brain, other_eye) =
                 organisms.get(other).expect("Mating organism without Body");
             uterus.chromosome = Some(

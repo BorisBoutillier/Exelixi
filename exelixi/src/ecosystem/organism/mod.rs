@@ -1,9 +1,11 @@
 mod organs;
 mod reproduction;
+mod spawn;
 
 use crate::ecosystem::*;
 pub use organs::*;
 pub use reproduction::*;
+pub use spawn::*;
 
 #[derive(Component, Reflect, Default, Debug)]
 #[reflect(Component)]

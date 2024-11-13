@@ -1,5 +1,5 @@
 # Easy simple runs, typically use to compare between runs, code modification that should not impact the simulation
-CONFIG=bench_A
+CONFIG=default
 SEED=0
 STEPS=10000
 

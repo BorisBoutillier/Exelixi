@@ -1,9 +1,9 @@
 use crate::ecosystem::*;
 
 pub fn auto_spawning(
-    mut commands: Commands,
     ecosystem_config: Res<EcosystemConfig>,
     mut rng: ResMut<GlobalEntropy<WyRand>>,
+    mut spawn_events: EventWriter<SpawnOrganismEvent>,
     kdtree: Res<OrganismKdTree>,
 ) {
     let half_width = ecosystem_config.environment.width / 2;
@@ -54,13 +54,12 @@ pub fn auto_spawning(
                         }
                     }
                 }
-                if let Some(pos) = pos {
-                    let mut command =
-                        commands.spawn((Organism::new(config), pos, Body::new(&config.body)));
-                    if let Some(leaf_config) = &config.leaf {
-                        command.insert(Leaf::new(leaf_config));
-                    }
-                }
+                spawn_events.send(SpawnOrganismEvent {
+                    species: config.id,
+                    position: pos,
+                    energy: None,
+                    chromosome: None,
+                });
             }
         }
     }

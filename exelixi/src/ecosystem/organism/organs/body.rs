@@ -51,10 +51,11 @@ impl Sensor for Body {
 
 pub fn body_energy_consumption(
     mut commands: Commands,
-    mut bodies: Query<(Entity, &mut Body)>,
+    mut ecosystem: ResMut<EcosystemRuntime>,
+    mut bodies: Query<(Entity, &Organism, &mut Body)>,
     actors: Query<All<&dyn EnergyActor>>,
 ) {
-    for (entity, mut body) in bodies.iter_mut() {
+    for (entity, organism, mut body) in bodies.iter_mut() {
         let tick_energy = if let Ok(energy_actors) = actors.get(entity) {
             // Aggregate all energy produced and consumed this tick by this entity
             energy_actors
@@ -70,6 +71,7 @@ pub fn body_energy_consumption(
             // We have consume more energy than we had in stock, we are dead.
             // Death consists simply in fully despawning ourself.
             commands.entity(entity).despawn_recursive();
+            ecosystem.decrease_population(&organism.species());
         }
     }
 }

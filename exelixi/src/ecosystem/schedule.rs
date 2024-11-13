@@ -9,6 +9,8 @@ impl EcosystemSchedule {
         let mut schedule = Schedule::new(EcosystemSchedule);
         schedule.add_systems(
             (
+                ensure_minimum_population,
+                spawn_organism,
                 statistics_accumulation,
                 locomotion_movement,
                 build_organism_kdtree,
@@ -20,8 +22,8 @@ impl EcosystemSchedule {
                 body_energy_consumption,
                 leaf_lifecycle,
                 apply_deferred,
-                evolve,
-                auto_spawning,
+                (evolve, auto_spawning),
+                spawn_organism,
                 apply_deferred,
             )
                 .chain(),

@@ -6,10 +6,10 @@ STEPS=100
 cargo build
 export CARGO_MANIFEST_DIR=`pwd`/exelixi
 echo "-----------"
-for CONFIG in `ls configs/`
+for CONFIG in `ls configs/*.ron`
 do
     echo "-- Running with ${CONFIG}"
-    cargo run -- --seed=${SEED} --config=configs/${CONFIG} --run-for=${STEPS} --exit >& /dev/null
+    cargo run -- --seed=${SEED} --config ${CONFIG} --run-for=${STEPS} --exit >& /dev/null
     if [ $? != "0" ]
     then
         echo "  ##### ERROR #####"

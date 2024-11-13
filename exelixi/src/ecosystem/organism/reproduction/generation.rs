@@ -1,3 +1,5 @@
+use lib_genetic_algorithm::Individual;
+
 use crate::ecosystem::{organism::reproduction::individual::OrganismIndividual, *};
 
 #[allow(clippy::too_many_arguments)]
@@ -8,6 +10,7 @@ pub fn evolve(
     mut ecosystem: ResMut<EcosystemRuntime>,
     mut rng: ResMut<GlobalEntropy<WyRand>>,
     mut generation_evolutions: ResMut<GenerationEvolutions>,
+    mut spawn_events: EventWriter<SpawnOrganismEvent>,
 ) {
     for (species, state) in generation_evolutions.per_species.iter_mut() {
         if ecosystem.steps % state.generation_length == 0 {
@@ -21,6 +24,7 @@ pub fn evolve(
                 .filter(|(_, organism, _, _, _, _)| &organism.species() == species)
                 .map(|(entity, _, _, body, brain, eye)| {
                     commands.entity(*entity).despawn_recursive();
+                    ecosystem.decrease_population(species);
                     OrganismIndividual::from_components(&state.config, body, eye, brain)
                 })
                 .collect::<Vec<_>>();
@@ -31,7 +35,7 @@ pub fn evolve(
                 .map(|(_, _, _, b, _, _)| b.energy())
                 .sum::<f32>();
 
-            let mut new_population = state.genetic_algorithm.evolve(
+            let new_population = state.genetic_algorithm.evolve(
                 &mut *rng,
                 &current_population,
                 state.fertility_rate,
@@ -41,12 +45,7 @@ pub fn evolve(
             );
             let n_evolve = new_population.len();
             let evolve_energy = total_energy / n_evolve as f32;
-            // If not enough survived, add random organisms
-            let missing_population = minimum_population as i32 - new_population.len() as i32;
-            for _ in 0..missing_population {
-                new_population.push(OrganismIndividual::random(&mut *rng, &state.config));
-            }
-
+            //
             // Spawn new organisms
             let current_positions = organisms
                 .iter()
@@ -59,11 +58,6 @@ pub fn evolve(
                 .into_iter()
                 .enumerate()
                 .for_each(|(i, individual)| {
-                    let (mut body, eye, locomotion, brain) =
-                        individual.into_components(&state.config);
-                    if i < n_evolve {
-                        body.set_energy(evolve_energy);
-                    }
                     let angle = rng.gen_range(-PI..PI);
                     let (x, y) = match (current_positions.is_empty(), state.child_spawn_distance) {
                         (false, Some(distance)) => {
@@ -82,15 +76,12 @@ pub fn evolve(
                         ),
                     };
                     let position = Position::new(x, y, angle);
-                    spawn_organism(
-                        &mut commands,
-                        &state.config,
-                        body,
-                        eye,
-                        locomotion,
-                        brain,
-                        position,
-                    );
+                    spawn_events.send(SpawnOrganismEvent {
+                        species: state.config.id,
+                        position: Some(position),
+                        energy: Some(evolve_energy),
+                        chromosome: Some(individual.chromosome().clone()),
+                    });
                 });
         }
     }
@@ -99,32 +90,3 @@ pub fn evolve(
 }
 
 use std::f32::consts::PI;
-
-#[allow(clippy::too_many_arguments)]
-pub fn spawn_organism(
-    commands: &mut Commands,
-    organism_config: &SpeciesConfig,
-    body: Body,
-    eye: Option<Eye>,
-    locomotion: Option<Locomotion>,
-    brain: Brain,
-    position: Position,
-) {
-    let organism = Organism::new(organism_config);
-    let mut command = commands.spawn((organism, position, body, brain));
-    if let Some(locomotion) = locomotion {
-        command.insert(locomotion);
-    }
-    if let Some(eye) = eye {
-        command.insert(eye);
-    }
-    if let Some(leaf_config) = &organism_config.leaf {
-        command.insert(Leaf::new(leaf_config));
-    }
-    if let Some(mouth_config) = &organism_config.mouth {
-        command.insert(Mouth::new(mouth_config));
-    }
-    if let Some(uterus_config) = &organism_config.uterus {
-        command.insert(Uterus::new(uterus_config));
-    }
-}

@@ -33,6 +33,7 @@ impl EnergyActor for Mouth {
 pub fn mouth_eating(
     mut commands: Commands,
     mut eaters: Query<(Entity, &Position, &mut Mouth)>,
+    mut ecosystem: ResMut<EcosystemRuntime>,
     kdtree: Res<OrganismKdTree>,
     bodies: Query<&Body>,
 ) {
@@ -58,7 +59,7 @@ pub fn mouth_eating(
             }
             if let Some((food_entity, food_distance)) = food {
                 foods
-                    .entry(food_entity)
+                    .entry((food_entity, *species))
                     .or_insert(vec![])
                     .push((food_distance, entity));
             }
@@ -68,9 +69,11 @@ pub fn mouth_eating(
     // We store the energy of each eaten organism before applying any mouth eating
     // so that eaten energy is independent of order of mouth eating.
     let food_energy = HashMap::<Entity, f32>::from_iter(
-        foods.keys().map(|e| (*e, bodies.get(*e).unwrap().energy())),
+        foods
+            .keys()
+            .map(|(e, _)| (*e, bodies.get(*e).unwrap().energy())),
     );
-    for (food_entity, mut food_eaters) in foods.into_iter() {
+    for ((food_entity, food_species), mut food_eaters) in foods.into_iter() {
         food_eaters.sort_by(|(d1, _), (d2, _)| d1.partial_cmp(d2).unwrap());
         if let Some((_, e)) = food_eaters
             .into_iter()
@@ -80,6 +83,7 @@ pub fn mouth_eating(
             mouth.energy_eaten += food_energy[&food_entity];
             has_eaten.insert(e);
             commands.entity(food_entity).despawn_recursive();
+            ecosystem.decrease_population(&food_species);
         }
     }
 }
