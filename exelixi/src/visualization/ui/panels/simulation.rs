@@ -7,6 +7,7 @@ pub fn ui_simulation(
     mut contexts: EguiContexts,
     ecosystem_config: ResMut<EcosystemConfig>,
     ecosystem_statistics: Res<EcosystemStatistics>,
+    ecosystem: Res<EcosystemRuntime>,
     mut ui_state: ResMut<UiState>,
 ) {
     egui::containers::Window::new("Simulation")
@@ -24,31 +25,30 @@ pub fn ui_simulation(
                     .show(ui, |ui| {
                         let mut plot_lines = vec![];
                         for (species, stats) in ecosystem_statistics.organisms.iter() {
-                            if let Some(stat) = stats.last() {
-                                let color = ecosystem_config.get_egui_color(species, 1.0, 0.7);
-                                let checked = ui_state
-                                    .simulation_energy_checked
-                                    .entry(*species)
-                                    .or_insert(true);
-                                ui.checkbox(
-                                    checked,
-                                    RichText::new(format!("{} {}", stats.name, stat.size))
-                                        .color(color),
+                            let color = ecosystem_config.get_egui_color(species, 1.0, 0.7);
+                            let checked = ui_state
+                                .simulation_energy_checked
+                                .entry(*species)
+                                .or_insert(true);
+                            ui.checkbox(
+                                checked,
+                                RichText::new(format!(
+                                    "{} {}",
+                                    stats.name, ecosystem.population[species]
+                                ))
+                                .color(color),
+                            );
+                            if *checked {
+                                plot_lines.push(
+                                    egui_plot::Line::new(
+                                        stats
+                                            .accumulation
+                                            .iter()
+                                            .map(|(step, stat)| [*step as f64, stat.size as f64])
+                                            .collect::<Vec<_>>(),
+                                    )
+                                    .color(color),
                                 );
-                                if *checked {
-                                    plot_lines.push(
-                                        egui_plot::Line::new(
-                                            stats
-                                                .accumulation
-                                                .iter()
-                                                .map(|(step, stat)| {
-                                                    [*step as f64, stat.size as f64]
-                                                })
-                                                .collect::<Vec<_>>(),
-                                        )
-                                        .color(color),
-                                    );
-                                }
                             }
                         }
                         if plot_lines.is_empty() {

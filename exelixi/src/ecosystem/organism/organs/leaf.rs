@@ -26,12 +26,13 @@ impl EnergyActor for Leaf {
     }
 }
 
-pub fn leaf_lifecycle(mut commands: Commands, mut leaves: Query<(Entity, &mut Leaf)>) {
-    for (entity, mut leaf) in leaves.iter_mut() {
+pub fn leaf_processing(mut leaves: Query<&mut Leaf>) {
+    for mut leaf in leaves.iter_mut() {
         if leaf.lifetime > 1 {
-            leaf.lifetime -= 1
-        } else {
-            commands.entity(entity).remove::<Leaf>();
+            leaf.lifetime -= 1;
+            if leaf.lifetime == 0 {
+                leaf.energy_production = 0.0;
+            }
         }
     }
 }

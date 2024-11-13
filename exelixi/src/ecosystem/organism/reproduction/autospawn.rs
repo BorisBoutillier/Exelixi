@@ -3,7 +3,7 @@ use crate::ecosystem::*;
 pub fn auto_spawning(
     ecosystem_config: Res<EcosystemConfig>,
     mut rng: ResMut<GlobalEntropy<WyRand>>,
-    mut spawn_events: EventWriter<SpawnOrganismEvent>,
+    mut organisms_lifecycle: ResMut<OrganismsLifecycle>,
     kdtree: Res<OrganismKdTree>,
 ) {
     let half_width = ecosystem_config.environment.width / 2;
@@ -54,7 +54,7 @@ pub fn auto_spawning(
                         }
                     }
                 }
-                spawn_events.send(SpawnOrganismEvent {
+                organisms_lifecycle.births.push(OrganismBirth {
                     species: config.id,
                     position: pos,
                     energy: None,

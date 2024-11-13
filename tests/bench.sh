@@ -2,7 +2,8 @@
 PFX=${1}
 TIME=`date +%y-%m-%d-%H:%M:%S`
 COMMIT=`git log --format="%h" -n 1`
-SAVE="saves/bench-${PFX}-${TIME}-${COMMIT}.txt"
+BASENAME="bench-${PFX}-${TIME}-${COMMIT}.txt"
+SAVE="./saves/${BASENAME}"
 ERRORS=0
 cargo build --release
 echo "-----------"
@@ -20,10 +21,11 @@ do
         fi
     } 2>> ${SAVE}
 done
+ln -sf ${BASENAME} saves/last_bench.txt
 echo "-----------"
 echo "Bench result saved to ${SAVE}"
 if [ ${ERRORS} != 0 ]; then
-echo "--> ERRORS: ${ERRORS}, see save"
+echo "--> ERRORS: ${ERRORS}, see ./saves/last_bench.txt"
 else
 echo "--> OK"
 fi

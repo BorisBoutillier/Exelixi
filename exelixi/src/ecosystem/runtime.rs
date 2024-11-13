@@ -55,7 +55,7 @@ pub fn initialize_on_new_config(mut commands: Commands, config: Res<EcosystemCon
 // If under the minimum, create random organism of this species, at a random position.
 pub fn ensure_minimum_population(
     organisms: Query<&Organism>,
-    mut spawn_events: EventWriter<SpawnOrganismEvent>,
+    mut organism_lives: ResMut<OrganismsLifecycle>,
     ecosystem: ResMut<EcosystemRuntime>,
     ecosystem_config: Res<EcosystemConfig>,
 ) {
@@ -73,7 +73,7 @@ pub fn ensure_minimum_population(
             ecosystem_config.species[species].name
         );
         for _ in population..ecosystem_config.species[species].minimum_population {
-            spawn_events.send(SpawnOrganismEvent {
+            organism_lives.births.push(OrganismBirth {
                 species: *species,
                 position: None,
                 energy: None,

@@ -1,11 +1,11 @@
+mod lifecycle;
 mod organs;
 mod reproduction;
-mod spawn;
 
 use crate::ecosystem::*;
+pub use lifecycle::*;
 pub use organs::*;
 pub use reproduction::*;
-pub use spawn::*;
 
 #[derive(Component, Reflect, Default, Debug)]
 #[reflect(Component)]
@@ -40,7 +40,7 @@ impl Organism {
     }
 }
 
-pub fn aging(mut organisms: Query<&mut Organism>) {
+pub fn organism_aging(mut organisms: Query<&mut Organism>) {
     for mut organism in organisms.iter_mut() {
         organism.tick();
     }

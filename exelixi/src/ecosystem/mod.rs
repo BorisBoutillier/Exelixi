@@ -46,7 +46,7 @@ impl Plugin for EcosystemPlugin {
             .register_component_as::<dyn EnergyActor, Locomotion>()
             .register_component_as::<dyn EnergyActor, Mouth>()
             .register_component_as::<dyn EnergyActor, Uterus>();
-        app.add_event::<SpawnOrganismEvent>();
+        app.insert_resource(OrganismsLifecycle::default());
         app.register_type::<SpeciesId>()
             .register_type::<CellSensors>()
             .register_type::<Position>()

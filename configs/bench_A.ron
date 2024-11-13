@@ -7,6 +7,7 @@
 ,   species: [
         (
             name : "Herbivore"
+        ,   minimum_population : 2
         ,   eye: Some(EyeConfig (
                 fov_angle: Fixed(3.14)
             ,   fov_range: Fixed(100)

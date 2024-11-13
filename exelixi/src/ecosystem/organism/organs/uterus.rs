@@ -30,7 +30,7 @@ impl EnergyActor for Uterus {
 // Each organism uterus will try to catch the chromosome of the closest
 // organism of the same species within mating_distance.
 // This mating is currently instantaneous and does not impact in any way the other organism
-pub fn mating(
+pub fn uterus_processing(
     config: Res<EcosystemConfig>,
     mut uteruses: Query<(Entity, &Position, &Organism, &mut Uterus)>,
     organisms: Query<(&Body, &Brain, Option<&Eye>)>,

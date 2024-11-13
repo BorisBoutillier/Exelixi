@@ -4,6 +4,8 @@
 -- Short term:
   - Uterus organ.
   - Birth reproduction.
+  - Allow to run for a single step ( in GUI)
+  - Allow to override on command-line the accumulation steps and accumulation start.
 --- Ecosystem
 - ECS:
   - Add support for Simulation config auto-saving to a directory, with directory and save rate configurable.

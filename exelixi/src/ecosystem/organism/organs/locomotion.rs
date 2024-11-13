@@ -68,7 +68,7 @@ impl Actuator for Locomotion {
     }
 }
 
-pub fn locomotion_movement(
+pub fn locomotion_processing(
     mut movables: Query<(&mut Position, &Locomotion)>,
     config: Res<EcosystemConfig>,
 ) {

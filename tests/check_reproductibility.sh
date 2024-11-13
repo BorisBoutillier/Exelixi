@@ -1,8 +1,8 @@
 ERRORS=0
 SEED=0
-STEPS_A=10000
-STEPS_B=10000
-STEPS_C=20000
+STEPS_A=50000
+STEPS_B=50000
+STEPS_C=100000
 PROFILE="--release"
 export CARGO_MANIFEST_DIR=`pwd`/exelixi
 mkdir saves/reproductibility
