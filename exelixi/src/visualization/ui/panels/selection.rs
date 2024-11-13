@@ -30,6 +30,7 @@ pub fn ui_selection(
                                 .color(species_color),
                         );
                     });
+                    ui.label(format!("Age: {}", organism.age()));
                     CollapsingHeader::new("Position")
                         .default_open(false)
                         .show(ui, |ui| {

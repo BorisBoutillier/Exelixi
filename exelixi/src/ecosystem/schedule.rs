@@ -9,6 +9,7 @@ impl EcosystemSchedule {
         let mut schedule = Schedule::new(EcosystemSchedule);
         schedule.add_systems(
             (
+                aging,
                 ensure_minimum_population,
                 spawn_organism,
                 statistics_accumulation,
