@@ -21,14 +21,10 @@ impl GenerationEvolutions {
     pub fn new(config: &EcosystemConfig) -> Self {
         let mut per_species = BTreeMap::new();
         for (species_id, organism_config) in config.species.iter() {
-            if let ReproductionConfig::GenerationEvolution {
-                generation_length: _,
-                fertility_rate: _,
-                mutation_chance: _,
-                mutation_amplitude: _,
-                child_spawn_distance: _,
-            } = organism_config.reproduction
-            {
+            if matches!(
+                organism_config.reproduction,
+                ReproductionConfig::GenerationEvolution { .. }
+            ) {
                 per_species.insert(*species_id, GenerationEvolution::new(organism_config));
             }
         }
