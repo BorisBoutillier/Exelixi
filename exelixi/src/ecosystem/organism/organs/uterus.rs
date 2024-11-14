@@ -11,7 +11,7 @@ pub struct Uterus {
     // The Chromosome of the latest individual this organism
     // has mated with.
     // None while we have not yet mated, or we have given birth.
-    chromosome: Option<Chromosome>,
+    pub chromosome: Option<Chromosome>,
 }
 impl Uterus {
     pub fn new(config: &UterusConfig) -> Self {

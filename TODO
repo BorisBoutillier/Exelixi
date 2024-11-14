@@ -1,9 +1,9 @@
 -- Bugs
    with default cargo run, in GUI, a food blink at the exact middle of environment.
   . Reproductibility issues remains.
+  . Uterus processing bug with HerbivoreCarnivoteFullEye -> panic!
+  . Missing check that a config for an organism with Birth has an Uterus
 -- Short term:
-  - Uterus organ.
-  - Birth reproduction.
   - Allow to run for a single step ( in GUI)
   - Allow to override on command-line the accumulation steps and accumulation start.
 --- Ecosystem

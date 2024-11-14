@@ -25,7 +25,14 @@ impl EcosystemSchedule {
                 leaf_processing,
                 brain_processing,
                 (body_processing, organism_lifecycle, apply_deferred).chain(),
-                (evolve, auto_spawning, organism_lifecycle, apply_deferred).chain(),
+                (
+                    evolve,
+                    auto_spawning,
+                    reproduction_birth,
+                    organism_lifecycle,
+                    apply_deferred,
+                )
+                    .chain(),
             )
                 .chain(),
         );

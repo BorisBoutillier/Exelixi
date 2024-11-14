@@ -1,8 +1,10 @@
 mod autospawn;
+mod birth;
 mod generation;
 mod individual;
 
 pub use autospawn::*;
+pub use birth::*;
 pub use generation::*;
 pub use individual::*;
 

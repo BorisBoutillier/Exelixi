@@ -21,4 +21,15 @@ pub enum ReproductionConfig {
         #[serde(default)]
         child_spawn_distance: Option<f32>,
     },
+    Birth {
+        // Minimum age for an organism to give birth.
+        minimum_age: u32,
+        // Minimum energy % for the parent to give birth.
+        minimum_energy_pct: f32,
+        // Energy percentage transferred from the parent to the newly born.
+        // A more energetic parent will transfer more energy to its child.
+        child_energy_pct: f32,
+        mutation_chance: f32,
+        mutation_amplitude: f32,
+    },
 }

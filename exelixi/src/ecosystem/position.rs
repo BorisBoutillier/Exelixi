@@ -30,6 +30,10 @@ impl Position {
             self.angle
         );
     }
+    pub fn with_random_angle(mut self, rng: &mut dyn RngCore) -> Position {
+        self.angle = rng.gen_range(-PI..PI);
+        self
+    }
     pub fn distance_squared(&self, other: &Position) -> f32 {
         (self.x - other.x).powi(2) + (self.y - other.y).powi(2)
     }
