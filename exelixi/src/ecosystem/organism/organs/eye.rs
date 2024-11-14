@@ -144,8 +144,13 @@ impl Eye {
                 let sector = (sector as usize).min(self.n_sectors - 1);
 
                 let distance_pct = (self.fov_range - distance_squared.sqrt()) / self.fov_range;
-                let &(other_distance_pct, _, _) = closest_per_cell[sector].get(species).unwrap();
-                if distance_pct > other_distance_pct {
+                let &(other_distance_pct, other_energy_pct, other_hue) =
+                    closest_per_cell[sector].get(species).unwrap();
+                // In case of identical distance, we want to see the highest energy pct organism.
+                // and also compare hue for reproductibility
+                if (distance_pct, organism_energy_pct, organism_hue)
+                    > (other_distance_pct, other_energy_pct, other_hue)
+                {
                     closest_per_cell[sector]
                         .insert(*species, (distance_pct, organism_energy_pct, organism_hue));
                 }
