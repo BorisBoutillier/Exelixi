@@ -81,15 +81,21 @@ impl EcosystemConfig {
         let mut min_generation_length = u32::MAX;
         for species in species.values_mut() {
             species.update(&species_name_to_id);
+
             if let ReproductionConfig::GenerationEvolution {
-                generation_length,
-                fertility_rate: _,
-                mutation_chance: _,
-                mutation_amplitude: _,
-                child_spawn_distance: _,
+                generation_length, ..
             } = species.reproduction
             {
                 min_generation_length = min_generation_length.min(generation_length);
+            }
+            // Check that reproduction by Birth has an Uterus
+            if matches!(species.reproduction, ReproductionConfig::Birth { .. })
+                && species.uterus.is_none()
+            {
+                panic!(
+                    "Invalid configuration: Species {} has a Birth reproduction but no Uterus",
+                    species.name
+                );
             }
         }
         let statistics_aggregation_rate =
