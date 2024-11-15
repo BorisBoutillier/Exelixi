@@ -4,7 +4,6 @@
   . Uterus processing bug with HerbivoreCarnivoteFullEye -> panic!
 -- Short term:
   - Allow to run for a single step ( in GUI)
-  - Allow to override on command-line the accumulation steps and accumulation start.
   - Center around Chromosome instead of Individual.
   - Try to make Chromosome extraction and Organism building independent of Organ with Chromosome, through traits
   - Make Organ GUI display a trait, so as GUI can be agnostics to number of organs.

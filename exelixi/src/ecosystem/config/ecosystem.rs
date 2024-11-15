@@ -114,6 +114,19 @@ impl EcosystemConfig {
             statistics_aggregation_start,
         }
     }
+    pub fn with_statistics_aggregation_override(
+        mut self,
+        start: Option<u32>,
+        rate: Option<u32>,
+    ) -> Self {
+        if let Some(start) = start {
+            self.statistics_aggregation_start = start;
+        }
+        if let Some(rate) = rate {
+            self.statistics_aggregation_rate = rate;
+        }
+        self
+    }
     pub fn get_egui_color(
         &self,
         species_id: &SpeciesId,

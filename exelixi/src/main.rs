@@ -46,6 +46,12 @@ struct Args {
     /// When set, no GUI is open and program exist after doing the possible load/run_for/save commands.
     #[arg(long)]
     exit: bool,
+    /// When defined override configuration statistics_aggregation_start value
+    #[arg(long)]
+    stats_start: Option<u32>,
+    /// When defined override configuration statistics_aggregation_rate value
+    #[arg(long)]
+    stats_rate: Option<u32>,
 }
 
 fn main() {
@@ -60,6 +66,8 @@ fn main() {
     app.add_plugins(ecosystem::EcosystemPlugin {
         seed: args.seed,
         config_path: args.config,
+        override_stats_start: args.stats_start,
+        override_stats_rate: args.stats_rate,
     });
     app.add_plugins(simulation::SimulationPlugin {
         load_path: args.load,

@@ -30,6 +30,8 @@ use std::path::PathBuf;
 pub struct EcosystemPlugin {
     pub seed: Option<u64>,
     pub config_path: Option<PathBuf>,
+    pub override_stats_start: Option<u32>,
+    pub override_stats_rate: Option<u32>,
 }
 impl Plugin for EcosystemPlugin {
     fn build(&self, app: &mut App) {
@@ -74,7 +76,11 @@ impl Plugin for EcosystemPlugin {
             .register_type::<Vec<nn::Neuron>>()
             .register_type::<Vec<f32>>();
 
-        let ecosystem_config = EcosystemConfig::from_path(self.config_path.clone());
+        let ecosystem_config = EcosystemConfig::from_path(self.config_path.clone())
+            .with_statistics_aggregation_override(
+                self.override_stats_start,
+                self.override_stats_rate,
+            );
         app.insert_resource(EcosystemRuntime::new(&ecosystem_config));
         app.insert_resource(EcosystemStatistics::new(&ecosystem_config));
         app.insert_resource(GenerationEvolutions::new(&ecosystem_config));
