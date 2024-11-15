@@ -30,7 +30,7 @@ pub trait MutationMethod: Send + Sync {
     fn mutate(&self, rng: &mut dyn RngCore, chromosome: &mut Chromosome);
 }
 
-#[derive(Clone, Default, Reflect)]
+#[derive(Clone, Default, Reflect, Debug)]
 pub struct Chromosome {
     genes: Vec<f32>,
 }

@@ -1,21 +1,14 @@
-use lib_genetic_algorithm::{CrossoverMethod, Individual, MutationMethod};
+use lib_genetic_algorithm::{CrossoverMethod, MutationMethod};
 
 use crate::ecosystem::*;
 
 pub fn reproduction_birth(
-    mut organisms: Query<(
-        &Organism,
-        &Position,
-        &mut Body,
-        &mut Uterus,
-        Option<&Eye>,
-        &Brain,
-    )>,
+    mut organisms: Query<(&Organism, &Position, &mut Body, &mut Uterus)>,
     ecosystem_config: Res<EcosystemConfig>,
     mut rng: ResMut<GlobalEntropy<WyRand>>,
     mut organisms_lifecycle: ResMut<OrganismsLifecycle>,
 ) {
-    for (organism, position, mut body, mut uterus, eye, brain) in organisms.iter_mut() {
+    for (organism, position, mut body, mut uterus) in organisms.iter_mut() {
         let config = &ecosystem_config.species[&organism.species];
         if let ReproductionConfig::Birth {
             minimum_age,
@@ -27,14 +20,12 @@ pub fn reproduction_birth(
         {
             if organism.age >= minimum_age && body.energy_pct() >= minimum_energy_pct {
                 if let Some(other_chromosome) = uterus.chromosome.take() {
-                    let individual =
-                        OrganismIndividual::from_components(config, &body, &eye, brain);
                     let crossover_method = ga::UniformCrossover;
                     let mutation_method =
                         ga::GaussianMutation::new(mutation_chance, mutation_amplitude);
                     let mut child_chromosome = crossover_method.crossover(
                         &mut *rng,
-                        individual.chromosome(),
+                        &organism.chromosome,
                         &other_chromosome,
                     );
                     mutation_method.mutate(&mut *rng, &mut child_chromosome);
@@ -46,7 +37,7 @@ pub fn reproduction_birth(
                         species: organism.species,
                         position: Some(child_position),
                         energy: Some(child_energy),
-                        chromosome: Some(child_chromosome),
+                        chromosome: child_chromosome,
                     });
                 }
             }

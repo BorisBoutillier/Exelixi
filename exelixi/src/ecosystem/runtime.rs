@@ -1,5 +1,7 @@
 use std::collections::BTreeMap;
 
+use lib_genetic_algorithm::Chromosome;
+
 use crate::ecosystem::*;
 
 #[derive(Resource, Reflect, Serialize, Deserialize)]
@@ -77,7 +79,7 @@ pub fn ensure_minimum_population(
                 species: *species,
                 position: None,
                 energy: None,
-                chromosome: None,
+                chromosome: Chromosome::default(),
             });
         }
     }

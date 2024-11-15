@@ -2,6 +2,7 @@ mod lifecycle;
 mod organs;
 mod reproduction;
 
+use lib_genetic_algorithm::Chromosome;
 pub use lifecycle::*;
 pub use organs::*;
 pub use reproduction::*;
@@ -13,13 +14,17 @@ use crate::ecosystem::*;
 pub struct Organism {
     // Identifier of the species of this organism
     pub species: SpeciesId,
-    // Age in ticks since spawning of this organism
+    // Chromosome used to create this organism
+    // This can be an empty Chromosome for species without reproduction.
+    pub chromosome: Chromosome,
+    // Time in ticks since spawning of this organism
     pub age: u32,
 }
 impl Organism {
-    pub fn new(config: &SpeciesConfig) -> Self {
+    pub fn new(species: SpeciesId, chromosome: Chromosome) -> Self {
         Self {
-            species: config.id,
+            species,
+            chromosome,
             age: 0,
         }
     }

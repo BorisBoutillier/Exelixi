@@ -76,7 +76,7 @@ pub fn evolve(
                         species: state.config.id,
                         position: Some(position),
                         energy: Some(evolve_energy),
-                        chromosome: Some(individual.chromosome().clone()),
+                        chromosome: individual.chromosome().clone(),
                     });
                 });
         }

@@ -1,4 +1,4 @@
-use lib_genetic_algorithm::{Chromosome, Individual};
+use lib_genetic_algorithm::Chromosome;
 
 use crate::ecosystem::*;
 
@@ -31,9 +31,8 @@ impl EnergyActor for Uterus {
 // organism of the same species within mating_distance.
 // This mating is currently instantaneous and does not impact in any way the other organism
 pub fn uterus_processing(
-    config: Res<EcosystemConfig>,
     mut uteruses: Query<(Entity, &Position, &Organism, &mut Uterus)>,
-    organisms: Query<(&Body, &Brain, Option<&Eye>)>,
+    organisms: Query<&Organism>,
     kdtree: Res<OrganismKdTree>,
 ) {
     for (entity, position, organism, mut uterus) in uteruses.iter_mut() {
@@ -43,19 +42,8 @@ pub fn uterus_processing(
         if let Some(nearest) = nearests.iter().find(|n| {
             n.item.entity != entity && n.squared_distance <= uterus.mating_distance.powi(2)
         }) {
-            let other = nearest.item.entity;
-            let (other_body, other_brain, other_eye) =
-                organisms.get(other).expect("Mating organism without Body");
-            uterus.chromosome = Some(
-                OrganismIndividual::from_components(
-                    &config.species[&organism.species],
-                    other_body,
-                    &other_eye,
-                    other_brain,
-                )
-                .chromosome()
-                .clone(),
-            );
+            let mate = organisms.get(nearest.item.entity).unwrap();
+            uterus.chromosome = Some(mate.chromosome.clone());
         }
     }
 }

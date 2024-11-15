@@ -1,3 +1,5 @@
+use lib_genetic_algorithm::Chromosome;
+
 use crate::ecosystem::*;
 
 pub fn auto_spawning(
@@ -52,7 +54,7 @@ pub fn auto_spawning(
                     species: config.id,
                     position: pos,
                     energy: None,
-                    chromosome: None,
+                    chromosome: Chromosome::default(),
                 });
             }
         }
