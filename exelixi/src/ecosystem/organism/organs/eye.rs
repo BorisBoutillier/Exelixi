@@ -187,6 +187,7 @@ impl Sensor for Eye {
 }
 
 pub fn eye_processing(
+    ecosystem_config: Res<EcosystemConfig>,
     mut organisms_with_eye: Query<(&mut Eye, &Position)>,
     kdtree: Res<OrganismKdTree>,
     organisms: Query<(&Organism, &Body)>,
@@ -201,7 +202,13 @@ pub fn eye_processing(
             ) {
                 // Organism in the KdTree can have been eaten within this step
                 if let Ok((organism, body)) = organisms.get(entry.entity) {
-                    details.push((&entry.position, body.energy_pct(), organism.hue))
+                    details.push((
+                        &entry.position,
+                        body.energy_pct(),
+                        ecosystem_config.species[&organism.species]
+                            .visualization
+                            .hue,
+                    ))
                 }
             }
             visible.insert(*species, details);

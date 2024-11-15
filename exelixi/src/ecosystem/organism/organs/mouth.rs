@@ -68,7 +68,7 @@ pub fn mouth_processing(
     // We store the energy of each eaten organism before applying any mouth eating
     // so that eaten energy is independent of order of mouth eating.
     let food_energy = HashMap::<Entity, f32>::from_iter(
-        foods.keys().map(|e| (*e, bodies.get(*e).unwrap().energy())),
+        foods.keys().map(|e| (*e, bodies.get(*e).unwrap().energy)),
     );
     for (food_entity, mut food_eaters) in foods.into_iter() {
         food_eaters.sort_by(|(d1, _), (d2, _)| d1.partial_cmp(d2).unwrap());

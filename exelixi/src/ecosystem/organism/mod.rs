@@ -13,9 +13,6 @@ use crate::ecosystem::*;
 pub struct Organism {
     // Identifier of the species of this organism
     pub species: SpeciesId,
-    // Hue of this organism.
-    // Must be coherent with name as per Ecosystem config.
-    pub hue: f32,
     // Age in ticks since spawning of this organism
     pub age: u32,
 }
@@ -23,7 +20,6 @@ impl Organism {
     pub fn new(config: &SpeciesConfig) -> Self {
         Self {
             species: config.id,
-            hue: config.visualization.hue,
             age: 0,
         }
     }

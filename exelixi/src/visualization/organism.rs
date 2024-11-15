@@ -23,7 +23,7 @@ pub fn show_organism(
         commands.entity(entity).insert(SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(visualization_config.sprite_size.into()),
-                color: Color::hsl(organism.hue, 0.8, 0.5),
+                color: Color::hsl(visualization_config.hue, 0.8, 0.5),
                 ..Default::default()
             },
             texture: asset_server.load(visualization_config.sprite_file.clone()),

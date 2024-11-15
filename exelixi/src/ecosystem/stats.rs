@@ -119,7 +119,7 @@ pub fn accumulate_statistics(
             .get_mut(&organism.species)
             .expect("Found an Organism with a SpeciesId not in EcosystemRuntime.generation");
         stat.size += 1;
-        stat.energy_total += body.energy();
+        stat.energy_total += body.energy;
         stat.total_position_x += position.x;
         stat.total_position_y += position.y;
     }

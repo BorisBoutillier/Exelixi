@@ -38,10 +38,10 @@ pub fn reproduction_birth(
                         &other_chromosome,
                     );
                     mutation_method.mutate(&mut *rng, &mut child_chromosome);
-                    let child_energy = body.energy() * child_energy_pct;
+                    let child_energy = body.energy * child_energy_pct;
                     let child_position = (*position).with_random_angle(&mut *rng);
-                    let parent_energy = body.energy() - child_energy;
-                    body.set_energy(parent_energy);
+                    let parent_energy = body.energy - child_energy;
+                    body.energy = parent_energy;
                     organisms_lifecycle.births.push(OrganismBirth {
                         species: organism.species,
                         position: Some(child_position),

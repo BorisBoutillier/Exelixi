@@ -41,7 +41,7 @@ pub fn ui_selection(
                         .default_open(true)
                         .show(ui, |ui| {
                             ui.horizontal(|ui| {
-                                ui.label(format!("Energy: {}", body.energy()));
+                                ui.label(format!("Energy: {}", body.energy));
                                 ui.small(format!("[{:2.0}%]", body.energy_pct() * 100.0));
                             });
                         });

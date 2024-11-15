@@ -37,7 +37,7 @@ impl OrganismIndividual {
         chromosome.extend(brain_chromosome);
         //println!("  -> {}", eye_chromosome.len());
         Self {
-            energy: body.energy(),
+            energy: body.energy,
             chromosome,
         }
     }

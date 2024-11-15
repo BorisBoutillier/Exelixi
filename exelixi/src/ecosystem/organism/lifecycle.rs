@@ -69,7 +69,7 @@ pub fn organism_lifecycle(
             };
             let (mut body, eye, locomotion, brain) = individual.into_components(config);
             if let Some(energy) = &birth.energy {
-                body.set_energy(*energy);
+                body.energy = *energy;
             }
             command.insert((body, brain));
             if let Some(locomotion) = locomotion {
@@ -81,7 +81,7 @@ pub fn organism_lifecycle(
         } else {
             let mut body = Body::new(&config.body);
             if let Some(energy) = &birth.energy {
-                body.set_energy(*energy);
+                body.energy = *energy;
             }
             command.insert(body);
         }

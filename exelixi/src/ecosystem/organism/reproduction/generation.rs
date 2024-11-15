@@ -23,7 +23,7 @@ pub fn evolve(
             let total_energy = organisms
                 .iter()
                 .filter(|(_, organism, _, _, _, _)| &organism.species == species)
-                .map(|(_, _, _, b, _, _)| b.energy())
+                .map(|(_, _, _, b, _, _)| b.energy)
                 .sum::<f32>();
             let current_positions = organisms
                 .iter()
