@@ -10,7 +10,6 @@ pub enum ReproductionConfig {
         minimum_distance_from_eater: f32,
     },
     GenerationEvolution {
-        // Number of child one surviving organism spawn in next generation
         generation_length: u32,
         // Number of child one surviving organism spawn in next generation
         fertility_rate: f32,

@@ -11,7 +11,7 @@ pub fn selection_changed(
 ) {
     for entity in deselected.read() {
         if let Ok((mut sprite, organism)) = organisms_sprite.get_mut(entity) {
-            sprite.color = sprite.color.with_hue(organism.hue());
+            sprite.color = sprite.color.with_hue(organism.hue);
         }
     }
     for entity in selected.iter() {

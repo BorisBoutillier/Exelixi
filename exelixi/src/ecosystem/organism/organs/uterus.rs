@@ -37,10 +37,9 @@ pub fn uterus_processing(
     kdtree: Res<OrganismKdTree>,
 ) {
     for (entity, position, organism, mut uterus) in uteruses.iter_mut() {
-        let species = organism.species();
         // Look for two nearest to position, as we will get ourself.
         let nearests =
-            kdtree.per_species[&species].nearests(&KdTreeEntry::new(position, entity), 2);
+            kdtree.per_species[&organism.species].nearests(&KdTreeEntry::new(position, entity), 2);
         if let Some(nearest) = nearests.iter().find(|n| {
             n.item.entity != entity && n.squared_distance <= uterus.mating_distance.powi(2)
         }) {
@@ -49,7 +48,7 @@ pub fn uterus_processing(
                 organisms.get(other).expect("Mating organism without Body");
             uterus.chromosome = Some(
                 OrganismIndividual::from_components(
-                    &config.species[&species],
+                    &config.species[&organism.species],
                     other_body,
                     &other_eye,
                     other_brain,

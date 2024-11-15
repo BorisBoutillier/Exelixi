@@ -47,7 +47,7 @@ pub fn build_organism_kdtree(
         .collect::<BTreeMap<_, _>>();
     for (entity, organism, position) in organisms.iter() {
         per_species
-            .entry(organism.species())
+            .entry(organism.species)
             .and_modify(|v| v.push(KdTreeEntry::new(position, entity)));
     }
     organism_kdtree.per_species.clear();

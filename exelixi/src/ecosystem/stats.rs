@@ -116,7 +116,7 @@ pub fn accumulate_statistics(
     }
     for (organism, body, position) in organisms.iter() {
         let stat = current_stats
-            .get_mut(&organism.species())
+            .get_mut(&organism.species)
             .expect("Found an Organism with a SpeciesId not in EcosystemRuntime.generation");
         stat.size += 1;
         stat.energy_total += body.energy();

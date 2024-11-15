@@ -22,17 +22,17 @@ pub fn evolve(
             });
             let total_energy = organisms
                 .iter()
-                .filter(|(_, organism, _, _, _, _)| &organism.species() == species)
+                .filter(|(_, organism, _, _, _, _)| &organism.species == species)
                 .map(|(_, _, _, b, _, _)| b.energy())
                 .sum::<f32>();
             let current_positions = organisms
                 .iter()
-                .filter(|(_, organism, _, _, _, _)| &organism.species() == species)
+                .filter(|(_, organism, _, _, _, _)| &organism.species == species)
                 .map(|(_, _, p, _, _, _)| p)
                 .collect::<Vec<_>>();
             let current_individuals = organisms
                 .iter()
-                .filter(|(_, organism, _, _, _, _)| &organism.species() == species)
+                .filter(|(_, organism, _, _, _, _)| &organism.species == species)
                 .map(|(entity, _, _, body, brain, eye)| {
                     organisms_lifecycle.add_death(*entity);
                     OrganismIndividual::from_components(&state.config, body, eye, brain)

@@ -20,8 +20,8 @@ pub fn ui_selection(
             if ui_state.selection_open {
                 if let Ok((entity, organism, position, body, eye)) = selection.get_single() {
                     let species_color =
-                        ecosystem_config.get_egui_color(&organism.species(), 1.0, 0.7);
-                    let species_name = ecosystem_config.get_species_name(&organism.species());
+                        ecosystem_config.get_egui_color(&organism.species, 1.0, 0.7);
+                    let species_name = ecosystem_config.get_species_name(&organism.species);
                     ui.horizontal(|ui| {
                         ui.label(RichText::new(species_name).color(species_color));
                         ui.label(
@@ -30,7 +30,7 @@ pub fn ui_selection(
                                 .color(species_color),
                         );
                     });
-                    ui.label(format!("Age: {}", organism.age()));
+                    ui.label(format!("Age: {}", organism.age));
                     CollapsingHeader::new("Position")
                         .default_open(false)
                         .show(ui, |ui| {

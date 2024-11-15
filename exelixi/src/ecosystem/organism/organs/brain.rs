@@ -11,44 +11,34 @@ pub struct Brain {
 }
 
 impl Brain {
-    pub fn random(
-        rng: &mut dyn RngCore,
-        body: &Body,
-        eye: &Option<&Eye>,
-        locomotion: &Option<&Locomotion>,
-    ) -> Self {
+    pub fn random(rng: &mut dyn RngCore, n_sensors: usize, n_actuators: usize) -> Self {
         Self {
-            nn: nn::Network::random(rng, &Self::topology(body, eye, locomotion)),
+            nn: nn::Network::random(rng, &Self::topology(n_sensors, n_actuators)),
         }
     }
 
     pub fn from_genes(
         genes: impl IntoIterator<Item = f32>,
-        body: &Body,
-        eye: &Option<&Eye>,
-        locomotion: &Option<&Locomotion>,
+        n_sensors: usize,
+        n_actuators: usize,
     ) -> Self {
         Self {
-            nn: nn::Network::from_weights(&Self::topology(body, eye, locomotion), genes),
+            nn: nn::Network::from_weights(&Self::topology(n_sensors, n_actuators), genes),
         }
     }
     pub fn as_chromosome(&self) -> ga::Chromosome {
         self.nn.weights().collect()
     }
 
-    fn topology(
-        body: &Body,
-        eye: &Option<&Eye>,
-        locomotion: &Option<&Locomotion>,
-    ) -> [nn::LayerTopology; 3] {
-        let mut n_sensors = body.n_sensors();
-        if let Some(eye) = eye {
-            n_sensors += eye.n_sensors();
-        }
-        let mut n_actuators = 0;
-        if let Some(locomotion) = locomotion {
-            n_actuators += locomotion.n_actuators();
-        }
+    fn topology(n_sensors: usize, n_actuators: usize) -> [nn::LayerTopology; 3] {
+        //let mut n_sensors = body.n_sensors();
+        //if let Some(eye) = eye {
+        //    n_sensors += eye.n_sensors();
+        //}
+        //let mut n_actuators = 0;
+        //if let Some(locomotion) = locomotion {
+        //    n_actuators += locomotion.n_actuators();
+        //}
         [
             nn::LayerTopology { neurons: n_sensors },
             nn::LayerTopology {

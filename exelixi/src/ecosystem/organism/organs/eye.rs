@@ -201,7 +201,7 @@ pub fn eye_processing(
             ) {
                 // Organism in the KdTree can have been eaten within this step
                 if let Ok((organism, body)) = organisms.get(entry.entity) {
-                    details.push((&entry.position, body.energy_pct(), organism.hue()))
+                    details.push((&entry.position, body.energy_pct(), organism.hue))
                 }
             }
             visible.insert(*species, details);

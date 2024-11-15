@@ -48,7 +48,7 @@ pub fn organism_lifecycle(
 ) {
     for &entity in std::mem::take(&mut lifecycle.deaths).iter() {
         let organism = organisms.get(entity).expect("Death of a non-Organism");
-        ecosystem.decrease_population(&organism.species());
+        ecosystem.decrease_population(&organism.species);
         commands.entity(entity).despawn_recursive();
     }
     for birth in std::mem::take(&mut lifecycle.births).iter() {

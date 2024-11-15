@@ -61,8 +61,8 @@ pub fn ensure_minimum_population(
 ) {
     let mut counts = BTreeMap::new();
     for organism in organisms.iter() {
-        *counts.entry(organism.species()).or_insert(0) += 1;
-        assert!(ecosystem.population.contains_key(&organism.species()))
+        *counts.entry(organism.species).or_insert(0) += 1;
+        assert!(ecosystem.population.contains_key(&organism.species))
     }
     for (species, &population) in ecosystem.population.iter() {
         assert_eq!(
